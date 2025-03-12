@@ -1,0 +1,66 @@
+/* ✅ Centrer le formulaire */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Pleine hauteur de l'écran */
+    background: linear-gradient(135deg, #f0f2f5, #d6dbe0);
+}
+
+/* ✅ Carte de connexion */
+.login-card {
+    width: 400px;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    text-align: center;
+}
+
+/* ✅ Logo Telnet */
+.logo-telnet {
+    width: 150px; /* Ajuste la taille du logo */
+    display: block;
+    margin: 0 auto 10px auto; /* Centrage et espacement */
+}
+
+/* ✅ Styles du titre */
+h2 {
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* ✅ Styles des champs */
+.form-control {
+    border-radius: 5px;
+    padding: 10px;
+}
+
+/* ✅ Bouton de connexion */
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    font-weight: bold;
+    padding: 10px;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* ✅ Liens stylisés */
+.forgot-password, .register-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.forgot-password:hover, .register-link:hover {
+    text-decoration: underline;
+}
+
+/* ✅ Checkbox "Se souvenir de moi" */
+.form-check-label {
+    font-size: 14px;
+}

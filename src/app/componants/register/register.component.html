@@ -1,0 +1,55 @@
+  <!-- <div class="register-container">
+    // ✅ Formulaire stylisé 
+    <div class="register-card">
+         // ✅ Logo Telnet 
+    <div class="logo-container">
+        <img src="../../../assets/img/telnet-logo.jpg" alt="Telnet Logo">
+    </div>
+        // <h4><i class="fas fa-user-plus"></i> Créer un compte</h4>
+
+        <form [formGroup]="registerForm" (ngSubmit)="register()">
+            
+            <div class="name-container">
+                <div class="form-group">
+                    <label for="firstname" class="form-label"><i class="fas fa-user"></i> First Name</label>
+                    <input type="text" id="firstname" class="form-control" placeholder="Enter your first name" formControlName="firstname" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="lastname" class="form-label"><i class="fas fa-user"></i> Last Name</label>
+                    <input type="text" id="lastname" class="form-control" placeholder="Enter your last name" formControlName="lastname" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="email" class="form-control" placeholder="Enter your email" formControlName="email" required>
+            </div>
+            <div class="name-container">
+            <div class="form-group">
+                <label for="password" class="form-label"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="password" class="form-control" placeholder="Enter your password" formControlName="password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword" class="form-label"><i class="fas fa-lock"></i> Confirm Password</label>
+                <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" formControlName="confirmPassword" required>
+            </div>
+</div>
+            <div class="form-group">
+                <label for="role" class="form-label"><i class="fas fa-user-tag"></i> Role</label>
+                <select class="form-select" id="role" formControlName="role">
+                    <option value="" selected disabled>Select your role</option>
+                    <option value="USER">User</option>
+                    <option value="ADMIN">Admin</option>
+                    <option value="MANAGER">Manager</option>
+                </select>
+            </div>
+
+            <button type="submit" [disabled]="registerForm.invalid">Sign Up</button>
+
+            <p>Already have an account? <a routerLink="/login">Login</a></p>
+        </form>
+    </div>
+</div>
+-->

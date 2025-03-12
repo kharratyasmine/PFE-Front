@@ -1,0 +1,127 @@
+<div class="container">
+    <h2 class="text-center mt-3">👥 Liste des Membres d'Équipe</h2>
+</div>
+
+
+<!-- Barre de recherche -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <input type="text" class="form-control w-50" placeholder="🔍 Rechercher un membre..."
+        (input)="searchMemberByName($event)">
+    <div>
+        <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
+            <i class="fas fa-download"></i> Exporter
+        </button>
+        <button class="btn btn-primary" (click)="openModal()">
+            <i class="fas fa-user-plus"></i> Ajouter un Membre
+        </button>
+    </div>
+</div>
+
+<!-- Tableau des membres d'équipe -->
+<table class="table table-bordered table-hover text-center shadow-sm align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Image</th>
+            <th>Nom</th>
+            <th>Initial</th>
+            <th>Rôle</th>
+            <th>Allocation (%)</th>
+            <th>Holiday</th>
+            <th>Seniorité</th>
+            <th>Coût</th>
+            <th>Note</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let member of filteredMembers">
+
+            <td>
+                <img *ngIf="selectedMember.image" [src]="selectedMember.image"
+                    class="img-thumbnail rounded-circle shadow-sm" alt="Photo du membre" width="80" height="80">
+
+            </td>
+            <td class="fw-bold">{{ member.name }}</td>
+            <td>{{ member.initial }}</td>
+            <td class="text-uppercase">{{ member.teamRole }}</td>
+            <td>{{ member.allocation }}%</td>
+            <td>{{ member.holiday }}</td>
+            <td>{{ member.seniorite }}</td>
+            <td class="fw-bold text-success">{{ member.cout }}</td>
+            <td class="text-muted">{{ member.note }}</td>
+            <td class="text-end">
+                <button class="btn btn-warning btn-sm me-1" (click)="openModal(member)">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-danger btn-sm" (click)="deleteTeamMember(member.id!)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+
+<!-- MODALE AJOUTER/MODIFIER MEMBRE -->
+<dialog id="teamMemberModal">
+    <div class="dialog-header">
+        <span>{{ selectedMember ? 'Modifier' : 'Ajouter' }}</span>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+
+    <div class="dialog-body">
+
+        <label class="form-label">🏷 Nom</label>
+        <input type="text" [(ngModel)]="selectedMember.name" name="name" required />
+
+        <label class="form-label">🔠 Initial</label>
+        <input type="text" [(ngModel)]="selectedMember.initial" name="initial" />
+
+        <label class="form-label">📌 Rôle</label>
+        <input type="text" [(ngModel)]="selectedMember.teamRole" name="role" />
+
+        <label class="form-label">📊 Allocation (%)</label>
+        <input type="number" [(ngModel)]="selectedMember.allocation" name="allocation" min="0" max="100" required />
+
+        <label>🏅 Seniorité :</label>
+        <select [(ngModel)]="selectedMember.seniorite" class="form-control">
+            <option *ngFor="let s of SenioriteList" [ngValue]="s">
+                {{ getSenioriteLabel(s) }}
+            </option>
+        </select>
+
+        <label class="form-label">📝 dateEmbauche</label>
+        <input type="date" [(ngModel)]="selectedMember.dateEmbauche" name="dateEmbauche" required />
+
+        <label class="form-label">holiday </label>
+        <input type="date" [(ngModel)]="selectedMember.holiday" name="holiday" required />
+
+        <label class="form-label">💰 Coût</label>
+        <input type="number" [(ngModel)]="selectedMember.cout" name="cout" required />
+
+        <label class="form-label">📝 Note</label>
+        <input type="text" [(ngModel)]="selectedMember.note" name="note" required />
+
+        <div class="col-12">
+            <label class="form-label">Image</label>
+            <ngx-dropzone (change)="onSelect($event)" class="d-block mx-auto border rounded p-3">
+                <ngx-dropzone-label class="fw-bold text-center">🚀 Déposez une image ici</ngx-dropzone-label>
+                <ngx-dropzone-preview *ngFor="let f of files" [removable]="true" (removed)="onRemove(f)">
+                    <ngx-dropzone-label class="text-muted">
+                        {{f.name}} ({{f.type}})
+                    </ngx-dropzone-label>
+                </ngx-dropzone-preview>
+            </ngx-dropzone>
+        </div>
+    </div>
+    <div class="col-12 text-center mt-3">
+        <img *ngIf="imageUrl" [src]="imageUrl" class="img-thumbnail rounded-circle shadow-sm" alt="Uploaded Image"
+            width="80" height="80">
+    </div>
+
+
+    <div class="dialog-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">❌ Annuler</button>
+        <button class="btn btn-primary" (click)="saveTeamMember()">✅ Enregistrer</button>
+    </div>
+</dialog>

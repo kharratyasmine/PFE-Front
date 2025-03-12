@@ -1,0 +1,125 @@
+<div class="container">
+  <h2 class="text-center mt-3">📌 Liste des Projets</h2>
+
+  <!-- Barre de recherche -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <input type="text" (input)="searchProject($event)" placeholder="🔍 Rechercher un projet..." class="form-control w-50"/>
+
+    <div>
+      <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
+        <i class="fas fa-download"></i> Exporter
+      </button>
+      <button class="btn btn-primary" (click)="openModal()">
+        <i class="fas fa-plus"></i>Ajouter Projet
+      </button>
+    </div>
+  </div>
+
+  <!-- Tableau des projets -->
+  <table class="table table-bordered table-hover text-center shadow-sm">
+    <thead class="table-dark">
+      <tr>
+        
+        <th>Nom</th>
+        <th>Description</th>
+        <th>Type</th>
+        <th>Date de début</th>
+        <th>Date de fin</th>
+        <th>Status</th>
+        <th>Client</th>
+        <th>Scope</th>
+        <th>Requirements</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let project of filteredProjects">
+        <td>{{ project?.name }}</td>
+        <td>{{ project?.description }}</td>
+        <td>{{ project?.projectType }}</td>
+        <td>{{ project?.startDate | date: 'yyyy-MM-dd' }}</td>
+        <td>{{ project?.endDate | date: 'yyyy-MM-dd' }}</td>
+        <td>
+          <span class="badge rounded-pill px-3 py-2 text-uppercase"
+            [ngClass]="{
+              'bg-success': getStatusLabel(project.status) === 'Terminé',
+              'bg-warning text-dark': getStatusLabel(project.status) === 'En cours',
+              'bg-danger': getStatusLabel(project.status) === 'Bloqué',
+              'bg-secondary': getStatusLabel(project.status) === 'En attente',
+              'bg-info': getStatusLabel(project.status) === 'Annulé',
+              'bg-primary': getStatusLabel(project.status) === 'En attente devis',
+              'bg-dark': getStatusLabel(project.status) === 'En attente validation',
+              'bg-light': getStatusLabel(project.status) === 'En attente validation devis',
+              'bg-secondary text-dark': getStatusLabel(project.status) === 'En attente validation affectation'
+            }">
+            {{ getStatusLabel(project.status) }}
+          </span>
+        </td>
+        <td>{{ project.client ? project.client.name : 'Aucun client' }}</td>
+        <td>{{project?.scope}}</td>
+        <td>{{project?.requirements}}</td>
+        <td>
+          <button class="btn btn-warning btn-sm me-2" (click)="openModal(project)">
+            <i class="fas fa-edit"></i> 
+          </button>
+          <button class="btn btn-danger btn-sm me-2" (click)="deleteProject(project.id!)">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ✅ Modale d'ajout/modification -->
+<dialog id="projectModal">
+  <div class="dialog-header">
+    <span>{{ selectedProject.id ? 'Modifier Projet' : 'Ajouter Projet' }}</span>
+    <button class="close-btn" (click)="closeModal()">&times;</button>
+  </div>
+
+  <div class="dialog-body">
+    <label>Nom du Projet :</label>
+    <input type="text" [(ngModel)]="selectedProject.name" />
+
+    <label>Type :</label>
+    <input type="text" [(ngModel)]="selectedProject.projectType" />
+
+    <label>Description :</label>
+    <textarea [(ngModel)]="selectedProject.description"></textarea>
+
+    <label>Date début :</label>
+    <input type="date" [(ngModel)]="selectedProject.startDate" />
+
+    <label>Date fin :</label>
+    <input type="date" [(ngModel)]="selectedProject.endDate" />
+
+    <label>Status :</label>
+    <select [(ngModel)]="selectedProject.status" class="form-control">
+    <option *ngFor="let s of statusList" [ngValue]="s">{{ getStatusLabel(s) }}</option>
+    </select>
+
+  <label for="client">Client</label>
+    <select id="client" [(ngModel)]="selectedProject.client" class="form-control">
+      <option *ngFor="let client of clients" [ngValue]="client">{{ client.name }}</option>
+    </select>
+    
+    <label for="user">Utilisateur :</label>
+<select id="user" [(ngModel)]="selectedProject.user" class="form-control">
+  <option *ngFor="let u of user" [value]="user">{{ u.firstname }} {{ u.lastname }}</option>
+</select>
+
+    
+    <label>Scope :</label>
+    <input type="text" [(ngModel)]="selectedProject.scope" />
+    <label>Requirements :</label>
+    <input type="text" [(ngModel)]="selectedProject.requirements" />
+  </div>
+
+  <div class="dialog-footer">
+    <button class="btn btn-secondary" (click)="closeModal()">❌ Annuler</button>
+    <button class="btn btn-primary" (click)="saveProject()">✅ Enregistrer</button>
+  </div>
+</dialog>
+
+

@@ -1,0 +1,71 @@
+<div class="container">
+    <h2>Liste des Clients</h2>
+   <!-- Barre de recherche -->
+   <div class="d-flex justify-content-between align-items-center mb-3">
+    <input type="text" (input)="searchClient($event)" placeholder="🔍 Rechercher un client..." class="form-control w-50"/>
+    <div>
+      <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
+        <i class="fas fa-download"></i> Exporter
+      </button>
+      <button class="btn btn-primary" (click)="openModal()">
+        <i class="fas fa-plus"></i>Ajouter Client
+      </button>
+    </div>
+  </div>
+
+   <!-- Tableau des projets -->
+  <table class="table table-bordered table-hover text-center shadow-sm">
+    <thead class="table-dark">
+      <tr>
+          
+          <th>Nom</th>
+          <th>Email</th>
+          <th>Téléphone</th>
+          <th>Adresse</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let client of filteredClients">
+          <td>{{ client.name }}</td>
+          <td>{{ client.email }}</td>
+          <td>{{ client.contact }}</td>
+          <td>{{ client.address }}</td>
+          <td>
+            <button class="btn btn-warning btn-sm me-2" (click)="openModal(client)">
+              <i class="fas fa-edit"></i> 
+            </button>
+            <button class="btn btn-danger btn-sm me-2" (click)="deleteClient(client.id!)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Modale d'ajout/modification de client -->
+  <dialog id="clientModal">
+    <div class="dialog-header">
+      <span>{{ selectedClient.id ? 'Modifier Client' : 'Ajouter Client' }}</span>
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+  </div>
+  <div class="dialog-body">
+      <label>Nom:</label>
+      <input type="text" [(ngModel)]="selectedClient.name" />
+      
+      <label>Email:</label>
+      <input type="email" [(ngModel)]="selectedClient.email"/>
+      
+      <label>Téléphone:</label>
+      <input type="number" [(ngModel)]="selectedClient.contact" />
+      
+      <label>Adresse:</label>
+      <input type="text" [(ngModel)]="selectedClient.address" />
+  </div>
+  <div class="dialog-footer">  
+      <button class="btn btn-primary" (click)="saveClient()">✅ Enregistrer</button>
+      <button class="btn btn-secondary" (click)="closeModal()">❌ Annuler</button>
+    </div>
+  </dialog>
+  

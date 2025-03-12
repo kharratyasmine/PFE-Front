@@ -1,0 +1,110 @@
+<div class="container">
+    <h2 class="text-center mt-3">📌 Liste des Tâches</h2>
+
+    <!-- Barre de recherche -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <input type="text" class="form-control w-50" placeholder="🔍 Rechercher une tâche..."
+            (input)="searchTaskByName($event)">
+        <div>
+            <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
+                <i class="fas fa-download"></i> Exporter
+            </button>
+            <button class="btn btn-primary" (click)="openModal()">
+                <i class="fas fa-plus"></i> Ajouter une tâche
+            </button>
+        </div>
+    </div>
+
+    <!-- Tableau des tâches -->
+    <table class="table table-bordered table-hover text-center shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Assigné à</th>
+                <th>Projet</th>
+                <th>Date Début</th>
+                <th>Date Fin</th>
+                <th>Progress (%)</th>
+                <th>Statut</th>
+                <th>⚙️ Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let task of filteredTasks">
+                <td>{{ task.id }}</td>
+                <td>{{ task.name }}</td>
+                <td>{{ task.description }}</td>
+                <td>{{ task.teamMember?.name || 'Non assigné' }}</td>
+                <td>{{ task.project?.name || 'Non défini' }}</td>
+                <td>{{ task.startDate | date: 'yyyy-MM-dd' }}</td>
+                <td>{{ task.endDate | date: 'yyyy-MM-dd' }}</td>
+                <td>{{ task.progress }}</td>
+                <td>
+                    <span class="badge rounded-pill px-3 py-2 text-uppercase" [ngClass]="{
+                                'bg-success': getStatusLabel(task.status) === 'Terminé',
+                                'bg-warning text-dark': getStatusLabel(task.status) === 'En cours',
+                                'bg-danger': getStatusLabel(task.status) === 'Bloqué',
+                                'bg-secondary': getStatusLabel(task.status) === 'En attente',
+                                'bg-info': getStatusLabel(task.status) === 'Annulé',
+
+                            }">
+                        {{ getStatusLabel(task.status) }}
+                    </span>
+                </td>
+
+                <td class="text-end">
+                    <button class="btn btn-warning btn-sm me-2" (click)="openEditModal(task)">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="deleteTask(task.id)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- MODALE AJOUTER/MODIFIER UNE TÂCHE -->
+<dialog id="taskModal">
+    <div class="dialog-header">
+        <span>{{ selectedTask.id ? 'Modifier' : 'Ajouter' }}</span>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+    <div class="dialog-body">
+        <label>🏷 Titre</label>
+        <input type="text" [(ngModel)]="selectedTask.name" name="title" required />
+        <label>📝 Description</label>
+        <textarea [(ngModel)]="selectedTask.description" name="description" required></textarea>
+
+        <label>📌 Statut</label>
+        <select [(ngModel)]="selectedTask.status" class="form-control">
+            <option *ngFor="let s of statusList" [ngValue]="s">{{ getStatusLabel(s) }}</option>
+        </select>
+
+        <label >📆 Date de début</label>
+        <input type="date" class="form-control" [(ngModel)]="selectedTask.startDate" name="startDate" required />
+   
+        <label >⏳ Date de fin</label>
+        <input type="date" class="form-control" [(ngModel)]="selectedTask.endDate" name="endDate" />
+        
+        <label for="teamMember">👤 Assigné à</label>
+        <select id="teamMember" [(ngModel)]="selectedTask.teamMember" class="form-control">
+          <option *ngFor="let member of availableMembers" [ngValue]="member">{{ member.name }}</option>
+        </select>
+
+        <label for="project">📌 Projet</label>
+    <select id="project" [(ngModel)]="selectedTask.project" class="form-control">
+      <option *ngFor="let project of availableProjects" [ngValue]="project">{{ project.name }}</option>
+    </select>
+
+        <label >📊 Progress (%)</label>
+        <input type="number" class="form-control" [(ngModel)]="selectedTask.progress" name="progress" min="0" max="100"
+            required />
+    </div>
+<div class="dialog-footer">
+  <button class="btn btn-secondary" (click)="closeModal()">❌ Annuler</button>
+  <button class="btn btn-primary" (click)="saveTask()">✅ Enregistrer</button>
+</div>
+</dialog>

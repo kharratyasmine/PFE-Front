@@ -1,0 +1,192 @@
+.container {
+  max-width: 90%;
+  margin: auto;
+}
+
+input::placeholder {
+  font-style: italic;
+  color: #aaa;
+}
+
+button {
+  transition: 0.3s ease-in-out;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+.modal-content {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+dialog {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+table {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+thead th {
+  background: #343a40;
+  color: white;
+  text-align: center;
+}
+
+td, th {
+  text-align: center;
+  vertical-align: middle;
+}
+/* ✅ Style général de la modale */
+dialog {
+width: 50%;
+max-width: 600px;
+border: none;
+border-radius: 8px;
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+padding: 20px;
+background-color: white;
+}
+
+/* ✅ En-tête de la modale */
+.dialog-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 18px;
+font-weight: bold;
+padding-bottom: 10px;
+border-bottom: 2px solid #ddd;
+}
+
+/* ✅ Bouton de fermeture */
+.close-btn {
+background: none;
+border: none;
+font-size: 24px;
+cursor: pointer;
+color: red;
+}
+
+/* ✅ Corps du formulaire */
+.dialog-body {
+display: flex;
+flex-direction: column;
+gap: 10px;
+padding: 15px 0;
+}
+
+.dialog-body label {
+font-weight: bold;
+margin-top: 5px;
+}
+
+.dialog-body input,
+.dialog-body textarea {
+width: 100%;
+padding: 8px;
+border: 1px solid #ccc;
+border-radius: 4px;
+font-size: 14px;
+}
+
+/* ✅ Pied de page de la modale */
+.dialog-footer {
+display: flex;
+justify-content: flex-end;
+gap: 10px;
+padding-top: 10px;
+border-top: 2px solid #ddd;
+}
+
+.dialog-footer .btn {
+padding: 8px 15px;
+font-size: 14px;
+cursor: pointer;
+border-radius: 5px;
+}
+
+/* ✅ Boutons */
+.btn-secondary {
+background-color: #6c757d;
+color: white;
+border: none;
+}
+
+.btn-primary {
+background-color: #007bff;
+color: white;
+border: none;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+opacity: 0.8;
+}
+
+/* ✅ Rendre la modale responsive */
+@media (max-width: 768px) {
+dialog {
+  width: 90%;
+}
+}
+.list-unstyled {
+  margin: 0;
+  padding: 0;
+}
+
+.list-unstyled li {
+  display: flex;
+  align-items: center;
+}
+
+.list-unstyled img {
+  border: 1px solid #ddd;
+  object-fit: cover;
+}
+/* Style pour la liste des membres */
+.member-card {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin: 5px;
+  background-color: #f9f9f9;
+  transition: all 0.3s ease-in-out;
+}
+
+.member-card:hover {
+  background-color: #e9ecef;
+  transform: scale(1.05);
+}
+
+/* Avatar des membres */
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+  border: 2px solid #ddd;
+}
+
+/* Checkbox */
+.member-checkbox {
+  margin-right: 10px;
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+/* Nom du membre */
+.member-name {
+  font-size: 16px;
+  font-weight: 500;
+}
+

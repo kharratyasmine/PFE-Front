@@ -1,0 +1,94 @@
+<div class="container">
+  <h2 class="text-center mt-3">👥 Liste des Équipes</h2>
+</div>
+
+ <!-- Barre de recherche -->
+ <div class="d-flex justify-content-between align-items-center mb-3">
+  <input type="text" (input)="searchTeamByName($event)" placeholder="🔍 Rechercher un équipe..." class="form-control w-50"/>
+
+  <div>
+    <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
+      <i class="fas fa-download"></i> Exporter
+    </button>
+    <button class="btn btn-primary" (click)="openModal()">
+      <i class="fas fa-plus"></i>Ajouter Projet
+    </button>
+  </div>
+</div>
+
+<!-- Tableau des équipes -->
+<table class="table table-bordered table-hover text-center shadow-sm">
+  <thead class="table-dark">
+    <tr>
+      <th>Nom</th>
+      <th>Projet</th>
+      <th>Membres</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let team of filteredTeams">
+      <td>{{ team.name }}</td>
+      <td>{{ team.project?.name || 'Aucun projet' }}</td>
+      <td>
+        <span *ngFor="let member of team.members; let i = index">
+          {{ member.name }}<span *ngIf="i < team.members.length - 1">, </span>
+        </span>
+      </td>
+      
+      <td>
+        <button class="btn btn-warning btn-sm me-2" (click)="openModal(team)">
+          <i class="fas fa-pencil-alt"></i> 
+        </button>                                    
+        <button class="btn btn-danger btn-sm" (click)="deleteTeam(team.id!)">
+          <i class="fas fa-trash"></i> 
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+  
+<!-- ✅ Modale d'ajout/modification -->
+<dialog id="teamModal">
+  <div class="dialog-header">
+    <span>{{ selectedTeam.id ? 'Modifier Équipe' : 'Ajouter Équipe' }}</span>
+    <button class="close-btn" (click)="closeModal()">&times;</button>
+  </div>
+
+  <div class="dialog-body">
+    <label>🏷 Nom de l'équipe</label>
+    <input type="text" [(ngModel)]="selectedTeam.name"  />
+
+     <label for="project">Project</label>
+     <select id="project" [(ngModel)]="selectedTeam.project" class="form-control">
+      <option *ngFor="let project of projects" [ngValue]="project">{{ project.name }}</option>
+    </select>
+    
+
+<!-- Section Membres -->
+<div class="mb-3">
+  <label class="form-label">👥 Membres</label>
+  <div class="d-flex flex-wrap">
+    <div *ngFor="let member of allMembers" class="member-card">
+      <label class="d-flex align-items-center">
+        <input 
+          type="checkbox" 
+          class="member-checkbox" 
+          [checked]="isMemberSelected(member)" 
+          (change)="toggleMemberSelection(member)" 
+        />
+        <span class="member-name">{{ member.name }}</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+
+    
+    
+  </div>
+  <div class="dialog-footer">
+    <button class="btn btn-secondary" (click)="closeModal()">❌ Annuler</button>
+    <button class="btn btn-primary" (click)="saveTeam()">✅ Enregistrer</button>
+  </div>
+</dialog>
