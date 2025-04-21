@@ -1,0 +1,25 @@
+<div class="container my-3">
+    <h4 class="mb-3">Edit Project</h4>
+  
+    <div class="table-responsive">
+      <table class="table table-bordered text-center align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Resource</th>
+            <th>Qualification/Role</th>
+            <th *ngFor="let month of months">{{ month }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of resources">
+            <td>{{ item.resource }}</td>
+            <td>{{ item.role }}</td>
+            <td *ngFor="let month of months">
+              {{ getMonthValue(item, month) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  

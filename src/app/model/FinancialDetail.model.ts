@@ -6,5 +6,5 @@ export interface FinancialDetail {
   workload: number;
   dailyCost: number;
   totalCost: number;
-  devis?: Devis;
+  devisId?: number;
 }

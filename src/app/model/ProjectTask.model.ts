@@ -1,22 +1,34 @@
-import { Project } from "./project.model";
-import { TeamMember } from "./TeamMember.model";
-
-export interface ProjectTask {
-    id: number;
-    name: string;
-    description: string;
-    status: TaskStatus;
-    startDate: Date;  
-    endDate: Date ;  
-    progress: number;
-    teamMember: TeamMember | null;  // ✅ Allows null if unassigned
-    project: Project | null;        // ✅ Allows null if unassigned
+// ProjectTask.model.ts
+export enum TaskStatus {
+  TODO = 'TODO',
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+  BLOCKED = 'BLOCKED'
 }
 
-export enum TaskStatus { 
-    EN_COURS = "EN_COURS",
-    TERMINE = "TERMINE",
-    EN_ATTENTE = "EN_ATTENTE",
-    ANNULE = "ANNULE",
+export interface TaskAssignment {
+  id?: number;
+  teamMemberId: number |null;
+  teamMemberName?: string;
+  progress: number;
+  workedMD: number;
+  estimatedMD: number;
+  remainingMD?: number;
+  estimatedStartDate: string;
+  estimatedEndDate: string;
+  effectiveStartDate?: string;
+  effectiveEndDate?: string;
+}
 
-  }
+export interface ProjectTask {
+  id?: number;
+  name: string;
+  description: string;
+  dateDebut: string; // YYYY-MM-DD
+  dateFin: string;
+  status: TaskStatus;
+  progress: number;
+  projectId: number | null;
+  projectName?: string;
+  assignments: TaskAssignment[];
+}

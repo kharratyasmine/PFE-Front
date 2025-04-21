@@ -1,22 +1,17 @@
-import { AffectationProject } from "./AffectationProject.model";
-import { ProjectTask } from "./ProjectTask.model";
-import { Seniorite } from "./seniorite.enum";
-import { Team } from "./Team.model";
-
 export interface TeamMember {
-  id?: number;
-  image: string;
+  id:number | null;
   name: string;
   initial: string;
-  allocation: number;
-  holiday: string;
-  dateEmbauche: string;
-  seniorite: Seniorite;
-  cout: number;
-  affectations?: AffectationProject[];
-  tasks?: ProjectTask[];
-  team: Team | null; // Lien avec l'équipe
-  note?: string;
-  teamRole?: string;
+  jobTitle: string;
+  holiday: string[];
+  image: string;
+  note: string;
+  role: string;
+  cost?: number;
+  startDate?: string;
+  experienceRange?: string;
+  team: number[];
+  allocation?: number;
+  allocationId?: number; // pour la mise à jour !
+   
 }
-

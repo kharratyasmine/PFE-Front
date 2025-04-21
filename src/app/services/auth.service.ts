@@ -1,73 +1,142 @@
-/* export interface AuthResponse {
-    access_token: string; // ✅ Maintenant, cela correspond à la réponse du backend
-    refresh_token: string;
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { jwtDecode } from 'jwt-decode';
+
+export interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthService {
+  private apiUrl = 'http://localhost:8080/auth'; // ✅ port de ton backend Spring Boot
+
+  constructor(private http: HttpClient) {}
+
+  // ✅ Register
+  register(userData: {
+    firstname: string;
+    lastname: string;
+    email: string;
+    password: string;
+    role: string;
+  }): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData);
+  }
+
+  // ✅ Login
+  login(credentials: { email: string; password: string }): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(
+      `${this.apiUrl}/authenticate`,
+      credentials,
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    ).pipe(
+      tap((response) => {
+        console.log('📌 Réponse API après login:', response);
+        if (response.access_token) {
+          this.saveToken(response.access_token, response.refresh_token);
+        }
+      })
+    );
+  }
+
+  // ✅ Enregistrement des tokens
+  saveToken(accessToken: string, refreshToken: string): void {
+    localStorage.setItem('access_token', accessToken);
+    localStorage.setItem('refresh_token', refreshToken);
+  
+    try {
+      const decoded: any = jwtDecode(accessToken);
+      const user = {
+        email: decoded?.sub || '',
+        role: decoded?.role || decoded?.authorities?.[0] || 'GUEST',
+        firstname: decoded?.firstname || '', // ajoute ça si présent dans le token
+        lastname: decoded?.lastname || '',   // idem
+        fullName: decoded?.firstname + ' ' + decoded?.lastname,
+        imageUrl: decoded?.imageUrl || 'assets/img/profiles/default-avatar.jpg' // fallback
+      };
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    } catch (err) {
+      console.error("Erreur lors du décodage et de l'enregistrement de l'utilisateur", err);
+    }
   }
   
+  getCurrentUser(): any {
+    const userStr = localStorage.getItem('currentUser');
+    return userStr ? JSON.parse(userStr) : null;
+  }
   
-  import { Injectable } from '@angular/core';
-  import { HttpClient } from '@angular/common/http';
-  import { Observable } from 'rxjs';
-  import { tap } from 'rxjs/operators';
-  import { jwtDecode } from 'jwt-decode';
+  getUserInfo(): { firstname: string, lastname: string, photoUrl: string } | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
   
-  @Injectable({
-    providedIn: 'root',
-  })
-  export class AuthService {
-    private apiUrl = 'http://localhost:8888/api/v1/auth';
-  
-    constructor(private http: HttpClient) {}
-  
-    register(userData: { firstname: string; lastname: string; email: string; password: string; role: string }) {
-      return this.http.post(`${this.apiUrl}/register`, userData);
-    }
-    login(credentials: { email: string; password: string }): Observable<AuthResponse> {
-      return this.http.post<AuthResponse>(
-        `${this.apiUrl}/authenticate`,
-        credentials,
-        { headers: { 'Content-Type': 'application/json' } } // ✅ Ajoute ce header
-      ).pipe(
-        tap(response => {
-          console.log('📌 Réponse API après login:', response);
-          if (response.access_token) {
-            this.saveToken(response.access_token);
-          }
-        })
-      );
-    }
-    
-    
-    saveToken(token: string): void {
-      localStorage.setItem('access_token', token);
-    }
-    getAccessToken(): string | null {
-      const token = localStorage.getItem('access_token');
-      console.log('📌 Token récupéré depuis localStorage:', token); // ✅ Vérifier si le token est bien récupéré
-      return token ? token : null;
-    }
-    
-    
-  
-    getUserRole(): string {
-      const token = this.getAccessToken();
-      if (!token) {
-        console.warn('⚠️ Aucun token trouvé, utilisateur considéré comme GUEST.');
-        return 'GUEST';
-      }
-      try {
-        console.log('📌 Token récupéré:', token); // ✅ Vérifier si le token est récupéré
-        const decoded: any = jwtDecode(token);
-        console.log('📌 Token décodé:', decoded); // ✅ Vérifier si le rôle est bien présent
-        return decoded.role || 'GUEST'; // 🔥 Retourner le rôle
-      } catch (error) {
-        console.error('❌ Erreur lors du décodage du token:', error);
-        return 'GUEST';
-      }
-    }
-    
-  
-    isAuthenticated(): boolean {
-      return !!this.getAccessToken();
+    try {
+      const decoded: any = jwtDecode(token);
+      return {
+        firstname: decoded?.firstname || '',
+        lastname: decoded?.lastname || '',
+        photoUrl: decoded?.photoUrl || 'assets/img/profiles/default-avatar.jpg'
+      };
+    } catch (error) {
+      console.error('Erreur décodage JWT', error);
+      return null;
     }
   }
-  */
+  
+
+  // ✅ Suppression des tokens (déconnexion)
+  logout(): void {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+  }
+
+  // ✅ Récupérer access_token
+  getAccessToken(): string | null {
+    const token = localStorage.getItem('access_token');
+    console.log('📌 Token récupéré depuis localStorage:', token);
+    return token ?? null;
+  }
+
+  // ✅ Récupérer refresh_token
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refresh_token') ?? null;
+  }
+
+  // ✅ Décoder le rôle utilisateur
+  getUserRole(): string {
+    const token = this.getAccessToken();
+    if (!token) return 'GUEST';
+
+    try {
+      const decoded: any = jwtDecode(token);
+      console.log('📌 Décodage JWT:', decoded);
+      return decoded?.role || decoded?.authorities?.[0] || 'GUEST';
+    } catch (error) {
+      console.error('❌ Erreur lors du décodage du token:', error);
+      return 'GUEST';
+    }
+  }
+
+  // ✅ Décoder l'email (souvent dans "sub")
+  getUserEmail(): string | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded?.sub || decoded?.email || null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // ✅ Vérifie si l'utilisateur est connecté
+  isAuthenticated(): boolean {
+    return !!this.getAccessToken();
+  }
+}

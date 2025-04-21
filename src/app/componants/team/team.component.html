@@ -1,94 +1,94 @@
-<div class="container">
-  <h2 class="text-center mt-3">👥 Liste des Équipes</h2>
+<div class="mb-3 d-flex justify-content-between align-items-center">
+  <h5>{{ 'teams associated with the project' | translate }}</h5>
 </div>
 
- <!-- Barre de recherche -->
- <div class="d-flex justify-content-between align-items-center mb-3">
-  <input type="text" (input)="searchTeamByName($event)" placeholder="🔍 Rechercher un équipe..." class="form-control w-50"/>
-
-  <div>
-    <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
-      <i class="fas fa-download"></i> Exporter
-    </button>
-    <button class="btn btn-primary" (click)="openModal()">
-      <i class="fas fa-plus"></i>Ajouter Projet
-    </button>
-  </div>
-</div>
-
-<!-- Tableau des équipes -->
-<table class="table table-bordered table-hover text-center shadow-sm">
-  <thead class="table-dark">
-    <tr>
-      <th>Nom</th>
-      <th>Projet</th>
-      <th>Membres</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let team of filteredTeams">
-      <td>{{ team.name }}</td>
-      <td>{{ team.project?.name || 'Aucun projet' }}</td>
-      <td>
-        <span *ngFor="let member of team.members; let i = index">
-          {{ member.name }}<span *ngIf="i < team.members.length - 1">, </span>
-        </span>
-      </td>
-      
-      <td>
-        <button class="btn btn-warning btn-sm me-2" (click)="openModal(team)">
-          <i class="fas fa-pencil-alt"></i> 
-        </button>                                    
-        <button class="btn btn-danger btn-sm" (click)="deleteTeam(team.id!)">
-          <i class="fas fa-trash"></i> 
+<div *ngIf="teams.length > 0; else noTeams">
+  <div *ngFor="let team of teams" class="card mb-3 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center bg-light">
+      <div class="d-flex align-items-center gap-2">
+        <i class="fas fa-users text-primary"></i>
+        <h5 class="mb-0">{{ team.name }}</h5>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-success btn-sm" (click)="openAddMemberModal(team)">
+          <i class="fas fa-user-plus"></i> {{ 'add member' | translate }}
         </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
-  
-<!-- ✅ Modale d'ajout/modification -->
-<dialog id="teamModal">
-  <div class="dialog-header">
-    <span>{{ selectedTeam.id ? 'Modifier Équipe' : 'Ajouter Équipe' }}</span>
-    <button class="close-btn" (click)="closeModal()">&times;</button>
-  </div>
+        <button class="btn btn-outline-danger btn-sm" (click)="removeTeam(team.id)">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+    </div>
 
-  <div class="dialog-body">
-    <label>🏷 Nom de l'équipe</label>
-    <input type="text" [(ngModel)]="selectedTeam.name"  />
-
-     <label for="project">Project</label>
-     <select id="project" [(ngModel)]="selectedTeam.project" class="form-control">
-      <option *ngFor="let project of projects" [ngValue]="project">{{ project.name }}</option>
-    </select>
-    
-
-<!-- Section Membres -->
-<div class="mb-3">
-  <label class="form-label">👥 Membres</label>
-  <div class="d-flex flex-wrap">
-    <div *ngFor="let member of allMembers" class="member-card">
-      <label class="d-flex align-items-center">
-        <input 
-          type="checkbox" 
-          class="member-checkbox" 
-          [checked]="isMemberSelected(member)" 
-          (change)="toggleMemberSelection(member)" 
-        />
-        <span class="member-name">{{ member.name }}</span>
-      </label>
+    <div class="card-body p-3">
+      <ul class="list-group">
+        <li *ngFor="let member of team.members" class="list-group-item d-flex justify-content-between align-items-center">
+          <div class="w-100">
+            <strong>{{ member.name }}</strong> ({{ member.jobTitle }})<br />
+            <small>
+              🎓 {{ member.role }} | 💰 {{ member.cost }} TND<br />
+              🕒 {{ 'allocation' | translate }} :
+              <span class="fw-bold">{{ member.allocation! * 100 | number:'1.0-0' }}%</span>
+              <button class="btn btn-outline-primary btn-sm ms-2" (click)="openAllocationModal(member)">
+                ✏️ {{ 'edit' | translate }}
+              </button>
+            </small>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-secondary">{{ member.initial }}</span>
+            <button class="btn btn-sm btn-danger" (click)="removeMemberFromTeam(team.id, member.id!)">
+              <i class="fas fa-user-minus"></i>
+            </button>
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
 </div>
 
+<ng-template #noTeams>
+  <div class="alert alert-warning">{{ 'no team found' | translate }}</div>
+</ng-template>
 
-    
-    
+<!-- Modal Allocation -->
+<div class="modal fade" id="allocationModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ "edit allocation" | translate }}</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <label>{{ 'new allocation' | translate }} (%)</label>
+        <input type="number" [(ngModel)]="selectedAllocation" min="0" max="100" class="form-control" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">{{ 'cancel' | translate }}</button>
+        <button class="btn btn-primary" (click)="saveAllocation()">{{ 'save' | translate }}</button>
+      </div>
+    </div>
   </div>
-  <div class="dialog-footer">
-    <button class="btn btn-secondary" (click)="closeModal()">❌ Annuler</button>
-    <button class="btn btn-primary" (click)="saveTeam()">✅ Enregistrer</button>
+</div>
+
+<!-- Modal Ajouter un membre -->
+<div class="modal fade" id="addMemberModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ 'add member to team' | translate }}</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <label>{{ 'select member' | translate }}</label>
+        <select class="form-select" [(ngModel)]="selectedMemberIdToAdd">
+          <option *ngFor="let member of availableMembers" [value]="member.id">
+            {{ member.name }}
+          </option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">{{ 'cancel' | translate }}</button>
+        <button class="btn btn-primary" (click)="addMemberToTeam()">{{ 'add' | translate }}</button>
+      </div>
+    </div>
   </div>
-</dialog>
+</div>

@@ -1,0 +1,24 @@
+<table class="table table-bordered text-center align-middle">
+  <thead class="table-primary">
+    <tr>
+      <th style="width: 5%">N°</th>
+      <th>Description</th>
+      <th>Invoicing Date</th>
+      <th>Amount (€)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let invoice of invoicingDetails; let i = index">
+      <td>{{ i + 1 | number:'2.0' }}</td>
+      <td>{{ invoice.description }}</td>
+      <td>{{ invoice.invoicingDate | date: 'dd/MM/yyyy' }}</td>
+      <td>{{ invoice.amount | number:'1.0-2' }}</td>
+    </tr>
+  </tbody>
+  <tfoot *ngIf="invoicingDetails.length > 0">
+    <tr class="fw-bold table-secondary">
+      <td colspan="3" class="text-end">Total Cost</td>
+      <td>{{ totalAmount | number:'1.0-2' }}</td>
+    </tr>
+  </tfoot>
+</table>

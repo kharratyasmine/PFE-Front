@@ -1,0 +1,83 @@
+<div class="container mt-4">
+  <h3 class="mt-4">Technical and Financial Proposal Project</h3>
+  <table class="table table-bordered table-hover text-center shadow-sm">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Référence</th>
+        <th>Date de création</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let devis of devisList">
+        <td>{{ devis.id }}</td>
+        <td>{{ devis.reference }}</td>
+        <td>{{ devis.creationDate | date }}</td>
+        <td>
+          <!-- Link to view Devis details -->
+     
+                   <button class="btn btn-outline-secondary btn-sm me-2" (click)="openDevisDetailsModal(devis.id!)">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  
+          <!-- Button to edit Devis -->
+          <button class="btn btn-outline-success btn-sm me-2" (click)="editDevis(devis)">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+
+          <!-- Button to delete Devis -->
+          <button class="btn btn-outline-danger btn-sm me-2" (click)="deleteDevis(devis.id!)">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+
+       
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal d'édition -->
+<div class="modal fade show d-block" tabindex="-1" role="dialog" *ngIf="isModalEditOpen" style="background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">✏️ Modifier le Devis</h5>
+        <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label>Référence</label>
+            <input type="text" [(ngModel)]="selectedDevis!.reference" name="reference" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label>Édition</label>
+            <input type="text" [(ngModel)]="selectedDevis!.edition" name="edition" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label>Date de création</label>
+            <input type="date" [(ngModel)]="selectedDevis!.creationDate" name="creationDate" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label>Statut</label>
+            <input type="text" [(ngModel)]="selectedDevis!.status" name="status" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label>Validité de la proposition</label>
+            <input type="text" [(ngModel)]="selectedDevis!.proposalValidity" name="proposalValidity" class="form-control" />
+          </div>
+          <div class="mb-3">
+            <label>Auteur</label>
+            <input type="text" [(ngModel)]="selectedDevis!.author" name="author" class="form-control" />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeEditModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="saveEditedDevis()">💾 Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>

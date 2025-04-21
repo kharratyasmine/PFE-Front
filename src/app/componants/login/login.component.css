@@ -1,66 +1,167 @@
-/* ✅ Centrer le formulaire */
+/* Style général du conteneur */
 .login-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Pleine hauteur de l'écran */
-    background: linear-gradient(135deg, #f0f2f5, #d6dbe0);
-}
-
-/* ✅ Carte de connexion */
-.login-card {
-    width: 400px;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
     padding: 20px;
-    background: #fff;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Carte de connexion */
+  .login-card {
+    background: white;
     border-radius: 10px;
-    text-align: center;
-}
-
-/* ✅ Logo Telnet */
-.logo-telnet {
-    width: 150px; /* Ajuste la taille du logo */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .login-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* Logo */
+  .logo-telnet {
     display: block;
-    margin: 0 auto 10px auto; /* Centrage et espacement */
-}
-
-/* ✅ Styles du titre */
-h2 {
-    margin-bottom: 20px;
-    font-weight: bold;
-    color: #333;
-}
-
-/* ✅ Styles des champs */
-.form-control {
-    border-radius: 5px;
-    padding: 10px;
-}
-
-/* ✅ Bouton de connexion */
-.btn-primary {
-    background-color: #007bff;
-    border: none;
-    font-weight: bold;
-    padding: 10px;
-}
-
-.btn-primary:hover {
-    background-color: #0056b3;
-}
-
-/* ✅ Liens stylisés */
-.forgot-password, .register-link {
-    color: #007bff;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.forgot-password:hover, .register-link:hover {
-    text-decoration: underline;
-}
-
-/* ✅ Checkbox "Se souvenir de moi" */
-.form-check-label {
+    margin: 0 auto 25px;
+    max-width: 180px;
+    height: auto;
+  }
+  
+  /* Titre */
+  .login-card h2 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 30px;
+    font-size: 24px;
+    text-align: center;
+    position: relative;
+  }
+  
+  .login-card h2::after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 3px;
+    background: #3498db;
+    margin: 10px auto 0;
+  }
+  
+  /* Formulaire */
+  .login-card form {
+    margin-top: 20px;
+  }
+  
+  /* Champs de formulaire */
+  .form-control {
+    border: 1px solid #dfe6e9;
+    border-radius: 6px;
+    padding: 12px 15px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+  }
+  
+  .form-control:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  }
+  
+  .form-label {
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  /* Checkbox "Se souvenir de moi" */
+  .form-check-input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+  }
+  
+  .form-check-label {
+    margin-left: 8px;
+    color: #636e72;
     font-size: 14px;
-}
+  }
+  
+  /* Bouton de connexion */
+  .btn-primary {
+    background-color: #3498db;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+  }
+  
+  .btn-primary:disabled {
+    background-color: #bdc3c7;
+    transform: none;
+  }
+  
+  /* Messages d'erreur */
+  .invalid-feedback {
+    font-size: 13px;
+    margin-top: 5px;
+    color: #e74c3c;
+  }
+  
+  .alert-danger {
+    background-color: #fdecea;
+    color: #e74c3c;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+  }
+  
+  /* Liens */
+  .forgot-password, .register-link {
+    color: #3498db;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+  }
+  
+  .forgot-password:hover, .register-link:hover {
+    color: #2980b9;
+    text-decoration: underline;
+  }
+  
+  /* Texte "Pas encore inscrit" */
+  .text-center p {
+    color: #636e72;
+    font-size: 14px;
+    margin-top: 20px;
+  }
+  
+  /* Animation du spinner */
+  .spinner-border {
+    vertical-align: middle;
+    margin-right: 5px;
+  }
+  
+  /* Responsive */
+  @media (max-width: 576px) {
+    .login-card {
+      padding: 30px 20px;
+    }
+    
+    .login-card h2 {
+      font-size: 20px;
+    }
+  }

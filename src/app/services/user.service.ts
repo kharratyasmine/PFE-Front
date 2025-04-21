@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from 'src/app/model/user.model';
-import { Role } from 'src/app/model/role.enum';
+
 
 @Injectable({
   providedIn: 'root'
@@ -15,12 +15,14 @@ export class UserService {
   getUsers(): Observable<User[]> {
     return this.http.get<User[]>(this.apiUrl);
   }
-
+  getUSerById(id: number): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/${id}`);
+    }
   addUser(user: User): Observable<User> {
     return this.http.post<User>(this.apiUrl, user);
   }
 
-  updateUser(user: User): Observable<User> {
+  updateUser(id: number,user: User): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/${user.id}`, user);
   }
 

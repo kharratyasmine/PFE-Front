@@ -1,71 +1,114 @@
 <div class="container">
-    <h2>Liste des Clients</h2>
-   <!-- Barre de recherche -->
-   <div class="d-flex justify-content-between align-items-center mb-3">
-    <input type="text" (input)="searchClient($event)" placeholder="🔍 Rechercher un client..." class="form-control w-50"/>
+  <h2 class="text-center mt-3">📌 {{ 'CUSTOMER_LIST' | translate }}</h2>
+
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
+      <li class="breadcrumb-item">
+        <a routerLink="/Dashboard">🏠{{ 'DASHBOARD' | translate }}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <a routerLink="/Client">{{ 'CUSTOMER_LIST' | translate }}</a>
+      </li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <input type="text" (input)="searchClient($event)" placeholder="🔍 {{ 'SEARCH_CLIENT' | translate }}"
+      class="form-control" style="width: 250px;" />
     <div>
       <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
-        <i class="fas fa-download"></i> Exporter
+        <i class="fas fa-download"></i>
       </button>
-      <button class="btn btn-primary" (click)="openModal()">
-        <i class="fas fa-plus"></i>Ajouter Client
-      </button>
+      <button class="btn btn-outline-success" (click)="openModal()"><i class="fas fa-plus"></i> {{ 'ADD_CUSTOMER' |
+        translate }}</button>
     </div>
   </div>
 
-   <!-- Tableau des projets -->
-  <table class="table table-bordered table-hover text-center shadow-sm">
-    <thead class="table-dark">
+  <table *ngIf="filteredClients.length > 0; else noClients"
+    class="table table-bordered table-hover text-center shadow-sm">
+    <thead>
       <tr>
-          
-          <th>Nom</th>
-          <th>Email</th>
-          <th>Téléphone</th>
-          <th>Adresse</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let client of filteredClients">
-          <td>{{ client.name }}</td>
-          <td>{{ client.email }}</td>
-          <td>{{ client.contact }}</td>
-          <td>{{ client.address }}</td>
-          <td>
-            <button class="btn btn-warning btn-sm me-2" (click)="openModal(client)">
-              <i class="fas fa-edit"></i> 
+        <th>{{ 'Company_Name' | translate }}</th>
+        <th>{{ 'RESPONSIBLE' | translate }}</th>
+        <th>{{ 'EMAIL' | translate }}</th>
+        <th>{{ 'PHONE' | translate }}</th>
+        <th>{{ 'ADDRESS' | translate }}</th>
+        <th>{{ 'ACTIONS' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let client of filteredClients | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
+
+        <td>{{ client.company }}</td>
+        <td>
+          <div *ngFor="let name of client.salesManagers" class="d-block mb-1">
+            {{ name }}
+          </div>
+        </td>
+        <td>{{ client.email }}</td>
+        <td>{{ client.contact }}</td>
+        <td>{{ client.address }}</td>
+        <td>
+          <button class="btn btn-outline-success btn-sm me-2" (click)="openModal(client)"> <i
+              class="fas fa-edit"></i></button>
+          <button class="btn btn-outline-danger btn-sm" (click)="deleteClient(client.id!)"><i
+              class="fas fa-trash"></i></button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
+  <ng-template #noClients>
+    <p class="text-muted">{{ 'NO_CUSTOMERS' | translate }}</p>
+  </ng-template>
+</div>
+
+<!-- Modale -->
+<dialog id="clientModal">
+  <div class="dialog-header">
+    <span>{{ selectedClient.id ? ('edit client' | translate) : ('add client' | translate) }}</span>
+    <button class="close-btn" (click)="closeModal()">&times;</button>
+  </div>
+
+  <!-- ✅ FORMULAIRE explicite -->
+  <form (ngSubmit)="saveClient()">
+    <div class="dialog-body">
+      <label class="form-label">{{ 'Company_Name' | translate }}</label>
+      <input type="text" class="form-control" [(ngModel)]="selectedClient.company" name="Company" required />
+
+
+      <div class="form-group">
+        <label class="form-label">{{ 'RESPONSIBLE' | translate }}</label>
+        <div *ngFor="let manager of selectedClient.salesManagers; let i = index; trackBy: trackByFn">
+          <div class="input-group mb-2">
+            <input type="text" class="form-control" 
+                   [(ngModel)]="selectedClient.salesManagers[i]" 
+                   name="salesManager_{{i}}"
+                   (input)="onManagerInput(i, $event)" />
+            <button type="button" class="btn btn-danger btn-sm" (click)="removeManager(i)">
+              <i class="fas fa-times"></i>
             </button>
-            <button class="btn btn-danger btn-sm me-2" (click)="deleteClient(client.id!)">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  
-  <!-- Modale d'ajout/modification de client -->
-  <dialog id="clientModal">
-    <div class="dialog-header">
-      <span>{{ selectedClient.id ? 'Modifier Client' : 'Ajouter Client' }}</span>
-      <button class="close-btn" (click)="closeModal()">&times;</button>
-  </div>
-  <div class="dialog-body">
-      <label>Nom:</label>
-      <input type="text" [(ngModel)]="selectedClient.name" />
-      
-      <label>Email:</label>
-      <input type="email" [(ngModel)]="selectedClient.email"/>
-      
-      <label>Téléphone:</label>
-      <input type="number" [(ngModel)]="selectedClient.contact" />
-      
-      <label>Adresse:</label>
-      <input type="text" [(ngModel)]="selectedClient.address" />
-  </div>
-  <div class="dialog-footer">  
-      <button class="btn btn-primary" (click)="saveClient()">✅ Enregistrer</button>
-      <button class="btn btn-secondary" (click)="closeModal()">❌ Annuler</button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-outline-success btn-sm mt-2" (click)="addManager()">
+          + Ajouter un responsable
+        </button>
+      </div>
+
+
+      <label class="form-label">{{ 'EMAIL' | translate }}</label>
+      <input type="email" class="form-control" [(ngModel)]="selectedClient.email" name="email" required />
+
+      <label class="form-label">{{ 'PHONE' | translate }}</label>
+      <input type="text" class="form-control" [(ngModel)]="selectedClient.contact" name="contact" required />
+
+      <label class="form-label">{{ 'ADDRESS' | translate }}</label>
+      <input type="text" class="form-control" [(ngModel)]="selectedClient.address" name="address" required />
     </div>
-  </dialog>
-  
+
+    <div class="dialog-footer mt-3">
+      <button type="button" class="btn btn-secondary" (click)="closeModal()">❌ Annuler</button>
+      <button type="submit" class="btn btn-primary">✅ Enregistrer</button>
+    </div>
+  </form>
+</dialog>

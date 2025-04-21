@@ -1,125 +1,135 @@
 <div class="container">
-  <h2 class="text-center mt-3">📌 Liste des Projets</h2>
+  <h2 class="text-center mt-3">📌 {{ 'Project List' | translate }}</h2>
 
-  <!-- Barre de recherche -->
+  <!-- 🔗 Fil d’Ariane -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
+      <li class="breadcrumb-item">
+        <a routerLink="/Dashboard">🏠 {{ 'DASHBOARD' | translate }}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        {{ 'Project List' | translate }}
+      </li>
+    </ol>
+  </nav>
+
+  <!-- 🔍 Barre de recherche et actions -->
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <input type="text" (input)="searchProject($event)" placeholder="🔍 Rechercher un projet..." class="form-control w-50"/>
-
+    <input type="text" (input)="searchProject($event)" placeholder="🔍 {{ 'Search Project' | translate }}"
+      class="form-control" style="width: 250px;" />
     <div>
       <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
-        <i class="fas fa-download"></i> Exporter
+        <i class="fas fa-download"></i>
       </button>
-      <button class="btn btn-primary" (click)="openModal()">
-        <i class="fas fa-plus"></i>Ajouter Projet
-      </button>
+      <button class="btn btn-outline-success" (click)="openModal()"> <i class="fas fa-plus"></i> {{ 'Add Project' | translate }}</button>
     </div>
   </div>
 
-  <!-- Tableau des projets -->
+  <!-- 📋 Tableau -->
   <table class="table table-bordered table-hover text-center shadow-sm">
-    <thead class="table-dark">
+    <thead>
       <tr>
-        
-        <th>Nom</th>
-        <th>Description</th>
-        <th>Type</th>
-        <th>Date de début</th>
-        <th>Date de fin</th>
-        <th>Status</th>
-        <th>Client</th>
-        <th>Scope</th>
-        <th>Requirements</th>
-        <th>Actions</th>
+        <th>{{ 'Project Name' | translate }}</th>
+        <th>{{ 'DESCRIPTION' | translate }}</th>
+        <th>{{ 'Project Type' | translate }}</th>
+        <th>{{ 'Start_Date' | translate }}</th>
+        <th>{{ 'End Date' | translate }}</th>
+        <th>{{ 'STATUS' | translate }}</th>
+        <th>{{ 'CLIENT' | translate }}</th>
+        <th>{{ 'ACTIVITY' | translate }}</th>
+        <th>{{ 'TECHNOLOGIES' | translate }}</th>
+        <th>{{ 'ACTIONS' | translate }}</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let project of filteredProjects">
+      <tr *ngFor="let project of filteredProjects | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
         <td>{{ project?.name }}</td>
         <td>{{ project?.description }}</td>
         <td>{{ project?.projectType }}</td>
         <td>{{ project?.startDate | date: 'yyyy-MM-dd' }}</td>
         <td>{{ project?.endDate | date: 'yyyy-MM-dd' }}</td>
+        <td>{{ getStatusLabel(project.status) }}</td>
+        
         <td>
-          <span class="badge rounded-pill px-3 py-2 text-uppercase"
-            [ngClass]="{
-              'bg-success': getStatusLabel(project.status) === 'Terminé',
-              'bg-warning text-dark': getStatusLabel(project.status) === 'En cours',
-              'bg-danger': getStatusLabel(project.status) === 'Bloqué',
-              'bg-secondary': getStatusLabel(project.status) === 'En attente',
-              'bg-info': getStatusLabel(project.status) === 'Annulé',
-              'bg-primary': getStatusLabel(project.status) === 'En attente devis',
-              'bg-dark': getStatusLabel(project.status) === 'En attente validation',
-              'bg-light': getStatusLabel(project.status) === 'En attente validation devis',
-              'bg-secondary text-dark': getStatusLabel(project.status) === 'En attente validation affectation'
-            }">
-            {{ getStatusLabel(project.status) }}
-          </span>
+          <div *ngFor="let name of project.client?.salesManagers" class="d-block mb-1">
+            {{ name || ('NO_CLIENT' | translate)}}
+          </div>
         </td>
-        <td>{{ project.client ? project.client.name : 'Aucun client' }}</td>
-        <td>{{project?.scope}}</td>
-        <td>{{project?.requirements}}</td>
+        <td>{{ project?.activity }}</td>
+        <td>{{ project?.technologie }}</td>
         <td>
-          <button class="btn btn-warning btn-sm me-2" (click)="openModal(project)">
-            <i class="fas fa-edit"></i> 
+          <a [routerLink]="['/project', project.id]" class="btn btn-outline-secondary btn-sm me-2">
+            <i class="fas fa-eye"></i>
+          </a>
+          <button class="btn btn-outline-success btn-sm me-2" (click)="openModal(project)">
+            <i class="fas fa-pencil-alt"></i>
           </button>
-          <button class="btn btn-danger btn-sm me-2" (click)="deleteProject(project.id!)">
+          <button class="btn btn-outline-danger btn-sm" (click)="deleteProject(project.id!)">
             <i class="fas fa-trash"></i>
           </button>
         </td>
       </tr>
     </tbody>
   </table>
+
+  <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
+
+  <!-- 📦 Modal Bootstrap -->
+  <dialog id="projectModal">
+    <div class="dialog-header">
+      <span>{{ selectedProject.id ? ('edit project' | translate) : ('add project' | translate) }}</span>
+      <button class="close-btn" (click)="closeModal()">&times;</button>
+    </div>
+  
+    <div class="dialog-body">
+  
+      <label>{{ 'project name' | translate }}</label>
+      <input class="form-control" type="text" [(ngModel)]="selectedProject.name" name="name" required />
+  
+      <label>{{ 'description' | translate }}</label>
+      <textarea class="form-control" [(ngModel)]="selectedProject.description" name="description" required></textarea>
+  
+      <label>{{ 'project type' | translate }}</label>
+      <input class="form-control" type="text" [(ngModel)]="selectedProject.projectType" name="projectType" required />
+  
+      <label>{{ 'start date' | translate }}</label>
+      <input class="form-control" type="date" [(ngModel)]="selectedProject.startDate" name="startDate" required />
+  
+      <label>{{ 'end date' | translate }}</label>
+      <input class="form-control" type="date" [(ngModel)]="selectedProject.endDate" name="endDate" required />
+  
+      <label>{{ 'status' | translate }}</label>
+      <select class="form-select" [(ngModel)]="selectedProject.status" name="status">
+        <option *ngFor="let s of statusList" [ngValue]="s">{{ getStatusLabel(s) }}</option>
+      </select>
+  
+      <label>{{ 'client' | translate }}</label>
+      <select class="form-select" [(ngModel)]="selectedProject.clientId" name="clientId">
+        <option [ngValue]="null">-- {{ 'select client' | translate }} --</option>
+        <option *ngFor="let client of clients" [value]="client.id">
+          {{ client.salesManagers }} - {{ client.company }}
+        </option>
+      </select>
+  
+      <label>{{ 'user' | translate }}</label>
+      <select class="form-select" [(ngModel)]="selectedProject.userId" name="userId">
+        <option [ngValue]="null">-- {{ 'select user' | translate }} --</option>
+        <option *ngFor="let user of users" [value]="user.id">
+          {{ user.firstname }} {{ user.lastname }}
+        </option>
+      </select>
+  
+      <label>{{ 'activity' | translate }}</label>
+      <input class="form-control" type="text" [(ngModel)]="selectedProject.activity" name="activity" />
+  
+      <label>{{ 'technologies' | translate }}</label>
+      <input class="form-control" type="text" [(ngModel)]="selectedProject.technologie" name="technologie" />
+    </div>
+  
+    <div class="dialog-footer">
+      <button class="btn btn-secondary" (click)="closeModal()">❌ {{ 'cancel' | translate }}</button>
+      <button class="btn btn-primary" (click)="saveProject()">✅ {{ 'save' | translate }}</button>
+    </div>
+  </dialog>
+  
 </div>
-
-<!-- ✅ Modale d'ajout/modification -->
-<dialog id="projectModal">
-  <div class="dialog-header">
-    <span>{{ selectedProject.id ? 'Modifier Projet' : 'Ajouter Projet' }}</span>
-    <button class="close-btn" (click)="closeModal()">&times;</button>
-  </div>
-
-  <div class="dialog-body">
-    <label>Nom du Projet :</label>
-    <input type="text" [(ngModel)]="selectedProject.name" />
-
-    <label>Type :</label>
-    <input type="text" [(ngModel)]="selectedProject.projectType" />
-
-    <label>Description :</label>
-    <textarea [(ngModel)]="selectedProject.description"></textarea>
-
-    <label>Date début :</label>
-    <input type="date" [(ngModel)]="selectedProject.startDate" />
-
-    <label>Date fin :</label>
-    <input type="date" [(ngModel)]="selectedProject.endDate" />
-
-    <label>Status :</label>
-    <select [(ngModel)]="selectedProject.status" class="form-control">
-    <option *ngFor="let s of statusList" [ngValue]="s">{{ getStatusLabel(s) }}</option>
-    </select>
-
-  <label for="client">Client</label>
-    <select id="client" [(ngModel)]="selectedProject.client" class="form-control">
-      <option *ngFor="let client of clients" [ngValue]="client">{{ client.name }}</option>
-    </select>
-    
-    <label for="user">Utilisateur :</label>
-<select id="user" [(ngModel)]="selectedProject.user" class="form-control">
-  <option *ngFor="let u of user" [value]="user">{{ u.firstname }} {{ u.lastname }}</option>
-</select>
-
-    
-    <label>Scope :</label>
-    <input type="text" [(ngModel)]="selectedProject.scope" />
-    <label>Requirements :</label>
-    <input type="text" [(ngModel)]="selectedProject.requirements" />
-  </div>
-
-  <div class="dialog-footer">
-    <button class="btn btn-secondary" (click)="closeModal()">❌ Annuler</button>
-    <button class="btn btn-primary" (click)="saveProject()">✅ Enregistrer</button>
-  </div>
-</dialog>
-
-

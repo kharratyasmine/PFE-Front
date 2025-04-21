@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Client } from 'src/app/model/client.model';
-import { Project, Status } from 'src/app/model/project.model';
-import { Role } from 'src/app/model/role.enum';
-import { User } from 'src/app/model/user.model';
-import { ClientService } from 'src/app/services/client.service';
+import { Project, ProjectDTO, Status } from 'src/app/model/project.model';
 import { ProjectService } from 'src/app/services/project.service';
+import { ClientService } from 'src/app/services/client.service';
 import { UserService } from 'src/app/services/user.service';
+import { Client } from 'src/app/model/client.model';
+import { User } from 'src/app/model/user.model';
+import { Team } from 'src/app/model/Team.model';
+import { TeamMemberAllocation } from 'src/app/model/MemberAllocation.model';
 
 @Component({
   selector: 'app-project',
@@ -13,98 +14,178 @@ import { UserService } from 'src/app/services/user.service';
   styleUrls: ['./project.component.css']
 })
 export class ProjectComponent implements OnInit {
- 
+
+
   projects: Project[] = [];
   filteredProjects: Project[] = [];
-  clients: Client[] = []; 
-  user:User[]=[];
-  
- 
-  status = status; // Référence à l'énumération pour le template
-  statusKeys = Object.keys(status).filter(key => isNaN(Number(key))) as (keyof typeof status)[];
-   
+  allTeams: Team[] = [];
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+
+  clients: Client[] = [];
+  users: User[] = [];
+
+  isEditMode: boolean = false;
+  statusList = Object.values(Status);
+  status = Status;
+
+  teamMembersByTeam: { [teamId: number]: any[] } = {};
+  allocations: { [key: string]: number } = {}; // key = memberId-projectId
+  allocationsByProject: TeamMemberAllocation[] = [];
   selectedProject: Project = {
     id: 0,
     name: '',
-    projectType: '',
     description: '',
+    projectType: '',
     startDate: '',
     endDate: '',
+    activity: '',
+    technologie: '',
+    clientId: null,
+    userId: null,
     status: Status.EN_COURS,
-    scope: '',
-    client: { id: 0, name: '', contact: '', address: '', email: '' },
-    user: {
-      id: 0, firstname: '', lastname: '', email: '', role: Role.CHEF_EQUIPE,
-      motDePasse: ''
-    },
-    requirements: '',
+    userName: '',
+    teams: [],
     devisList: [],
-    affectations: [],
-    team: [],
-    tasks: []
+    demandes: []
   };
-  modalInstance: any;
-  
 
   constructor(
     private projectService: ProjectService,
     private clientService: ClientService,
-    private userService:UserService
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
-    this.loadProjects();
     this.loadClients();
     this.loadUsers();
+    this.loadProjects();
   }
 
-  /**
-   * Charger la liste des clients depuis le backend.
-   */
-  loadClients(): void {this.clientService.getAllClients().subscribe(
-    (data) => {
-      console.log("✅ Clients récupérés :", data);
-      this.clients = data;
-    },
-    (error) => {
-      console.error("❌ Erreur chargement clients", error);
-      console.log("📌 Détails de l'erreur :", error.message);
-      console.log("📌 Réponse complète :", error);
-    }
-  );
-}
-  /**
-   * Charger la liste des projets depuis le backend.
-   */
   loadProjects(): void {
     this.projectService.getAllProjects().subscribe(
-      (data) => {
-        console.log("✅ Projets récupérés :", data);
+      data => {
         this.projects = data;
+        console.log("📦 Projets chargés :", this.projects);
         this.filteredProjects = [...this.projects];
+  
+        // Charger toutes les équipes pour le select multiple du modal
+        this.projectService.getAllTeams().subscribe(teamData => {
+          this.allTeams = teamData;
+        });
       },
-      (error) => {
-        console.error('❌ Erreur chargement projets', error);
-      }
+      error => console.error('❌ Erreur chargement projets', error)
     );
   }
+
+  
+  loadClients(): void {
+    this.clientService.getAllClients().subscribe({
+      next: (data) => this.clients = data,
+      error: (err) => console.error("Erreur chargement clients", err)
+    });
+  }
+
   loadUsers(): void {
-    this.userService.getUsers().subscribe(
-      (data) => {
-        console.log("✅ Utilisateurs récupérés :", data);
-        this.user = data; // Stocke les utilisateurs disponibles
-      },
-      (error) => {
-        console.error("❌ Erreur chargement utilisateurs", error);
-      }
-    );
+    this.userService.getUsers().subscribe({
+      next: (data) => this.users = data,
+      error: (err) => console.error("Erreur chargement utilisateurs", err)
+    });
+  }
+  private modalInstance!: bootstrap.Modal;
+
+
+  // Remplace cette méthode :
+openModal(project?: Project): void {
+  this.selectedProject = project ? { ...project } : {
+    id: 0, name: '', description: '', projectType: '',
+    startDate: '', endDate: '', activity: '', technologie: '', clientId: null, userId: null, status: Status.EN_COURS,
+    userName: '', teams: [], devisList: [], demandes: []
+  };
+  this.isEditMode = !!project;
+
+  // 💡 On utilise <dialog>
+  const modal = document.getElementById('projectModal') as HTMLDialogElement;
+  if (modal) modal.showModal();
+}
+
+  
+
+ // Remplace cette méthode :
+closeModal(): void {
+  const modal = document.getElementById('projectModal') as HTMLDialogElement;
+  if (modal) modal.close();
+}
+
+  
+  saveProject(): void {
+    // ✅ On extrait uniquement les IDs des équipes
+    const teamIds = (this.selectedProject.teams || [])
+    .map(team => team.id)
+    .filter((id): id is number => id !== undefined);
+  
+  const projectToSend: ProjectDTO = {
+    id: this.selectedProject.id,
+    name: this.selectedProject.name,
+    description: this.selectedProject.description,
+    projectType: this.selectedProject.projectType,
+    startDate: this.selectedProject.startDate,
+    endDate: this.selectedProject.endDate,
+    activity: this.selectedProject.activity,
+    technologie: this.selectedProject.technologie,
+    status: this.selectedProject.status,
+    clientId: this.selectedProject.clientId!, // 👈 vérifie bien qu’il n’est pas null
+    userId: this.selectedProject.userId!,
+    teamIds: teamIds
+  };
+   
+    if (this.selectedProject.id && this.isEditMode) {
+      this.projectService.updateProject(this.selectedProject.id, projectToSend).subscribe(() => {
+        this.loadProjects();
+        this.closeModal();
+      });
+    } else {
+      this.projectService.createProject(projectToSend).subscribe(() => {
+        this.loadProjects();
+        this.closeModal();
+      });
+    }
   }
   
-  getStatusList(): string[] {
-    return Object.values(status);  // ✅ Retourne la liste des statuts sous forme de string
-  }
+ // isTeamSelected(team: Team): boolean {
+   // return this.selectedProject.teams.some(t => t.id === team.id);
+ // }
   
-  statusList = Object.values(Status);
+ // toggleTeamSelection(team: Team, event: Event): void {
+   // const checkbox = event.target as HTMLInputElement;
+   // if (checkbox.checked) {
+      // Ajoute si coché
+   //   this.selectedProject.teams.push(team);
+  //  } else {
+  //    // Retire si décoché
+ //     this.selectedProject.teams = this.selectedProject.teams.filter(t => t.id !== team.id);
+  //  }
+ // }
+  
+
+  deleteProject(id: number): void {
+    if (confirm("Voulez-vous supprimer ce projet ?")) {
+      this.projectService.deleteProject(id).subscribe(() => {
+        this.projects = this.projects.filter(p => p.id !== id);
+        this.filteredProjects = [...this.projects];
+      });
+    }
+  }
+
+  searchProject(event: Event): void {
+    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
+    this.filteredProjects = this.projects.filter(project =>
+      project.name.toLowerCase().includes(searchTerm) ||
+      project.description.toLowerCase().includes(searchTerm) ||
+      project.projectType.toLowerCase().includes(searchTerm) 
+     );
+    this.currentPage = 1;
+  }
 
   getStatusLabel(status: Status): string {
     const labels: { [key in Status]: string } = {
@@ -112,188 +193,33 @@ export class ProjectComponent implements OnInit {
       [Status.TERMINE]: "Terminé",
       [Status.EN_ATTENTE]: "En attente",
       [Status.ANNULE]: "Annulé",
-      [Status.EN_ATTENTE_DEVIS]: "En attente devis",
-      [Status.EN_ATTENTE_VALIDATION]: "En attente validation",
-      [Status.EN_ATTENTE_VALIDATION_DEVIS]: "En attente validation devis",
-      [Status.EN_ATTENTE_VALIDATION_AFFECTATION]: "En attente validation affectation"
+     
     };
     return labels[status] || "INCONNU";
   }
   
 
-  /**
-   * Ouvrir la modale pour ajouter/modifier un projet.
-   */
-  openModal(project?: Project): void {
-    this.selectedProject = project ? { ...project } : {
-      id: 0,
-      name: '',
-      projectType: '',
-      description: '',
-      startDate: '',
-      endDate: '',
-      status: Status.EN_COURS,
-      scope: '',
-      requirements: '',
-      client: null, 
-      user: null,
-      devisList: [],
-      affectations: [],
-      team: [],
-      tasks: []
-    };
+loadAllocations(projectId: number) {
+  this.projectService.getAllocations(projectId).subscribe(data => {
+    this.allocationsByProject = data;
+  });
+}
 
-    const modal = document.getElementById('projectModal');
-    if (modal) {
-      (modal as any).showModal();
-    }
-  }
+downloadExcel(): void {
+  this.projectService.downloadExcel(this.projects).subscribe(
+    data => {
+      const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'task.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    },
+    error => console.error('Erreur lors du téléchargement Excel :', error)
+  );
+}
 
-  /**
-   * Fermer la modale d'ajout/modification.
-   */
-  closeModal(): void {
-    const modal = document.getElementById('projectModal');
-    if (modal) {
-      (modal as any).close();
-    }
-  }
-
-  /**
-   * Télécharger les projets au format Excel.
-   */
-  downloadExcel(): void {
-    this.projectService.downloadExcel(this.projects).subscribe(
-      (data) => {
-        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'projects.xlsx';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-      },
-      (error) => {
-        console.error('❌ Erreur lors du téléchargement du fichier Excel :', error);
-      }
-    );
-  }
-
-  /**
-   * Ajouter ou mettre à jour un projet.
-   */
-  saveProject(): void {
-    console.log("📤 Projet à envoyer :", this.selectedProject);
-  
-    // ✅ Vérifier et simplifier `client`
-    if (this.selectedProject.client) {
-      this.selectedProject.client = {
-        id: this.selectedProject.client.id,
-        name: this.selectedProject.client.name || '',
-        contact: this.selectedProject.client.contact || '',
-        address: this.selectedProject.client.address || '',
-        email: this.selectedProject.client.email || ''
-      };
-    }
-  
-    // ✅ Vérifier et simplifier `user`
-    if (this.selectedProject.user) {
-      this.selectedProject.user = {
-        id: this.selectedProject.user.id,
-        firstname: this.selectedProject.user.firstname || '',
-        lastname: this.selectedProject.user.lastname || '',
-        email: this.selectedProject.user.email || '',
-        motDePasse: this.selectedProject.user.motDePasse || '',
-        role: this.selectedProject.user.role || Role.CHEF_EQUIPE 
-
-      };
-    }
-  
-    if (this.selectedProject.id) {
-      console.log("🚀 Données finales envoyées pour update :", this.selectedProject);
-      
-      this.projectService.updateProject(this.selectedProject.id, this.selectedProject).subscribe(
-        (updatedProject) => {
-          console.log("📥 Réponse backend après update :", updatedProject);
-          this.loadProjects();  
-          this.closeModal();
-        },
-        (error) => {
-          console.error("❌ Erreur mise à jour projet", error);
-        }
-      );
-    } else {
-      this.projectService.createProject(this.selectedProject).subscribe(
-        (newProject) => {
-          console.log("✅ Projet ajouté :", newProject);
-  
-          // 🔥 Mettre à jour `selectedProject` avec l'ID généré
-          this.selectedProject = { ...newProject };
-  
-          // 🔥 Met à jour directement `this.projects`
-          this.projects.push(newProject);
-  
-          this.closeModal();
-        },
-        (error) => {
-          console.error("❌ Erreur ajout projet", error);
-        }
-      );
-    }
-  }
-  
-  /**
-   * Supprimer un projet après confirmation.
-   */
-  
-  deleteProject(id: number): void {
-    if (confirm("Voulez-vous vraiment supprimer ce projet ?")) {
-      this.projectService.deleteProject(id).subscribe(
-        () => {
-          console.log(`✅ Projet supprimé.`);
-          
-          // 🔥 Met à jour la liste sans recharger la page
-          this.projects = this.projects.filter(project => project.id !== id);
-          this.filteredProjects = [...this.projects]; // Met aussi à jour la liste filtrée
-        },
-        (error) => {
-          console.error("❌ Erreur suppression projet", error);
-          alert("Erreur lors de la suppression du projet : " + error.message);
-        }
-      );
-    }
-  }
-  
-  
-
-
-  /**
-   * Filtrer les projets par nom.
-   */
-  searchProject(event: Event): void {
-    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
-    this.filteredProjects = this.projects.filter(project => project.name.toLowerCase().includes(searchTerm));
-  }
-
-  /**
-   * Ouvrir une modale Bootstrap.
-   */
-  private showModal(id: string): void {
-    const modalElement = document.getElementById(id);
-    if (modalElement) {
-      this.modalInstance = new (window as any).bootstrap.Modal(modalElement);
-      this.modalInstance.show();
-    }
-  }
-
-  /**
-   * Fermer la modale Bootstrap.
-   */
-  closeViewModal(): void {
-    if (this.modalInstance) {
-      this.modalInstance.hide();
-    }
-  }
 }

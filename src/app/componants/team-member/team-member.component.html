@@ -1,127 +1,192 @@
 <div class="container">
-    <h2 class="text-center mt-3">👥 Liste des Membres d'Équipe</h2>
-</div>
+  <h2 class="text-center mt-3">📌{{ 'List of Members' | translate }}</h2>
+
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
+      <li class="breadcrumb-item">
+        <a routerLink="/Dashboard">🏠 {{ 'DASHBOARD' | translate }}</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a routerLink="/teamMember">{{'Members' | translate}}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        {{ 'List of Members' | translate }}
+      </li>
+    </ol>
+  </nav>
 
 
-<!-- Barre de recherche -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <input type="text" class="form-control w-50" placeholder="🔍 Rechercher un membre..."
-        (input)="searchMemberByName($event)">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <input type="text" class="form-control" placeholder="🔍 {{'Search_Member'|translate}}"
+      (input)="searchMemberByName($event)" style="width: 250px;" />
+
     <div>
-        <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
-            <i class="fas fa-download"></i> Exporter
-        </button>
-        <button class="btn btn-primary" (click)="openModal()">
-            <i class="fas fa-user-plus"></i> Ajouter un Membre
-        </button>
+      <a href="TeamMemberGrid" class="btn btn-outline-gray me-2 active">
+        <i class="feather-list"></i>
+      </a>
+      <a routerLink="/TeamMemberGrid" class="btn btn-outline-gray me-2">
+        <i class="feather-grid"></i>
+      </a>
+      <button class="btn btn-primary me-2" (click)="downloadExcel()">
+        <i class="fas fa-download"></i>
+      </button>
+      <button class="btn btn-outline-success" (click)="openModal()">
+        <i class="fas fa-user-plus"></i>{{ 'Add_Member' | translate }} </button>
     </div>
-</div>
+  </div>
 
-<!-- Tableau des membres d'équipe -->
-<table class="table table-bordered table-hover text-center shadow-sm align-middle">
+  <!-- Tableau des membres -->
+  <table class="table table-bordered table-hover text-center shadow-sm">
     <thead class="table-dark">
-        <tr>
-            <th>Image</th>
-            <th>Nom</th>
-            <th>Initial</th>
-            <th>Rôle</th>
-            <th>Allocation (%)</th>
-            <th>Holiday</th>
-            <th>Seniorité</th>
-            <th>Coût</th>
-            <th>Note</th>
-            <th>Actions</th>
-        </tr>
+      <tr>
+        <th>{{'IMAGE' | translate}}</th>
+        <th>{{'NAME' | translate}}</th>
+        <th>{{'INITIAL'|translate}}</th>
+        <th>{{'Qualification'|translate}}</th>
+        <th>{{'Holiday'|translate}}</th>
+        <th style="width: 25%;">{{'Start_Date' | translate }}</th>
+        <th>{{ 'EXPERIENCE' | translate }}</th>
+        <th>{{ 'ROLE' | translate }}</th>
+        <th>{{ 'COST' | translate }}</th>
+        <th>{{ 'NOTE' | translate }}</th>
+        <th >{{ 'ACTIONS' | translate }}</th>
+      </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let member of filteredMembers">
+      <tr *ngFor="let member of filteredMembers | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
+        <td>
+          <img *ngIf="member.image" [src]="member.image" class="img-thumbnail rounded-circle shadow-sm"
+            alt="Photo du membre" width="80" height="80" />
+        </td>
+        <td class="fw-bold">{{ member.name }}</td>
+        <td>{{ member.initial }}</td>
+        <td class="text-uppercase">{{ member.jobTitle }}</td>
+        <td>
+          <span *ngFor="let day of member.holiday" class="badge badge-transparent">
+            {{ day }}
+          </span>
+        </td>
+        
 
-            <td>
-                <img *ngIf="selectedMember.image" [src]="selectedMember.image"
-                    class="img-thumbnail rounded-circle shadow-sm" alt="Photo du membre" width="80" height="80">
+        <td ><span class="badge badge-transparent">{{ member.startDate | date:'yyyy-MM-dd' }}</span></td>
+        <td>{{ member.experienceRange }}</td>
 
-            </td>
-            <td class="fw-bold">{{ member.name }}</td>
-            <td>{{ member.initial }}</td>
-            <td class="text-uppercase">{{ member.teamRole }}</td>
-            <td>{{ member.allocation }}%</td>
-            <td>{{ member.holiday }}</td>
-            <td>{{ member.seniorite }}</td>
-            <td class="fw-bold text-success">{{ member.cout }}</td>
-            <td class="text-muted">{{ member.note }}</td>
-            <td class="text-end">
-                <button class="btn btn-warning btn-sm me-1" (click)="openModal(member)">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-danger btn-sm" (click)="deleteTeamMember(member.id!)">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        </tr>
+        <td>{{ member.role }}</td>
+        <td class="fw-bold text-success">{{ member.cost }}</td>
+        <td>{{ member.note }}</td>
+        <td>
+         
+          <div class="d-flex justify-content-end align-items-center">
+            <a [routerLink]="['/teamMemberDetails']" class="btn btn-outline-secondary btn-sm me-2">
+              <i class="fas fa-eye"></i>
+            </a>
+            <button class="btn btn-outline-success btn-sm me-2" (click)="openModal(member)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-outline-danger btn-sm" (click)="deleteTeamMember(member.id!)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </td>
+
+      </tr>
     </tbody>
-</table>
+  </table>
+
+  <!-- Pagination -->
+  <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
 
 
-<!-- MODALE AJOUTER/MODIFIER MEMBRE -->
-<dialog id="teamMemberModal">
+  <!-- Modale d'ajout / modification d'un membre -->
+  <dialog id="teamMemberModal">
     <div class="dialog-header">
-        <span>{{ selectedMember ? 'Modifier' : 'Ajouter' }}</span>
-        <button class="close-btn" (click)="closeModal()">&times;</button>
+      <span>{{ selectedMember && selectedMember.id ? ('Edit Member' | translate) : ('Add New Member' | translate)
+        }}</span>
+      <button class="close-btn" (click)="closeModal()">&times;</button>
     </div>
 
     <div class="dialog-body">
 
-        <label class="form-label">🏷 Nom</label>
-        <input type="text" [(ngModel)]="selectedMember.name" name="name" required />
+      <label class="form-label"> {{ 'NAME' | translate }} </label>
+      <input type="text" class="form-control" [(ngModel)]="selectedMember.name" name="name" (change)="onNameChange()" />
 
-        <label class="form-label">🔠 Initial</label>
-        <input type="text" [(ngModel)]="selectedMember.initial" name="initial" />
 
-        <label class="form-label">📌 Rôle</label>
-        <input type="text" [(ngModel)]="selectedMember.teamRole" name="role" />
+      <label class="form-label">{{ 'INITIAL' | translate }} </label>
+      <input type="text" class="form-control" [(ngModel)]="selectedMember.initial" name="initial"
+        (input)="initialModified = true" />
 
-        <label class="form-label">📊 Allocation (%)</label>
-        <input type="number" [(ngModel)]="selectedMember.allocation" name="allocation" min="0" max="100" required />
 
-        <label>🏅 Seniorité :</label>
-        <select [(ngModel)]="selectedMember.seniorite" class="form-control">
-            <option *ngFor="let s of SenioriteList" [ngValue]="s">
-                {{ getSenioriteLabel(s) }}
-            </option>
+      <label class="form-label">{{ 'Qualification' | translate }} </label>
+      <input type="text" [(ngModel)]="selectedMember.jobTitle" name="role" />
+      <!-- 📅 Date de début -->
+      <div class="mb-3">
+        <label class="form-label">📅 {{ 'Start_Date' | translate }}</label>
+        <input type="date" class="form-control" [(ngModel)]="selectedMember.startDate" name="startDate"
+          (change)="updateExperienceFromStartDate()" />
+      </div>
+
+      <!-- 🔢 Plage d'expérience -->
+      <div class="mb-3">
+        <label class="form-label">📊 {{ 'EXPERIENCE' | translate }}</label>
+        <input type="text" class="form-control" [value]="selectedMember.experienceRange" readonly />
+        <small class="form-text text-muted">
+          Plage : {{ selectedMember.experienceRange || 'Inconnue' }}
+        </small>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">{{ 'ROLE' | translate }}</label>
+        <select class="form-select" [(ngModel)]="selectedMember.role" name="role"
+          (change)="roleModified = true; onSeniorityChange()">
+          <option *ngFor="let role of senioriteOptions" [value]="role">
+            {{ role }}
+          </option>
         </select>
+      </div>
 
-        <label class="form-label">📝 dateEmbauche</label>
-        <input type="date" [(ngModel)]="selectedMember.dateEmbauche" name="dateEmbauche" required />
 
-        <label class="form-label">holiday </label>
-        <input type="date" [(ngModel)]="selectedMember.holiday" name="holiday" required />
+      <label>{{ 'COST' | translate }}</label>
+      <input type="number" [(ngModel)]="selectedMember.cost" (input)="costModified = true" class="form-control"
+        name="cout" />
 
-        <label class="form-label">💰 Coût</label>
-        <input type="number" [(ngModel)]="selectedMember.cout" name="cout" required />
+      <label class="form-label">📆{{ 'Holiday' | translate }}</label>
+      <input type="date" #holidayInput class="form-control" (change)="addHoliday(holidayInput.value)" />
 
-        <label class="form-label">📝 Note</label>
-        <input type="text" [(ngModel)]="selectedMember.note" name="note" required />
+      <!-- Affichage des jours sélectionnés -->
+      <div *ngIf="selectedMember.holiday && selectedMember.holiday.length > 0">
+        <span class="badge bg-primary me-1" *ngFor="let date of selectedMember.holiday">
+          {{ date }}
+          <i class="fas fa-times cursor-pointer text-white" (click)="removeHoliday(date)"></i>
+        </span>
+      </div>
 
-        <div class="col-12">
-            <label class="form-label">Image</label>
-            <ngx-dropzone (change)="onSelect($event)" class="d-block mx-auto border rounded p-3">
-                <ngx-dropzone-label class="fw-bold text-center">🚀 Déposez une image ici</ngx-dropzone-label>
-                <ngx-dropzone-preview *ngFor="let f of files" [removable]="true" (removed)="onRemove(f)">
-                    <ngx-dropzone-label class="text-muted">
-                        {{f.name}} ({{f.type}})
-                    </ngx-dropzone-label>
-                </ngx-dropzone-preview>
-            </ngx-dropzone>
-        </div>
+      <label class="form-label">📝 {{ 'NOTE' | translate }}</label>
+      <input type="text" [(ngModel)]="selectedMember.note" name="note" required />
+
+      <!-- Zone de Dropzone pour l'image -->
+      <div class="col-12">
+        <label class="form-label">{{ 'UPLOAD_IMAGE' | translate }}</label>
+        <ngx-dropzone (change)="onSelect($event)" class="d-block mx-auto border rounded p-3">
+          <ngx-dropzone-label class="fw-bold text-center">
+            🚀 Drop an image here
+          </ngx-dropzone-label>
+          <ngx-dropzone-preview *ngFor="let f of files" [removable]="true" (removed)="onRemove(f)">
+            <ngx-dropzone-label class="text-muted">
+              {{ f.name }} ({{ f.type }})
+            </ngx-dropzone-label>
+          </ngx-dropzone-preview>
+        </ngx-dropzone>
+      </div>
+
+      <!-- Aperçu de l'image -->
+      <div class="col-12 text-center mt-3">
+        <img *ngIf="selectedMember.image" [src]="selectedMember.image" class="img-thumbnail rounded-circle shadow-sm"
+          alt="Uploaded Image" width="100" height="100" />
+      </div>
     </div>
-    <div class="col-12 text-center mt-3">
-        <img *ngIf="imageUrl" [src]="imageUrl" class="img-thumbnail rounded-circle shadow-sm" alt="Uploaded Image"
-            width="80" height="80">
-    </div>
-
 
     <div class="dialog-footer">
-        <button class="btn btn-secondary" (click)="closeModal()">❌ Annuler</button>
-        <button class="btn btn-primary" (click)="saveTeamMember()">✅ Enregistrer</button>
+      <button class="btn btn-secondary" (click)="closeModal()">❌ {{ 'CANCEL' | translate }}</button>
+      <button class="btn btn-primary" (click)="saveTeamMember()">✅ {{ 'SAVE' | translate }}</button>
     </div>
-</dialog>
+  </dialog>

@@ -1,0 +1,124 @@
+<div class="history-section">
+  <div class="section-header">
+    <h5 class="section-title">Historique des modifications</h5>
+    <button class="btn btn-add" (click)="openAddModal()">
+      <i class="fas fa-plus-circle me-2"></i>Ajouter une ligne
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="history-table">
+        <thead class="table-primary">
+        <tr>
+          <th class="version-col">Version</th>
+          <th class="description-col">Description des modifications</th>
+          <th class="action-col">Action</th>
+          <th class="date-col">Date</th>
+          <th class="name-col">Nom</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let group of groupedHistories; let i = index">
+          <tr class="group-row" [class.even-row]="i % 2 === 0">
+            <td class="version-cell" rowspan="3">{{ group.version }}</td>
+            <td class="description-cell" rowspan="3">{{ group.description }}</td>
+
+            <td class="action-cell">
+              <span class="action-badge written">Written</span>
+            </td>
+            <td class="date-cell">{{ group.actions['Written'].date | date:'dd/MM/yyyy' }}</td>
+            <td class="name-cell">{{ group.actions['Written'].name }}</td>
+          </tr>
+          <tr [class.even-row]="i % 2 === 0">
+            <td class="action-cell">
+              <span class="action-badge verified">Verified</span>
+            </td>
+            <td class="date-cell">{{ group.actions['Verified'].date | date:'dd/MM/yyyy' }}</td>
+            <td class="name-cell">{{ group.actions['Verified'].name }}</td>
+          </tr>
+          <tr [class.even-row]="i % 2 === 0">
+            <td class="action-cell">
+              <span class="action-badge approved">Approved</span>
+            </td>
+            <td class="date-cell">{{ group.actions['Approved'].date | date:'dd/MM/yyyy' }}</td>
+            <td class="name-cell">{{ group.actions['Approved'].name }}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal d'ajout -->
+  <div class="modal-overlay" *ngIf="isEditModalOpen">
+    <div class="modal-container">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">
+            <i class="fas fa-history me-2"></i>Nouvelle version d'historique
+          </h3>
+          <button class="modal-close" (click)="closeModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form class="history-form">
+            <div class="form-group">
+              <label>Version</label>
+              <input type="text" class="form-control" [value]="currentVersion" disabled />
+            </div>
+
+            <div class="form-group">
+              <label>Description des modifications</label>
+              <textarea class="form-control" [(ngModel)]="sharedDescription" name="description" rows="3"></textarea>
+            </div>
+
+            <div class="actions-list">
+              <div class="action-item" *ngFor="let action of newActions; let i = index">
+                <div class="action-select">
+                  <label>Action</label>
+                  <select class="form-control" [(ngModel)]="action.action" [name]="'action' + i">
+                    <option value="Written">Written</option>
+                    <option value="Verified">Verified</option>
+                    <option value="Approved">Approved</option>
+                  </select>
+                </div>
+
+                <div class="action-name">
+                  <label>Nom</label>
+                  <input type="text" class="form-control" [(ngModel)]="action.name" [name]="'name' + i" />
+                </div>
+
+                <div class="action-date">
+                  <label>Date</label>
+                  <input type="date" class="form-control" [(ngModel)]="action.date" [name]="'date' + i" />
+                </div>
+
+                <div class="action-delete">
+                  <button type="button" class="btn-delete" (click)="deleteNewAction(i)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="add-action">
+              <button class="btn-add-action" type="button" (click)="newActions.push(createAction(''))">
+                <i class="fas fa-plus-circle me-2"></i>Ajouter une action
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-cancel" (click)="closeModal()">
+            <i class="fas fa-times me-2"></i>Annuler
+          </button>
+          <button class="btn btn-save" (click)="saveGroupedHistory()">
+            <i class="fas fa-save me-2"></i>Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

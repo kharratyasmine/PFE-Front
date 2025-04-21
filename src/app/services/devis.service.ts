@@ -30,4 +30,19 @@ export class DevisService {
   deleteDevis(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+  getDevisByProject(projectId: number): Observable<Devis[]> {
+    return this.http.get<Devis[]>(`${this.apiUrl}/project/${projectId}`);
+  }
+
+  downloadDevisWord(devisId: number): void {
+    this.http.get(`http://localhost:8080/devisExport/word/${devisId}`, {
+      responseType: 'blob'
+    }).subscribe(blob => {
+      const a = document.createElement('a');
+      a.href = window.URL.createObjectURL(blob);
+      a.download = `devis_${devisId}.docx`;
+      a.click();
+    });
+  }
+  
 }

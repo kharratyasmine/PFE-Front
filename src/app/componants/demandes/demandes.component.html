@@ -1,0 +1,110 @@
+<div class="mb-3 d-flex justify-content-between align-items-center">
+  <h5>{{ 'related requests' | translate }}</h5>
+  <button class="btn btn-outline-success btn-sm" (click)="openModal()">
+    <i class="fas fa-plus"></i> {{ 'add request' | translate }}
+  </button>
+</div>
+
+<table *ngIf="project?.demandes?.length; else noDemands" class="table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>{{ 'name' | translate }}</th>
+      <th>{{ 'start date' | translate }}</th>
+      <th>{{ 'end date' | translate }}</th>
+      <th>{{ 'scope' | translate }}</th>
+      <th>{{ 'requirements' | translate }}</th>
+      <th>{{ 'members' | translate }}</th>
+      <th>{{ 'actions' | translate }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let demande of project?.demandes">
+      <td>{{ demande.id }}</td>
+      <td>{{ demande.name }}</td>
+      <td>{{ demande.dateDebut }}</td>
+      <td>{{ demande.dateFin }}</td>
+      <td>{{ demande.scope }}</td>
+      <td>{{ demande.requirements }}</td>
+      <td>
+        <ul class="list-group">
+          <li *ngFor="let memberId of demande.teamMemberIds" class="list-group-item">
+            {{ getMemberName(memberId) }}
+          </li>
+        </ul>
+      </td>
+      <td>
+        
+        <button class="btn btn-outline-success btn-sm" (click)="openModal(demande)">
+          <i class="fas fa-pencil-alt"></i>
+        </button>
+        <button class="btn btn-outline-danger btn-sm"(click)="deleteDemande(demande.id!)">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<ng-template #noDemands>
+  <p class="text-muted">{{ 'no requests' | translate }}</p>
+</ng-template>
+
+<!-- Modal Bootstrap 5 -->
+<div class="modal fade" id="demandeModal" tabindex="-1" aria-labelledby="demandeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          {{ editMode ? ('edit request' | translate) : ('add request' | translate) }}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="demandeForm">
+          <div class="mb-3">
+            <label for="name" class="form-label">{{ 'name' | translate }}</label>
+            <input type="text" id="name" class="form-control" formControlName="name">
+          </div>
+
+          <div class="mb-3">
+            <label for="dateDebut" class="form-label">{{ 'start date' | translate }}</label>
+            <input type="date" id="dateDebut" class="form-control" formControlName="dateDebut">
+          </div>
+
+          <div class="mb-3">
+            <label for="dateFin" class="form-label">{{ 'end date' | translate }}</label>
+            <input type="date" id="dateFin" class="form-control" formControlName="dateFin">
+          </div>
+
+          <div class="mb-3">
+            <label for="scope" class="form-label">{{ 'scope' | translate }}</label>
+            <input type="text" id="scope" class="form-control" formControlName="scope">
+          </div>
+
+          <div class="mb-3">
+            <label for="requirements" class="form-label">{{ 'requirements' | translate }}</label>
+            <input type="text" id="requirements" class="form-control" formControlName="requirements">
+          </div>
+
+          <mat-form-field appearance="fill" class="w-100">
+            <mat-label>{{ 'members' | translate }}</mat-label>
+            <mat-select formControlName="teamMemberIds" multiple>
+              <mat-option *ngFor="let member of allTeamMembers" [value]="member.id">
+                {{ member.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'cancel' | translate }}</button>
+        <button type="button" class="btn btn-primary" (click)="saveDemande()">
+          {{ editMode ? ('edit' | translate) : ('add' | translate) }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

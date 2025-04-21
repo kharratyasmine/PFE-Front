@@ -1,26 +1,46 @@
-import { AffectationProject } from './AffectationProject.model';
 import { Client } from './client.model';
+import { Demande } from './demande.model';
 import { Devis } from './devis.model';
-import { ProjectTask } from './ProjectTask.model';
-import { Team } from './Team.model';
+import { Team} from './Team.model';
 import { User } from './user.model';
+// project-task.component.ts
+import { ProjectGroup } from 'src/app/model/project-group.model';
 
 export interface Project {
   id?: number;
   name: string;
   projectType: string;
   description: string;
-  startDate: string | Date;  // ✅ Accepter les deux formats
-  endDate: string | Date; 
-  scope: string;
-  requirements: string;
+  startDate: string; // Format "yyyy-MM-dd" reçu de l'API
+  endDate: string;
+  technologie: string;
+  activity: string;
   status: Status;
-  devisList?: Devis[]; // Liste des devis liés au projet
-  user: User| null; // Chef de projet
-  client: Client | null; // Client associé au projet
-  affectations?: AffectationProject[]; // TeamMember affectées
-  team?: Team[];
-  tasks?: ProjectTask[];
+  clientId: null;
+  client?: Client;
+  userId: null;
+  userName: string;
+  user?: User;
+  teams: Team[]; 
+  teamIds?: number[]; 
+  demandes: Demande[]; 
+  devisList: Devis[];
+  
+}
+
+export interface ProjectDTO {
+  id?: number;
+  name: string;
+  projectType: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  technologie: string;
+  activity: string;
+  status: Status;
+  clientId: number | null;
+  userId: number | null;
+  teamIds: number[];
 }
 
 
@@ -29,10 +49,5 @@ export enum Status {
   TERMINE = "TERMINE",
   EN_ATTENTE = "EN_ATTENTE",
   ANNULE = "ANNULE",
-  EN_ATTENTE_DEVIS = "EN_ATTENTE_DEVIS",
-  EN_ATTENTE_VALIDATION = "EN_ATTENTE_VALIDATION",
-  EN_ATTENTE_VALIDATION_DEVIS = "EN_ATTENTE_VALIDATION_DEVIS",
-  EN_ATTENTE_VALIDATION_AFFECTATION = "EN_ATTENTE_VALIDATION_AFFECTATION"
+
 }
-
-

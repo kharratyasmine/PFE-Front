@@ -1,9 +1,13 @@
 import { Role } from "./role.enum";
+
 export interface User {
-  id: number; 
+  id?: number; 
   firstname: string;
   lastname: string;
   email: string;
-  motDePasse: string;
+  password: string;
+  phoneNumber : String;
+  address: string;
   role: Role;
+  photoUrl?: string;
 }

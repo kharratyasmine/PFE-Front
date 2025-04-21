@@ -1,0 +1,58 @@
+<!-- 💡 Conteneur centré -->
+<div class="custom-modal-wrapper">
+
+  <div class="modal-content custom-modal-content bg-white shadow">
+    
+    <!-- Header -->
+    <div class="modal-header d-flex flex-column align-items-start border-bottom">
+      <div class="w-100 d-flex justify-content-between align-items-start">
+        <h5 class="modal-title text-primary d-flex align-items-center">
+          <i class="fas fa-file-invoice me-2"></i>
+          <span>Devis n° {{ devis?.reference }}</span>
+        </h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
+      </div>
+      <div class="mt-2 ms-1">
+        <small><strong>Auteur :</strong> {{ devis?.author }}</small><br />
+        <small><strong>Edition :</strong> {{ devis?.edition }}</small>
+      </div>
+      <button class="btn btn-outline-primary btn-sm" (click)="downloadWord()">
+        <i class="fas fa-file-word"></i> Exporter Word
+      </button>
+      
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+
+      <ul class="nav nav-tabs">
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#summary">Résumé</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#history">History</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#workload">Workload PROPOSAL</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#financial">FINANCIAL PROPOSAL</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#invoicing">Invoicing PROPOSAL</a></li>
+      </ul>
+
+      <div class="tab-content mt-3">
+        <div id="summary" class="tab-pane fade show active">
+          <app-summary *ngIf="devis?.id" [devisId]="devis?.id"></app-summary>
+        </div>
+        <div id="history" class="tab-pane fade">
+          <app-history *ngIf="devis?.id" [devisId]="devis?.id"></app-history>
+        </div>
+        <div id="workload" class="tab-pane fade">
+          <app-workload *ngIf="devis?.id" [devisId]="devis?.id"></app-workload>
+        </div>
+       
+        <div id="financial" class="tab-pane fade">
+          <app-financial *ngIf="devis?.id" [devisId]="devis?.id"></app-financial>
+        </div>
+        <div id="invoicing" class="tab-pane fade">
+          <app-invoicing *ngIf="devis?.id" [devisId]="devis?.id"></app-invoicing>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

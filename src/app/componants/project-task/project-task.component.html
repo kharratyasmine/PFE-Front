@@ -1,110 +1,228 @@
 <div class="container">
-    <h2 class="text-center mt-3">📌 Liste des Tâches</h2>
-
-    <!-- Barre de recherche -->
+  <div *ngFor="let group of groupedTasks; let i = index">
+    
+    <!-- Actions -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <input type="text" class="form-control w-50" placeholder="🔍 Rechercher une tâche..."
-            (input)="searchTaskByName($event)">
-        <div>
-            <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
-                <i class="fas fa-download"></i> Exporter
-            </button>
-            <button class="btn btn-primary" (click)="openModal()">
-                <i class="fas fa-plus"></i> Ajouter une tâche
-            </button>
-        </div>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <input type="text" class="form-control w-50" placeholder="🔍 {{ 'search' | translate }}..." (input)="onSearchChange(i, $event)" style="max-width: 250px;">
+      </div>
+      <button class="btn btn-outline-success btn-sm" (click)="openModal()">
+        <i class="fas fa-plus"></i> {{ 'add task' | translate }}
+      </button>
+       <!-- Barre de recherche -->
+    
     </div>
 
-    <!-- Tableau des tâches -->
-    <table class="table table-bordered table-hover text-center shadow-sm">
-        <thead class="table-dark">
-            <tr>
-                <th>Titre</th>
-                <th>Description</th>
-                <th>Assigné à</th>
-                <th>Projet</th>
-                <th>Date Début</th>
-                <th>Date Fin</th>
-                <th>Progress (%)</th>
-                <th>Statut</th>
-                <th>⚙️ Actions</th>
-            </tr>
+   
+
+    <!-- Tableau -->
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th rowspan="2">{{ 'task name' | translate }}</th>
+            <th rowspan="2">{{ 'description' | translate }}</th>
+            <th rowspan="2">{{ 'members' | translate }}</th>
+            <th rowspan="2">{{ 'status' | translate }}</th>
+            <th rowspan="2">{{ 'progress' | translate }}</th>
+            <th colspan="2">{{ 'estimated dates' | translate }}</th>
+            <th colspan="2">{{ 'effective dates' | translate }}</th>
+            <th colspan="3">MD</th>
+            <th rowspan="2" class="text-end">{{ 'actions' | translate }}</th>
+          </tr>
+          <tr>
+            <th>{{ 'start date' | translate }}</th>
+            <th>{{ 'end date' | translate }}</th>
+            <th>{{ 'start date' | translate }}</th>
+            <th>{{ 'end date' | translate }}</th>
+            <th>{{ 'worked' | translate }}</th>
+            <th>{{ 'estimated' | translate }}</th>
+            <th>{{ 'remaining' | translate }}</th>
+          </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let task of filteredTasks">
-                <td>{{ task.id }}</td>
-                <td>{{ task.name }}</td>
-                <td>{{ task.description }}</td>
-                <td>{{ task.teamMember?.name || 'Non assigné' }}</td>
-                <td>{{ task.project?.name || 'Non défini' }}</td>
-                <td>{{ task.startDate | date: 'yyyy-MM-dd' }}</td>
-                <td>{{ task.endDate | date: 'yyyy-MM-dd' }}</td>
-                <td>{{ task.progress }}</td>
-                <td>
-                    <span class="badge rounded-pill px-3 py-2 text-uppercase" [ngClass]="{
-                                'bg-success': getStatusLabel(task.status) === 'Terminé',
-                                'bg-warning text-dark': getStatusLabel(task.status) === 'En cours',
-                                'bg-danger': getStatusLabel(task.status) === 'Bloqué',
-                                'bg-secondary': getStatusLabel(task.status) === 'En attente',
-                                'bg-info': getStatusLabel(task.status) === 'Annulé',
-
-                            }">
-                        {{ getStatusLabel(task.status) }}
-                    </span>
-                </td>
-
-                <td class="text-end">
-                    <button class="btn btn-warning btn-sm me-2" (click)="openEditModal(task)">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm" (click)="deleteTask(task.id)">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
+          <ng-container *ngFor="let task of group.filteredTasks | paginate:{ itemsPerPage: itemsPerPage, currentPage: group.currentPage, id: 'pagination_' + i }">
+            
+            <!-- Cas sans assignation -->
+            <tr *ngIf="task.assignments.length === 0">
+              <td>{{ task.name }}</td>
+              <td>{{ task.description }}</td>
+              <td colspan="10" class="text-center text-muted fst-italic">
+                {{ 'no member assigned' | translate }}
+              </td>
+              <td class="text-end">
+                <button class="btn btn-outline-success btn-sm me-2" (click)="openModal(task)">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm" (click)="deleteTask(task.id!)">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
             </tr>
+
+            <!-- Cas avec assignations -->
+            <ng-container *ngFor="let a of task.assignments; let j = index">
+              <tr>
+                <td *ngIf="j === 0" [attr.rowspan]="task.assignments.length">{{ task.name }}</td>
+                <td *ngIf="j === 0" [attr.rowspan]="task.assignments.length">{{ task.description }}</td>
+                <td>{{ getMemberName(a.teamMemberId) }}</td>
+                <td *ngIf="j === 0" [attr.rowspan]="task.assignments.length">{{ getStatusLabel(task.status) }}</td>
+                <td>{{ a.progress }}%</td>
+                <td>{{ a.estimatedStartDate }}</td>
+                <td>{{ a.estimatedEndDate }}</td>
+                <td>{{ a.effectiveStartDate || '-' }}</td>
+                <td>{{ a.effectiveEndDate || '-' }}</td>
+                <td>{{ a.workedMD }}</td>
+                <td>{{ a.estimatedMD }}</td>
+                <td>{{ a.remainingMD }}</td>
+                <td *ngIf="j === 0" [attr.rowspan]="task.assignments.length" class="text-end">
+                  <button class="btn btn-warning btn-sm me-1" (click)="openModal(task)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm" (click)="deleteTask(task.id!)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+
+          </ng-container>
+
+          <!-- Aucun résultat -->
+          <tr *ngIf="group.filteredTasks.length === 0">
+            <td colspan="14" class="text-center text-muted fst-italic">{{ 'no task found' | translate }}</td>
+          </tr>
         </tbody>
-    </table>
+      </table>
+    </div>
+
+    <!-- ✅ Pagination en bas -->
+    <div class="d-flex justify-content-end mt-3">
+      <pagination-controls
+        id="pagination_{{ i }}"
+        (pageChange)="onPageChange(i, $event)"
+        [autoHide]="false"
+        previousLabel="« Previous"
+        nextLabel="Next »"
+        >
+      </pagination-controls>
+    </div>
+
+  </div>
 </div>
 
-<!-- MODALE AJOUTER/MODIFIER UNE TÂCHE -->
+
+
+<!-- MODAL -->
 <dialog id="taskModal">
-    <div class="dialog-header">
-        <span>{{ selectedTask.id ? 'Modifier' : 'Ajouter' }}</span>
-        <button class="close-btn" (click)="closeModal()">&times;</button>
+  <div class="dialog-header">
+    <span>{{ selectedTask.id ? ('edit task' | translate) : ('add task' | translate) }}</span>
+    <button class="close-btn" (click)="closeModal()">&times;</button>
+  </div>
+
+  <div class="dialog-body">
+    <div class="form-group">
+      <label>{{ 'task name' | translate }}</label>
+      <input class="form-control" [(ngModel)]="selectedTask.name">
     </div>
-    <div class="dialog-body">
-        <label>🏷 Titre</label>
-        <input type="text" [(ngModel)]="selectedTask.name" name="title" required />
-        <label>📝 Description</label>
-        <textarea [(ngModel)]="selectedTask.description" name="description" required></textarea>
 
-        <label>📌 Statut</label>
-        <select [(ngModel)]="selectedTask.status" class="form-control">
-            <option *ngFor="let s of statusList" [ngValue]="s">{{ getStatusLabel(s) }}</option>
-        </select>
-
-        <label >📆 Date de début</label>
-        <input type="date" class="form-control" [(ngModel)]="selectedTask.startDate" name="startDate" required />
-   
-        <label >⏳ Date de fin</label>
-        <input type="date" class="form-control" [(ngModel)]="selectedTask.endDate" name="endDate" />
-        
-        <label for="teamMember">👤 Assigné à</label>
-        <select id="teamMember" [(ngModel)]="selectedTask.teamMember" class="form-control">
-          <option *ngFor="let member of availableMembers" [ngValue]="member">{{ member.name }}</option>
-        </select>
-
-        <label for="project">📌 Projet</label>
-    <select id="project" [(ngModel)]="selectedTask.project" class="form-control">
-      <option *ngFor="let project of availableProjects" [ngValue]="project">{{ project.name }}</option>
-    </select>
-
-        <label >📊 Progress (%)</label>
-        <input type="number" class="form-control" [(ngModel)]="selectedTask.progress" name="progress" min="0" max="100"
-            required />
+    <div class="form-group">
+      <label>{{ 'description' | translate }}</label>
+      <textarea class="form-control" [(ngModel)]="selectedTask.description"></textarea>
     </div>
-<div class="dialog-footer">
-  <button class="btn btn-secondary" (click)="closeModal()">❌ Annuler</button>
-  <button class="btn btn-primary" (click)="saveTask()">✅ Enregistrer</button>
-</div>
+
+    <div class="form-group">
+      <label>{{ 'status' | translate }}</label>
+      <select class="form-control" [(ngModel)]="selectedTask.status">
+        <option *ngFor="let s of statusList" [ngValue]="s">{{ getStatusLabel(s) }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>{{ 'progress' | translate }} (%)</label>
+      <input type="number" class="form-control" [(ngModel)]="selectedTask.progress">
+    </div>
+
+    <div class="form-group">
+      <label>{{ 'start date' | translate }}</label>
+      <input type="date" class="form-control" [(ngModel)]="selectedTask.dateDebut">
+    </div>
+
+    <div class="form-group">
+      <label>{{ 'end date' | translate }}</label>
+      <input type="date" class="form-control" [(ngModel)]="selectedTask.dateFin">
+    </div>
+
+    <div class="form-group">
+      <label class="fw-bold">{{ 'assignments' | translate }}</label>
+
+      <div *ngFor="let assignment of selectedTask.assignments; let j = index" class="assignment-box mb-4 p-3 border rounded shadow-sm bg-light">
+
+        <div class="mb-3">
+          <label>{{ 'team member' | translate }}</label>
+          <select class="form-control" [(ngModel)]="assignment.teamMemberId">
+            <option [value]="null">-- {{ 'select member' | translate }} --</option>
+            <option *ngFor="let m of filteredMembers" [value]="m.id">{{ m.name }}</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label>{{ 'progress' | translate }} (%)</label>
+          <input type="number" class="form-control" [(ngModel)]="assignment.progress" min="0" max="100">
+        </div>
+
+        <div class="mb-3">
+          <label>{{ 'estimated md' | translate }}</label>
+          <input type="number" class="form-control" [(ngModel)]="assignment.estimatedMD" (input)="recalculateRemainingMD(assignment)">
+        </div>
+
+        <div class="mb-3">
+          <label>{{ 'worked md' | translate }}</label>
+          <input type="number" class="form-control" [(ngModel)]="assignment.workedMD" (input)="recalculateRemainingMD(assignment)">
+        </div>
+
+        <div class="mb-3">
+          <label>{{ 'remaining md' | translate }}</label>
+          <input type="number" class="form-control bg-white" [value]="assignment.remainingMD || 0" disabled>
+        </div>
+
+        <div class="mb-3">
+          <label>{{ 'estimated start date' | translate }}</label>
+          <input type="date" class="form-control" [(ngModel)]="assignment.estimatedStartDate">
+        </div>
+
+        <div class="mb-3">
+          <label>{{ 'estimated end date' | translate }}</label>
+          <input type="date" class="form-control" [(ngModel)]="assignment.estimatedEndDate">
+        </div>
+
+        <div class="mb-3">
+          <label>{{ 'effective start date' | translate }}</label>
+          <input type="date" class="form-control" [(ngModel)]="assignment.effectiveStartDate">
+        </div>
+
+        <div class="mb-3">
+          <label>{{ 'effective end date' | translate }}</label>
+          <input type="date" class="form-control" [(ngModel)]="assignment.effectiveEndDate">
+        </div>
+
+        <div class="text-end mt-2">
+          <button class="btn btn-outline-danger btn-sm" (click)="selectedTask.assignments.splice(j, 1)">
+            <i class="fas fa-trash-alt"></i> {{ 'delete' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button class="btn btn-outline-success btn-sm" (click)="selectedTask.assignments.push({ teamMemberId: null, progress: 0, estimatedMD: 0, workedMD: 0, estimatedStartDate: '', estimatedEndDate: '' })">
+          + {{ 'add member' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <div class="dialog-footer mt-4">
+      <button class="btn btn-secondary me-2" (click)="closeModal()">{{ 'cancel' | translate }}</button>
+      <button class="btn btn-primary" (click)="saveTask()">{{ 'save' | translate }}</button>
+    </div>
+  </div>
 </dialog>

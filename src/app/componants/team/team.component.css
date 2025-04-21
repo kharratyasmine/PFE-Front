@@ -1,19 +1,116 @@
 .container {
-  max-width: 90%;
-  margin: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+/* Titre */
+h2 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 25px;
+  position: relative;
+  display: inline-block;
 }
 
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #3498db, #9b59b6);
+  border-radius: 3px;
+}/* Breadcrumb */
+.breadcrumb {
+  background-color: #f8f9fa !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+}
+
+.breadcrumb-item a {
+  color: #6c757d;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.breadcrumb-item a:hover {
+  color: #3498db;
+}
+
+.breadcrumb-item.active {
+  color: #2c3e50;
+  font-weight: 500;
+}
 input::placeholder {
   font-style: italic;
   color: #aaa;
 }
 
-button {
-  transition: 0.3s ease-in-out;
+* Barre de recherche et boutons */
+.d-flex.justify-content-between {
+  margin-bottom: 25px;
 }
 
-button:hover {
-  transform: scale(1.05);
+.form-control {
+  border: 1px solid #dfe6e9;
+  border-radius: 8px;
+  padding: 10px 15px;
+  transition: all 0.3s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.form-control:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-outline-primary {
+  color: #3498db;
+  border-color: #3498db;
+}
+
+.btn-outline-primary:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-outline-success {
+  color: #2ecc71;
+  border-color: #2ecc71;
+}
+
+.btn-outline-success:hover {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.btn-outline-danger {
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+
+.btn-outline-danger:hover {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.875rem;
 }
 
 .modal-content {
@@ -34,8 +131,8 @@ table {
 }
 
 thead th {
-  background: #343a40;
-  color: white;
+  background: #ececec;
+  color: #343a40;
   text-align: center;
 }
 
@@ -43,150 +140,261 @@ td, th {
   text-align: center;
   vertical-align: middle;
 }
-/* ✅ Style général de la modale */
-dialog {
-width: 50%;
-max-width: 600px;
-border: none;
-border-radius: 8px;
-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-padding: 20px;
-background-color: white;
-}
-
-/* ✅ En-tête de la modale */
-.dialog-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-font-size: 18px;
-font-weight: bold;
-padding-bottom: 10px;
-border-bottom: 2px solid #ddd;
-}
-
-/* ✅ Bouton de fermeture */
-.close-btn {
-background: none;
-border: none;
-font-size: 24px;
-cursor: pointer;
-color: red;
-}
-
-/* ✅ Corps du formulaire */
-.dialog-body {
-display: flex;
-flex-direction: column;
-gap: 10px;
-padding: 15px 0;
-}
-
-.dialog-body label {
-font-weight: bold;
-margin-top: 5px;
-}
-
-.dialog-body input,
-.dialog-body textarea {
-width: 100%;
-padding: 8px;
-border: 1px solid #ccc;
-border-radius: 4px;
-font-size: 14px;
-}
-
-/* ✅ Pied de page de la modale */
-.dialog-footer {
-display: flex;
-justify-content: flex-end;
-gap: 10px;
-padding-top: 10px;
-border-top: 2px solid #ddd;
-}
-
-.dialog-footer .btn {
-padding: 8px 15px;
-font-size: 14px;
-cursor: pointer;
-border-radius: 5px;
-}
-
-/* ✅ Boutons */
-.btn-secondary {
-background-color: #6c757d;
-color: white;
-border: none;
-}
-
-.btn-primary {
-background-color: #007bff;
-color: white;
-border: none;
-}
-
-.btn-primary:hover,
-.btn-secondary:hover {
-opacity: 0.8;
-}
-
 /* ✅ Rendre la modale responsive */
 @media (max-width: 768px) {
+  dialog {
+    width: 90%;
+  }
+}  
+/* ✅ Style général de la modale */
 dialog {
-  width: 90%;
-}
-}
-.list-unstyled {
-  margin: 0;
-  padding: 0;
+  width: 100%;
+  max-width: 600px;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  background-color: white;
+  }
+  
+  /* ✅ En-tête de la modale */
+  .dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+  }
+  
+  /* ✅ Bouton de fermeture */
+  .close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: red;
+  }
+  
+  /* ✅ Corps du formulaire */
+  .dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px 0;
+  }
+  
+  .dialog-body label {
+  font-weight: bold;
+  margin-top: 5px;
+  }
+  
+  .dialog-body input,
+  .dialog-body textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  }
+  
+  /* ✅ Pied de page de la modale */
+  .dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 2px solid #ddd;
+  }
+  
+  .dialog-footer .btn {
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+  }
+  /* ✅ Assurer que la liste s'affiche sous le bouton */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  width: 100%;
 }
 
-.list-unstyled li {
+/* ✅ Ajuster la liste déroulante */
+.dropdown-menu {
+  position: absolute;
+  width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  z-index: 1000; /* S'assurer que la liste est au-dessus */
+}
+
+/* ✅ Améliorer l'affichage des éléments */
+.dropdown-item {
   display: flex;
   align-items: center;
-}
-
-.list-unstyled img {
-  border: 1px solid #ddd;
-  object-fit: cover;
-}
-/* Style pour la liste des membres */
-.member-card {
-  display: flex;
-  align-items: center;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 8px 12px;
-  margin: 5px;
-  background-color: #f9f9f9;
-  transition: all 0.3s ease-in-out;
-}
-
-.member-card:hover {
-  background-color: #e9ecef;
-  transform: scale(1.05);
-}
-
-/* Avatar des membres */
-.member-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-  object-fit: cover;
-  border: 2px solid #ddd;
-}
-
-/* Checkbox */
-.member-checkbox {
-  margin-right: 10px;
-  transform: scale(1.2);
+  justify-content: space-between;
+  padding: 8px;
   cursor: pointer;
 }
 
-/* Nom du membre */
-.member-name {
-  font-size: 16px;
-  font-weight: 500;
+/* ✅ Agrandir l'input allocation */
+.allocation-input {
+  width: 80px;  /* Augmenter la largeur */
+  font-size: 16px; /* Augmenter la taille du texte */
+  text-align: center;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
+/* ✅ Désactiver l'input si non sélectionné */
+.allocation-input:disabled {
+  background: #f0f0f0;
+  cursor: not-allowed;
+}
+
+/* ✅ Rendre la liste déroulante bien positionnée sous le bouton */
+.dropdown-toggle {
+  width: 100%;
+  text-align: left;
+  padding: 10px;
+  font-size: 16px;
+}
+/* ✅ Style du dropdown */
+.member-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.member-dropdown .dropdown-menu {
+  width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 10px;
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ Amélioration de l'affichage des membres */
+.member-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.member-item:last-child {
+  border-bottom: none;
+}
+
+/* ✅ Ajustement des checkboxes */
+.form-check-input {
+  margin-right: px;
+}
+
+/* ✅ Input allocation bien aligné */
+.allocation-input {
+  width: 80px;
+  font-size: 14px;
+  text-align: center;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* ✅ Désactiver l'input allocation si non sélectionné */
+.allocation-input:disabled {
+  background: #f0f0f0;
+  cursor: not-allowed;
+}
+/* ✅ Style général du fieldset */
+.member-fieldset {
+  border: 2px solid #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 10px;
+  background: #f9f9f9;
+  width: 100%;
+}
+
+/* ✅ Titre du fieldset */
+.member-fieldset legend {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+  padding: 5px;
+}
+
+/* ✅ Conteneur des membres avec alignement */
+.member-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #ddd;
+  width: 100%;
+}
+
+.member-item:last-child {
+  border-bottom: none;
+}
+
+/* ✅ Alignement du checkbox */
+.member-item input[type="checkbox"] {
+  width: 12px;
+  height: 12px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+/* ✅ Conteneur du texte */
+.member-text {
+  flex-grow: 1; /* ✅ Permet au texte d’occuper l’espace restant */
+  font-size: 14px;
+  color: #444;
+  white-space: nowrap;  /* ✅ Empêche le retour à la ligne */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ✅ Champ d’allocation bien aligné */
+.allocation-input {
+  width: 80px !important;  /* ✅ Taille uniforme */
+  min-width: 80px; /* ✅ Empêcher le redimensionnement */
+  max-width: 80px;
+  height: 30px;  /* ✅ Hauteur uniforme */
+  font-size: 14px;
+  text-align: center;
+  padding: 3px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* ✅ Désactiver l’input allocation si non sélectionné */
+.allocation-input:disabled {
+  background: #f0f0f0;
+  cursor: not-allowed;
+}
+.card-header h5 {
+  margin: 0;
+  font-weight: 600;
+}
+
+.card-header .btn {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+}
+
+.card .list-group-item {
+  background-color: #f9f9f9;
+  border: none;
+}

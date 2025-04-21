@@ -9,43 +9,30 @@ import { ClientService } from 'src/app/services/client.service';
   styleUrls: ['./client.component.css']
 })
 export class ClientComponent implements OnInit {
-  
+
   clients: Client[] = [];
   filteredClients: Client[] = [];
   modalInstance: any;
-  
-  selectedClient: Client = {
-    id: 0,
-    name: '',
-    email: '',
-    contact: '',
-    address: ''
-  };
-  
+  selectedClient: Client = { id: 0, company: '',salesManagers: [], email: '', contact: '', address: '' };
 
-  constructor(private clientService: ClientService) {}
+  currentPage: number = 1;
+  itemsPerPage: number = 6; // Nombre d'éléments par page
+  translate: any;
+  constructor(private clientService: ClientService) { }
 
   ngOnInit(): void {
-    this.loadClients();
+    this.getClients();
   }
 
   /**
    * Charger les clients depuis l'API
    */
-  loadClients(): void {
-    this.clientService.getAllClients().subscribe(
-        (response) => {
-            console.log('📌 Réponse brute du backend :', response);
-            this.clients = response as Client[];  // S'assurer que c'est bien un tableau d'objets Client
-            this.filteredClients = [...this.clients];
-        },
-        (error) => {
-            console.error('❌ Erreur chargement clients', error);
-            console.log("📌 Détails de l'erreur :", error.message);
-            console.log("📌 Réponse complète :", error);
-        }
-    );
-}
+  getClients() {
+    this.clientService.getAllClients().subscribe(data => {
+      this.clients = data;
+      this.filteredClients = data;
+    });
+  }
 
 
   /**
@@ -62,62 +49,67 @@ export class ClientComponent implements OnInit {
   /**
    * Ouvrir la modale d'ajout/modification de client
    */
-  openModal(client?: Client): void {
-     this.selectedClient = client ? { ...client } : {
-       id: 0,
-       name: '',
-       address:'',
-       contact:'',
-       email:'' 
-     };
-     const modal = document.getElementById('clientModal');
-     if (modal) {
-       (modal as any).showModal();
-     }
-   }
- 
-
-  /**
-   * Fermer la modale
-   */
-  closeModal(): void {
-    const modal = document.getElementById('clientModal');
-    if (modal) {
-      (modal as any).close();
+  openModal(client?: Client) {
+    if (client) {
+      this.selectedClient = { ...client }; // Copie de l'objet client existant
+    } else {
+      this.selectedClient = { id: 0, company: '',salesManagers: [], email: '', contact: '', address: '' };
     }
+    (document.getElementById('clientModal') as HTMLDialogElement).showModal();
+  }
+
+  closeModal() {
+    (document.getElementById('clientModal') as HTMLDialogElement).close();
   }
 
   /**
    * Ajouter ou modifier un client
    */
   saveClient(): void {
-    console.log("📤 Données envoyées :", JSON.stringify(this.selectedClient));
-
-    if (this.selectedClient.id) {
-        this.clientService.updateClient(this.selectedClient.id, this.selectedClient).subscribe(
-            (updatedClient) => {
-                console.log("✅ Client mis à jour :", updatedClient);
-                this.loadClients();
-                this.closeModal();
-            },
-            (error) => {
-                console.error("❌ Erreur mise à jour client", error);
-            }
-        );
+    // Préparation de l'objet client à envoyer
+    const clientToSend: Client = {
+      id: this.selectedClient.id && this.selectedClient.id > 0 ? this.selectedClient.id : undefined,
+      company: this.selectedClient.company,
+      salesManagers: this.selectedClient.salesManagers.filter(name => name.trim() !== ''),
+      contact: this.selectedClient.contact,
+      address: this.selectedClient.address,
+      email: this.selectedClient.email
+    };
+  
+    console.log("📤 Données envoyées :", JSON.stringify(clientToSend));
+  
+    if (this.selectedClient.id && this.selectedClient.id > 0) {
+      // Mise à jour du client existant
+      this.clientService.updateClient(this.selectedClient.id, clientToSend).subscribe(
+        updatedClient => {
+          console.log("✅ Client mis à jour :", updatedClient);
+          this.getClients(); // Met à jour la liste visible
+          this.closeModal(); // Ferme le formulaire/modal
+        },
+        error => {
+          console.error("❌ Erreur mise à jour client", error);
+          const errorMessage = error.error?.message || JSON.stringify(error.error) || "Erreur inconnue côté backend";
+          alert(errorMessage);
+        }
+      );
     } else {
-        this.clientService.createClient(this.selectedClient).subscribe(
-            (newClient) => {
-                console.log("✅ Client ajouté :", newClient);
-                this.loadClients();
-                this.closeModal();
-            },
-            (error) => {
-                console.error("❌ Erreur ajout client", error);
-                console.log("📌 Détails erreur :", error.message);
-            }
-        );
+      // Création d'un nouveau client
+      this.clientService.createClient(clientToSend).subscribe(
+        newClient => {
+          console.log("✅ Client ajouté :", newClient);
+          this.getClients(); // Rafraîchit la liste
+          this.closeModal(); // Ferme la modale
+        },
+        error => {
+          console.error("❌ Erreur ajout client", error);
+          const errorMessage = error.error?.message || JSON.stringify(error.error) || "Erreur inconnue côté backend";
+          alert(errorMessage);
+        }
+      );
     }
-}
+  }
+  
+
 
   /**
    * Supprimer un client
@@ -129,22 +121,28 @@ export class ClientComponent implements OnInit {
           console.log(`✅ Client supprimé avec succès.`);
 
           this.clients = this.clients.filter(client => client.id !== id);
-          this.filteredClients = [...this.clients]; 
+          this.filteredClients = [...this.clients];
         },
         (error) => console.error('❌ Erreur suppression client', error)
       );
     }
   }
+  changeLanguage(lang: string) {
+    this.translate.use(lang);
+  }
+  
 
   /**
    * Filtrer les clients par nom
    */
-  searchClient(event: Event): void {
-    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
-    this.filteredClients = this.clients.filter(client => client.name.toLowerCase().includes(searchTerm));
+  searchClient(event: any) {
+    const searchTerm = event.target.value.toLowerCase();
+    this.filteredClients = this.clients.filter(client =>
+      client.company.toLowerCase().includes(searchTerm) || 
+      client.email.toLowerCase().includes(searchTerm)
+    );
   }
 
-  
   downloadExcel(): void {
     this.clientService.downloadExcel(this.clients).subscribe(
       (data) => {
@@ -163,4 +161,25 @@ export class ClientComponent implements OnInit {
       }
     );
   }
+
+  // Fonction de trackBy pour optimiser le *ngFor
+trackByFn(index: number, item: any): number {
+  return index;
+}
+
+// Gestion plus propre de l'ajout
+addManager(): void {
+  this.selectedClient.salesManagers = [...this.selectedClient.salesManagers, ''];
+}
+
+// Gestion plus propre de la suppression
+removeManager(index: number): void {
+  this.selectedClient.salesManagers = this.selectedClient.salesManagers.filter((_, i) => i !== index);
+}
+
+// Optionnel: Gestion de l'input
+onManagerInput(index: number, event: Event): void {
+  const value = (event.target as HTMLInputElement).value;
+  this.selectedClient.salesManagers[index] = value;
+}
 }

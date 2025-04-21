@@ -1,0 +1,125 @@
+/* Global Page Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+  }
+  
+  .content {
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  .page-header {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  /* Card Wrapper */
+  .card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    width: 100%;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+  
+  .card-body {
+    flex-grow: 1;
+    padding: 15px;
+  }
+  
+  .student-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Profile Image */
+  .student-img img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #007bff;
+  }
+  
+  /* Member Info */
+  .student-content {
+    text-align: center;
+    margin-top: 15px;
+  }
+  
+  .student-content h5 {
+    font-size: 1.2rem;
+    margin: 10px 0 5px 0;
+    color: #343a40;
+  }
+  
+  .student-content p {
+    margin: 3px 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  
+  /* Grid Layout */
+  .student-pro-list .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -10px;
+  }
+  
+  .student-pro-list .col-xl-3,
+  .student-pro-list .col-lg-4,
+  .student-pro-list .col-md-6 {
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
+  @media (min-width: 1200px) {
+    .student-pro-list .col-xl-3 {
+      width: 25%;
+    }
+  }
+  
+  @media (max-width: 1199px) and (min-width: 992px) {
+    .student-pro-list .col-lg-4 {
+      width: 33.33%;
+    }
+  }
+  
+  @media (max-width: 991px) and (min-width: 768px) {
+    .student-pro-list .col-md-6 {
+      width: 50%;
+    }
+  }
+  
+  @media (max-width: 767px) {
+    .student-pro-list .col-md-6 {
+      width: 100%;
+    }
+  }
+  
+  /* Footer */
+  footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 0.9rem;
+    color: #777;
+  }
+  

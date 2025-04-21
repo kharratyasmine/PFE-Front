@@ -1,0 +1,30 @@
+<p>The table below describes the project development and management workload costs detailed by resource types and project phases.</p>
+
+
+<table class="table table-bordered text-center">
+  <thead class="table-primary">
+    <tr>
+      <th>Position</th>
+      <th>Total Workload (Man/Day) / Type</th>
+      <th>Daily cost (Euro) / Type</th>
+      <th>Total cost (Euro) / Type</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let f of financialDetails">
+      <td>{{ f.position }}</td>
+      <td>{{ f.workload }}</td>
+      <td>{{ f.dailyCost | number:'1.0-2' }}</td>
+      <td>{{ f.totalCost | number:'1.0-2' }}</td>
+    </tr>
+  </tbody>
+
+  <!-- ✅ Ligne de total -->
+  <tfoot *ngIf="financialDetails.length > 0">
+    <tr class="fw-bold table-secondary">
+      <td colspan="3" class="text-end">Total (Euros)</td>
+      <td>{{ totalCost | number:'1.0-2' }}</td>
+    </tr>
+  </tfoot>
+  
+</table>

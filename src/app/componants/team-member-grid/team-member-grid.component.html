@@ -1,0 +1,89 @@
+<!-- Container for the page content -->
+<div class="content container-fluid">
+  <!-- Page Header -->
+  <div class="page-header">
+    <h3 class="page-title">Liste des Membres</h3>
+  </div>
+
+   <!-- Fil d’Ariane (breadcrumb) -->
+   <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
+      <li class="breadcrumb-item">
+        <a routerLink="/Dashboard">🏠 Dashboard</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a routerLink="/TeamMember"> Membres</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+         Liste des Membres
+      </li>
+    </ol>
+  </nav>
+
+  <div class="page-header">
+    <div class="row align-items-center">
+      <div class="col">
+        <div class="form-group">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="🔍 Rechercher un membre..."
+            (input)="searchMemberByName($event)"
+            style="width: 250px;"
+          />
+        </div>
+      </div>
+      <div class="col-auto text-end float-end ms-auto download-grp">
+        <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
+          <i class="fas fa-download"></i> Exporter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card container -->
+  <div class="card card-table comman-shadow">
+    <div class="card-body">
+      <!-- Grid container -->
+      <div class="student-pro-list">
+        <div class="row">
+          <!-- Loop through each member in 'filteredMembers' -->
+          <div
+            class="col-xl-3 col-lg-4 col-md-6 d-flex"
+            *ngFor="let member of filteredMembers"
+          >
+            <div class="card">
+              <div class="card-body">
+                <div class="student-box">
+                  <div class="student-img">
+                    <!-- Member image -->
+                    <img
+                      class="img-fluid"
+                      [src]="member.image"
+                      alt="Photo du membre"
+                    />
+                  </div>
+                  <div class="student-content">
+                    <h5>{{ member.name }}</h5>
+                    <p><strong>Initial :</strong> {{ member.initial }}</p>
+                    <p><strong>Rôle :</strong> {{ member.jobTitle }}</p>
+                    <p><strong>Holiday :</strong> {{ member.holiday }}</p>
+                    <p>
+                      <strong>Date de début :</strong>
+                      {{ member.startDate }}
+                    </p>
+                    <p><strong>Seniorité :</strong> {{ member.role }}</p>
+                    <p><strong>Coût :</strong> {{ member.cost }}</p>
+                    <p><strong>Note :</strong> {{ member.note }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

@@ -1,0 +1,38 @@
+<div *ngFor="let chunk of workloadChunks; let groupIndex = index" class="mb-4">
+  <table class="table table-bordered text-center align-middle">
+    <thead class="table-primary">
+      <tr>
+        <th style="width: 5%;">N</th>
+        <th>Period</th>
+        <th>Estimated workload per Resource (Man/day)</th>
+        <th>Public holidays</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of chunk; let i = index">
+        <td>{{ i + 1 + groupIndex * 3 }}</td>
+        <td>{{ row.period }}</td>
+        <td>
+          <input type="number" class="form-control form-control-sm text-center"
+                 [(ngModel)]="row.estimatedWorkload" />
+        </td>
+        <td>
+          <input type="number" class="form-control form-control-sm text-center"
+                 [(ngModel)]="row.publicHolidays" />
+        </td>
+      </tr>
+      <tr class="table-secondary fw-bold">
+        <td colspan="2">Total / ressource (bloc {{ groupIndex + 1 }})</td>
+        <td>{{ getChunkTotal(chunk) }} Man/day</td>
+
+        <td colspan="1"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="text-end mt-2">
+  <button class="btn btn-success btn-sm" (click)="saveModifications()">
+    <i class="fas fa-save"></i> Enregistrer les modifications
+  </button>
+</div>

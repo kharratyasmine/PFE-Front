@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import * as bootstrap from 'bootstrap';
-import { Project } from 'src/app/model/project.model';
+import { ActivatedRoute } from '@angular/router';
+import { ProjectGroup } from 'src/app/model/project-group.model';
 import { ProjectTask, TaskStatus } from 'src/app/model/ProjectTask.model';
-import { TeamMember } from 'src/app/model/TeamMember.model';
-import { ProjectTaskService } from 'src/app/services/project-task.service';
+import { TaskService } from 'src/app/services/project-task.service';
 import { ProjectService } from 'src/app/services/project.service';
 import { TeamMemberService } from 'src/app/services/team-member.service';
 
@@ -12,235 +11,215 @@ import { TeamMemberService } from 'src/app/services/team-member.service';
   templateUrl: './project-task.component.html',
   styleUrls: ['./project-task.component.css']
 })
-export class ProjectTaskComponent  implements OnInit {
+export class ProjectTaskComponent implements OnInit {
+  projectId: number | null = null;
+ // ✅ ajouté
+  projects: any[] = [];
+  filteredMembers: any[] = [];
+  itemsPerPage: number = 3;
+  selectedTask: ProjectTask = this.createEmptyTask();
+  isEditMode = false;
+  groupedTasks: ProjectGroup[] = [];
+  
 
-  tasks: ProjectTask[] = [];
-  filteredTasks: ProjectTask[] = [];
-  availableMembers: TeamMember[] = [];
-  availableProjects: Project[] = [];
-  selectedTaskId: number | null = null;
-  modalInstance: any;
 
-  status = status; // Référence à l'énumération pour le template
-  statusKeys = Object.keys(status).filter(key => isNaN(Number(key))) as (keyof typeof status)[];
-
-  // ✅ Initialisation d'une tâche vide
-  selectedTask: ProjectTask = {
-    id: 0,
-      name: '',
-      description: '',
-      status: TaskStatus.EN_COURS ,
-      startDate: new Date(),
-      endDate: new Date(),
-      progress: 0,
-      teamMember: null,
-      project: null
-  };
+  statusList = [
+    TaskStatus.TODO,
+    TaskStatus.IN_PROGRESS,
+    TaskStatus.DONE,
+    TaskStatus.BLOCKED
+  ];
 
   constructor(
-    private projectTaskService: ProjectTaskService,
-    private teamMemberService: TeamMemberService,
-    private projectService: ProjectService
+    private route: ActivatedRoute,
+    private taskService: TaskService,
+    private projectService: ProjectService,
+    private teamMemberService: TeamMemberService
   ) {}
 
   ngOnInit(): void {
-    this.loadTasks();
-    this.loadMembers();
-    this.loadProjects();
-  }
-
-  loadTasks(): void {
-    this.projectTaskService.getAllTasks().subscribe(
-      (data) => {
-        this.tasks = data;
-        this.filteredTasks = [...this.tasks];
-      },
-      (error) => {
-        console.error('❌ Erreur lors du chargement des tâches', error);
+    this.route.parent?.params.subscribe(params => { // ✅ Utiliser route.parent.params
+      const idParam = params['id'];
+      this.projectId = idParam ? +idParam : null;
+  
+      if (this.projectId && !isNaN(this.projectId)) {
+        this.loadCurrentProjectTasks();
+        this.loadMembersByProject(this.projectId);
+      } else {
+        console.error('❌ projectId invalide ou absent dans l’URL', idParam);
       }
-    );
+    });
   }
+  
+  
 
-    getStatusList(): string[] {
-      return Object.values(status);  // ✅ Retourne la liste des statuts sous forme de string
+  loadCurrentProjectTasks(): void {
+    this.projectService.getProjectById(this.projectId!).subscribe(proj => {
+      this.projects = [proj];
+      this.groupedTasks = [{
+        projectId: proj.id ?? null, // ✅ Correction explicite (id ou null)
+        projectName: proj.name,
+        tasks: [],
+        filteredTasks: [],
+        currentPage: 1
+      }];
+  
+      this.taskService.getTasksByProject(this.projectId!).subscribe(tasks => {
+        console.log('taches reçues:', tasks); // vérifie les tâches reçues
+        this.groupedTasks[0].tasks = tasks;
+        this.groupedTasks[0].filteredTasks = tasks;
+    });
+    
+      });
+    
+  }
+  
+
+  loadMembersByProject(projectId: number | null): void {
+    if (!projectId) {
+      this.filteredMembers = [];
+      return;
     }
     
-    statusList = Object.values(status);
+    this.teamMemberService.getMembersByProject(projectId).subscribe(
+      (data) => {
+        console.log('🚀 Membres reçus:', data);
+        this.filteredMembers = data;
+      },
+      (error) => {
+        console.error('Erreur chargement membres:', error);
+        alert("Erreur lors du chargement des membres.");
+      }
+    );
+  }
+  getMemberName(memberId: number | null): string {
+    const member = this.filteredMembers.find(m => m.id === memberId);
+    return member ? member.name : 'Inconnu';
+  }
   
-    getStatusLabel(status: TaskStatus): string {
-      const labels: { [key in TaskStatus]: string } = {
-        [status.EN_COURS]: "En cours",
-        [status.TERMINE]: "Terminé",
-        [status.EN_ATTENTE]: "En attente",
-        [status.ANNULE]: "Annulé",
-      };
-      return labels[status] || "INCONNU";
+  recalculateRemainingMD(assignment: any): void {
+    if (assignment.estimatedMD != null && assignment.workedMD != null) {
+      assignment.remainingMD = assignment.estimatedMD - assignment.workedMD;
+    } else {
+      assignment.remainingMD = 0;
     }
-
-  loadMembers(): void {
-    this.teamMemberService.getTeamMembers().subscribe(
-      (data) => {
-        this.availableMembers = data;
-      },
-      (error) => {
-        console.error('❌ Erreur lors du chargement des membres', error);
-      }
-    );
   }
+  
+  
 
-  loadProjects(): void {
-    this.projectService.getAllProjects().subscribe(
-      (data) => {
-        this.availableProjects = data;
-      },
-      (error) => {
-        console.error('❌ Erreur lors du chargement des projets', error);
-      }
-    );
-  }
+  
+  openModal(task?: ProjectTask, projectId?: number): void {
+    this.isEditMode = !!task;
+    this.selectedTask = task ? { ...task } : this.createEmptyTask();
+    this.selectedTask.projectId = projectId ?? this.projectId;
+    this.selectedTask.assignments.forEach(a => this.recalculateRemainingMD(a));
 
-  openModal(): void {
-    this.tasks = { 
-      id: 0,
-      name: '',
-      description: '',
-      statut: '',
-      startDate: new Date(),
-      endDate: new Date(),
-      progress: 0,
-      teamMember: null,
-      project: null
-    };
-    this.selectedTaskId = null;
-    this.showModal('taskModal');
+  
+    this.loadMembersByProject(this.selectedTask.projectId);
+  
+    const modal = document.getElementById('taskModal') as HTMLDialogElement;
+    if (modal) modal.showModal();
   }
-
-  openEditModal(projectTask: ProjectTask): void {
-    this.selectedTaskId = projectTask.id;
-    this.task = { ...projectTask };
-    this.showModal('taskModal');
-  }
+  
 
   closeModal(): void {
-    this.hideModal('taskModal');
-    this.selectedTaskId = null;
+    const modal = document.getElementById('taskModal') as HTMLDialogElement;
+    if (modal) modal.close();
+    this.selectedTask = this.createEmptyTask();
   }
-  convertToDate(field: 'startDate' | 'endDate', event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.value) {
-      this.task[field] = new Date(input.value);
-    }
-  }
-  
+
   saveTask(): void {
-    if (!this.task.project || !this.task.project.id) {
-      alert('❌ Sélectionnez un projet avant d\'ajouter une tâche.');
+    if (!this.selectedTask) return;
+
+    const validStatuses = Object.values(TaskStatus);
+    if (!validStatuses.includes(this.selectedTask.status)) {
+      alert('Le statut est invalide !');
       return;
     }
-    if (!this.task.teamMember || !this.task.teamMember.id) {
-      alert('❌ Sélectionnez un membre de l\'équipe avant d\'ajouter une tâche.');
+
+    if (!this.selectedTask.projectId) {
+      alert("Erreur : Aucun projet sélectionné pour la tâche !");
       return;
     }
-  
-    // ✅ Vérifie que les valeurs saisies sont bien des dates
-    if (!(this.task.startDate instanceof Date) || isNaN(this.task.startDate.getTime())) {
-      alert("❌ La date de début est invalide !");
-      return;
-    }
-    if (!(this.task.endDate instanceof Date) || isNaN(this.task.endDate.getTime())) {
-      alert("❌ La date de fin est invalide !");
-      return;
-    }
-  
-    // ✅ Envoi au backend avec des dates sous format ISO
-    const taskToSend: ProjectTask = {
-      ...this.task,
-      startDate: new Date(this.task.startDate),  // ✅ Reste un objet `Date`
-      endDate: new Date(this.task.endDate)       // ✅ Reste un objet `Date`
-    };
-  
-    console.log("📤 Envoi de la tâche :", taskToSend);
-  
-    this.projectTaskService.createTask(taskToSend).subscribe(
-      (newTask) => {
-        console.log("✅ Tâche ajoutée avec succès :", newTask);
-        this.tasks.push(newTask);
-        this.filteredTasks = [...this.tasks];
-        this.closeModal();
-      },
-      (error) => {
-        console.error('❌ Erreur lors de l\'ajout de la tâche', error);
-      }
-    );
+
+    const request = this.isEditMode
+      ? this.taskService.updateTask(this.selectedTask.id!, this.selectedTask)
+      : this.taskService.createTaskForProject(this.projectId!, this.selectedTask);
+
+    request.subscribe(() => {
+      this.loadCurrentProjectTasks();
+      this.closeModal();
+    }, error => {
+      alert('Erreur lors de l\'enregistrement.');
+      console.error(error);
+    });
   }
-  
-  
 
   deleteTask(id: number): void {
-    if (confirm("Voulez-vous vraiment supprimer cette tâche ?")) {
-      this.projectTaskService.deleteTask(id).subscribe(
-        () => {
-          this.tasks = this.tasks.filter(task => task.id !== id);
-          this.filteredTasks = [...this.tasks];
-        },
-        (error) => {
-          console.error('❌ Erreur lors de la suppression de la tâche', error);
+    if (confirm('Voulez-vous vraiment supprimer cette tâche ?')) {
+      this.taskService.deleteTask(id).subscribe({
+        next: () => this.loadCurrentProjectTasks(),
+        error: (error) => {
+          console.error('Erreur suppression', error);
+          alert("Erreur lors de la suppression !");
         }
-      );
+      });
+    }
+  }
+  
+
+  downloadExcel(): void {
+    this.taskService.downloadExcel(this.projects).subscribe(
+      data => {
+        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'task.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error => console.error('Erreur lors du téléchargement Excel :', error)
+    );
+  }
+
+  createEmptyTask(): ProjectTask {
+    return {
+      id: undefined,
+      name: '',
+      description: '',
+      dateDebut: new Date().toISOString().split('T')[0],
+      dateFin: new Date().toISOString().split('T')[0],
+      status: TaskStatus.TODO,
+      progress: 0,
+      projectId: this.projectId,
+      assignments: []
+    };
+  }
+
+  getStatusLabel(status: TaskStatus | string): string {
+    switch (status) {
+      case TaskStatus.TODO: return 'À faire';
+      case TaskStatus.IN_PROGRESS: return 'En cours';
+      case TaskStatus.DONE: return 'Terminé';
+      case TaskStatus.BLOCKED: return 'Bloqué';
+      default: return 'Inconnu';
     }
   }
 
+  onSearchChange(groupIndex: number, event: Event): void {
+    const searchTerm = (event.target as HTMLInputElement).value.toLowerCase();
+    const group = this.groupedTasks[groupIndex];
+    group.filteredTasks = group.tasks.filter(task =>
+      task.name.toLowerCase().includes(searchTerm) ||
+      task.description?.toLowerCase().includes(searchTerm)
+    );
+    group.currentPage = 1;
+  }
 
-    private showModal(id: string): void {
-      const modalElement = document.getElementById(id);
-      if (modalElement) {
-        this.modalInstance = new bootstrap.Modal(modalElement);
-        this.modalInstance.show();
-      }
-    }
-  
-    hideModal(id: string): void {
-      if (this.modalInstance) {
-        this.modalInstance.hide();
-        this.modalInstance = null;
-      }
-    }
-    /**
-   * ✅ Filtrer les tâches en fonction du texte entré
-   */
-    searchTaskByName(event: Event): void {
-      const target = event.target as HTMLInputElement;
-      const searchTerm = target.value.toLowerCase();
-      console.log('🔍 Recherche de tâche :', searchTerm);
-  
-      this.filteredTasks = this.tasks.filter(task => 
-        task.name.toLowerCase().includes(searchTerm)
-      );
-  
-      console.log('✅ Tâches filtrées :', this.filteredTasks);
-    }
-  
-    /**
-     * ✅ Télécharger la liste des tâches en Excel
-     */
-    downloadExcel(): void {
-      this.projectTaskService.downloadExcel(this.tasks).subscribe(
-        (data) => {
-          const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'tasks.xlsx';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-        },
-        (error) => {
-          console.error('❌ Erreur lors du téléchargement du fichier Excel', error);
-        }
-      );
-    }
-  
-  
+  onPageChange(groupIndex: number, page: number): void {
+    this.groupedTasks[groupIndex].currentPage = page;
+  }
 }

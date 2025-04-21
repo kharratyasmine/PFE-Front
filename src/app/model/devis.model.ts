@@ -1,3 +1,4 @@
+import { Distribution, Visa } from "./distribution.model";
 import { FinancialDetail } from "./FinancialDetail.model";
 import { InvoicingDetail } from "./InvoicingDetail.model";
 import { Project } from "./project.model";
@@ -12,7 +13,17 @@ export interface Devis {
   status: string;
   proposalValidity: string;
   project?: Project;
+  author?: string;
   financialDetails?: FinancialDetail[];
   workloadDetails?: WorkloadDetail[];
   invoicingDetails?: InvoicingDetail[];
+  distributions?: Distribution[];
+  visas?: Visa[];
+  history?: DevisHistory[];
+}
+
+
+
+export interface DevisHistory {
+
 }

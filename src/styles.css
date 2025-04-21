@@ -1,6 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
+
+
 html, body { height: 100%; }
 body {
     font-family: 'Roboto', sans-serif;
+    
   }
   
+ 
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Forcer l’overlay Angular Material au-dessus de tout */
+.cdk-overlay-container,
+.cdk-overlay-connected-position-bounding-box {
+  z-index: 999999 !important;
+}
+
+.header-left img {
+  margin-left: 15px; /* Tu peux augmenter selon le besoin, ex: 20px */
+}
+
+
