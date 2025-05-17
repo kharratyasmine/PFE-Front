@@ -77,11 +77,17 @@ export class DemandesComponent implements OnInit {
     });
   }
 
-  loadTeamMembers(): void {
-    this.teamMemberService.getAllTeamMembers().subscribe(data => {
-      this.allTeamMembers = [...data, ...this.temporaryMembers];
-    });
-  }
+ loadTeamMembers(): void {
+  this.teamMemberService.getAllTeamMembers().subscribe(data => {
+    const merged = [...data, ...this.temporaryMembers];
+    this.allTeamMembers = merged.filter((value, index, self) =>
+      index === self.findIndex(m =>
+        m.name.trim().toLowerCase() === value.name.trim().toLowerCase() &&
+        m.role === value.role
+      )
+    );
+  });
+}
 
   getMemberName(id: number): string {
     const member = this.allTeamMembers.find(m => m.id === id);

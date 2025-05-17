@@ -11,6 +11,8 @@ export interface TeamMember {
   role: string;
   cost?: number;
   startDate?: string;
+  endDate?:String;
+  status?: string;
   experienceRange?: string;
   teams: number[];
   allocation?: number;

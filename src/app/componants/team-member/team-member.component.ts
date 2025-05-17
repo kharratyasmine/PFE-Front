@@ -22,6 +22,7 @@ export class TeamMemberComponent implements OnInit {
   roleModified: boolean = false;
   initialModified: boolean = false;
   selectedMember: TeamMember = this.getEmptyTeamMember();
+  today: Date = new Date();
 
   currentPage: number = 1;
   itemsPerPage: number = 4; // Nombre d'éléments par page
@@ -29,11 +30,17 @@ export class TeamMemberComponent implements OnInit {
   constructor(
     private teamMemberService: TeamMemberService,
     private uploadService: UploadService,
-    
-  ) {}
+
+  ) { }
 
   ngOnInit(): void {
     this.loadTeamMembers();
+  }
+  isMemberActive(member: any): boolean {
+    if (!member || !member.endDate) return true;
+    const end = new Date(member.endDate);
+    const today = new Date();
+    return end > today;
   }
 
   // Gestion de l'upload d'image
@@ -42,29 +49,40 @@ export class TeamMemberComponent implements OnInit {
     this.files.push(...event.addedFiles);
     this.uploadFiles();
   }
-
- uploadFiles(): void {
-  if (!this.files[0]) {
-    alert("Veuillez sélectionner une image.");
-    return;
+  filterRealMembers(members: TeamMember[]): TeamMember[] {
+    return members.filter(member =>
+      member.name &&
+      member.name.trim().toLowerCase() !== 'inconnu' &&
+      member.initial &&
+      member.initial.trim() !== '' &&
+      member.startDate !== null &&
+      member.jobTitle !== null &&
+      member.cost !== null
+    );
   }
 
-  const file = this.files[0];
-  const formData = new FormData();
-  formData.append("image", file);
+  uploadFiles(): void {
+    if (!this.files[0]) {
+      alert("Veuillez sélectionner une image.");
+      return;
+    }
 
-  this.uploadService.uploadTeamMemberImage(this.selectedMember.id!, formData)
-    .subscribe({
-      next: (res: any) => {
-        console.log("✅ Image enregistrée localement :", res);
-        this.selectedMember.image = res.imagePath;
-        this.imageUploaded = true;
-      },
-      error: (err) => {
-        console.error("❌ Erreur upload image :", err);
-      }
-    });
-}
+    const file = this.files[0];
+    const formData = new FormData();
+    formData.append("image", file);
+
+    this.uploadService.uploadTeamMemberImage(this.selectedMember.id!, formData)
+      .subscribe({
+        next: (res: any) => {
+          console.log("✅ Image enregistrée localement :", res);
+          this.selectedMember.image = res.imagePath;
+          this.imageUploaded = true;
+        },
+        error: (err) => {
+          console.error("❌ Erreur upload image :", err);
+        }
+      });
+  }
 
 
   onRemove(file: File): void {
@@ -78,9 +96,9 @@ export class TeamMemberComponent implements OnInit {
   loadTeamMembers(): void {
     this.teamMemberService.getAllTeamMembers().subscribe({
       next: (members) => {
-        this.teamMembers = members;
-        // Dupliquer dans filteredMembers pour la recherche et la pagination
-        this.filteredMembers = [...members];
+        this.teamMembers = this.filterRealMembers(members);
+        this.filteredMembers = [...this.teamMembers];
+
         console.log("Liste des membres récupérée :", members);
       },
       error: (err) => {
@@ -133,23 +151,24 @@ export class TeamMemberComponent implements OnInit {
       cost: 0,
       experienceRange: '',
       startDate: '',
+      endDate: '',
       teams: [],
-    
+
     };
   }
   updateExperienceFromStartDate(): void {
     if (!this.selectedMember?.startDate) return;
-  
+
     const start = new Date(this.selectedMember.startDate);
     const now = new Date();
-  
+
     const diffInMs = now.getTime() - start.getTime();
     const years = diffInMs / (1000 * 60 * 60 * 24 * 365.25);
     const fullYears = Math.floor(years);
-  
+
     // 📊 Calculer la plage d'expérience
     this.selectedMember.experienceRange = `${fullYears} - ${fullYears + 1} Year${fullYears + 1 > 1 ? 's' : ''}`;
-  
+
     // 🎓 Suggérer un rôle automatiquement (si pas modifié manuellement)
     if (!this.roleModified) {
       if (fullYears <= 2) {
@@ -162,11 +181,11 @@ export class TeamMemberComponent implements OnInit {
         this.selectedMember.role = 'SENIOR_MANAGER';
       }
     }
-  
+
     // 💰 Mettre à jour le coût si nécessaire
     this.onSeniorityChange();
   }
-  
+
   getExperienceLabel(exp: number | undefined): string {
     if (!exp) return '0 - 1 an';
     if (exp <= 1) return '0 - 1 an';
@@ -176,7 +195,7 @@ export class TeamMemberComponent implements OnInit {
     if (exp <= 10) return '6 - 10 ans';
     return '10+ ans';
   }
-  
+
 
   // Ajouter une date de congé
   addHoliday(date: string): void {
@@ -225,7 +244,7 @@ export class TeamMemberComponent implements OnInit {
       modal?.hide();
     }
   }
-  
+
 
   openModal(member?: TeamMember): void {
     if (member) {
@@ -235,14 +254,14 @@ export class TeamMemberComponent implements OnInit {
     }
     this.costModified = false;
     this.initialModified = false;
-  
+
     const modalElement = document.getElementById('teamMemberModal');
     if (modalElement) {
       const modal = new bootstrap.Modal(modalElement);
       modal.show();
     }
   }
-  
+
   downloadExcel(): void {
     this.teamMemberService.downloadExcel(this.teamMembers).pipe(
       catchError(error => {
@@ -265,13 +284,13 @@ export class TeamMemberComponent implements OnInit {
   }
   onExperienceChange(): void {
     const range = this.selectedMember.experienceRange;
-  
+
     if (!range || this.roleModified) return;
-  
+
     // 🧠 Extraire le nombre de départ (ex: "2 - 3 Years" → 2)
     const match = range.match(/^(\d+)\s*-/);
     const startYear = match ? parseInt(match[1], 10) : 0;
-  
+
     // 🎓 Suggérer le rôle en fonction de l’expérience
     if (startYear <= 2) {
       this.selectedMember.role = 'JUNIOR';
@@ -282,7 +301,7 @@ export class TeamMemberComponent implements OnInit {
     } else {
       this.selectedMember.role = 'SENIOR_MANAGER';
     }
-  
+
     // 💰 Mettre à jour le coût
     this.onSeniorityChange();
   }
@@ -315,18 +334,18 @@ export class TeamMemberComponent implements OnInit {
   generateInitial(): void {
     const parts = this.selectedMember.name.trim().split(' ');
     if (parts.length < 2) return;
-  
+
     const prenom = parts[0].toUpperCase(); // ex: YASMINE
     const nom = parts[1].toUpperCase();    // ex: KHARRAT
-  
+
     let baseInitial = prenom.substring(0, 2) + nom.charAt(0); // YA + K = YAK
     let uniqueInitial = baseInitial;
     let counter = 1;
-  
+
     const existingInitials = this.teamMembers
       .map(m => m.initial?.toUpperCase())
       .filter(init => init !== this.selectedMember.initial); // exclure lui-même
-  
+
     while (existingInitials.includes(uniqueInitial)) {
       if (prenom.length > 2 + counter) {
         uniqueInitial = prenom.substring(0, 2 + counter) + nom.charAt(0);
@@ -335,14 +354,14 @@ export class TeamMemberComponent implements OnInit {
       }
       counter++;
     }
-  
+
     this.selectedMember.initial = uniqueInitial;
   }
-  
+
   onNameChange(): void {
     if (!this.initialModified) {
       this.generateInitial();
     }
   }
-  
+
 }

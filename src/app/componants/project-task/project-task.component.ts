@@ -634,10 +634,14 @@ export class ProjectTaskComponent implements OnInit {
         this.selectedTaskDetails.status = TaskStatus.TODO;
       }
     }
-      if (oldValue !== totalMD && this.selectedTaskDetails?.id) {
+    console.log(`Progression calculée : ${assignment.progress}%`);
+
+    if (oldValue !== totalMD && this.selectedTaskDetails?.id) {
       this.updateTaskAssignment(assignment);
     }
   }
+
+
   // Avant de sauvegarder la tâche, mettre à jour toutes les valeurs calculées
   updateAllCalculatedValues(): void {
     if (!this.selectedTask || !this.selectedTask.assignments) return;
@@ -659,6 +663,8 @@ export class ProjectTaskComponent implements OnInit {
       }
     });
   }
+
+
   // Modifier la méthode saveTask pour mettre à jour les valeurs calculées avant sauvegarde
   saveTask(): void {
     if (!this.selectedTask) return;
@@ -734,6 +740,7 @@ export class ProjectTaskComponent implements OnInit {
     });
   }
 
+
   deleteTask(id: number): void {
     if (confirm('Voulez-vous vraiment supprimer cette tâche ?')) {
       this.taskService.deleteTask(id).subscribe({
@@ -745,6 +752,7 @@ export class ProjectTaskComponent implements OnInit {
       });
     }
   }
+
 
   downloadExcel(): void {
     this.taskService.downloadExcel(this.projects).subscribe(
@@ -819,4 +827,46 @@ export class ProjectTaskComponent implements OnInit {
       }
     });
   }
+
+  addWorkDayOutsideRange(assignment: any): void {
+  this.selectedAssignment = assignment;
+  this.selectedWorkDate = new Date().toISOString().split('T')[0]; // par défaut : aujourd’hui
+  this.selectedWorkStatus = 'full'; // valeur initiale
+  this.selectedWorkComment = '';
+
+  const modal = document.getElementById('workDayModal');
+  if (modal) {
+    this.workDayModalInstance = new bootstrap.Modal(modal);
+    this.workDayModalInstance.show();
+  }
+}
+getAllWorkedDays(assignment: any): Date[] {
+  const estimatedDays = this.getWorkingDays(assignment.estimatedStartDate, assignment.estimatedEndDate);
+
+  const extraDates = this.memberWorkEntries
+    .filter(e => e.memberId === assignment.teamMemberId)
+    .map(e => new Date(e.date))
+    .filter(date =>
+      !estimatedDays.some(d => d.toDateString() === date.toDateString())
+    );
+
+  const allDates = [...estimatedDays, ...extraDates];
+
+  // 🔹 Assurez-vous que tous les jours sont uniques (même si entrées dupliquées existent)
+  const uniqueDates = allDates.filter((date, index, self) =>
+    index === self.findIndex(d => d.toDateString() === date.toDateString())
+  );
+
+  // 🔹 Triez les dates pour affichage propre
+  return uniqueDates.sort((a, b) => a.getTime() - b.getTime());
+}
+
+isOutOfEstimatedRange(day: Date, estimatedStartDate: string | null | undefined, estimatedEndDate: string | null | undefined): boolean {
+  if (!estimatedStartDate || !estimatedEndDate) return false;
+  const start = new Date(estimatedStartDate);
+  const end = new Date(estimatedEndDate);
+  return day < start || day > end;
+}
+
+
 }

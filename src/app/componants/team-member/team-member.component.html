@@ -40,11 +40,13 @@
   <table class="table table-bordered table-hover text-center shadow-sm">
     <thead class="table-dark">
       <tr>
-        <th>{{'IMAGE' | translate}}</th>
-        <th>{{'NAME' | translate}}</th>
-        <th>{{'INITIAL'|translate}}</th>
-        <th>{{'Qualification'|translate}}</th>
-        <th style="width: 25%;">{{'Start_Date' | translate }}</th>
+        <th>{{ 'IMAGE' | translate }}</th>
+        <th>{{ 'NAME' | translate }}</th>
+        <th>{{ 'INITIAL' | translate }}</th>
+        <th>{{ 'STATUS' | translate }}</th> <!-- ✅ Garde ce champ -->
+        <th>{{ 'Qualification' | translate }}</th>
+        <th>{{ 'Start_Date' | translate }}</th>
+        <th>{{ 'End_Date' | translate }}</th> <!-- ✅ Colonne correcte -->
         <th>{{ 'EXPERIENCE' | translate }}</th>
         <th>{{ 'ROLE' | translate }}</th>
         <th>{{ 'COST' | translate }}</th>
@@ -52,6 +54,7 @@
         <th>{{ 'ACTIONS' | translate }}</th>
       </tr>
     </thead>
+
     <tbody>
       <tr *ngFor="let member of filteredMembers | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
         <td>
@@ -61,8 +64,17 @@
         </td>
         <td class="fw-bold">{{ member.name }}</td>
         <td>{{ member.initial }}</td>
+        <td>
+          <span class="badge" [ngClass]="isMemberActive(member) ? 'bg-success' : 'bg-danger'">
+            {{ isMemberActive(member) ? ('Currently Working' | translate) : ('Left Company' | translate) }}
+          </span>
+
+
+        </td>
+
+        
         <td class="text-uppercase">{{ member.jobTitle }}</td>
-     <!--   <td>
+        <!--   <td>
           <span *ngFor="let day of member.holiday" class="badge badge-transparent">
             {{ day }}
           </span>
@@ -70,6 +82,7 @@
 
 
         <td><span class="badge badge-transparent">{{ member.startDate | date:'yyyy-MM-dd' }}</span></td>
+        <td><span class="badge badge-transparent">{{ member.endDate }}</span></td>
         <td>{{ member.experienceRange }}</td>
 
         <td>{{ member.role }}</td>
@@ -127,6 +140,10 @@
             <input type="date" class="form-control" [(ngModel)]="selectedMember.startDate" name="startDate"
               (change)="updateExperienceFromStartDate()" />
           </div>
+          <div class="mb-3">
+            <label class="form-label">📅 {{ 'End_Date' | translate }}</label>
+            <input type="date" class="form-control" [(ngModel)]="selectedMember.endDate" name="endDate" />
+          </div>
 
 
           <div class="mb-3">
@@ -150,7 +167,7 @@
             <input type="number" [(ngModel)]="selectedMember.cost" (input)="costModified = true" class="form-control"
               name="cout" />
           </div>
-        <!--    <div class="mb-3">
+          <!--    <div class="mb-3">
             <label class="form-label">📆{{ 'Holiday' | translate }}</label>
             <input type="date" #holidayInput class="form-control" (change)="addHoliday(holidayInput.value)" />
           </div>
@@ -182,7 +199,7 @@
 
           <!-- Aperçu de l'image -->
           <div class="col-12 text-center mt-3">
-            <img *ngIf="selectedMember.image"  [src]="'http://localhost:8080' + selectedMember.image"
+            <img *ngIf="selectedMember.image" [src]="'http://localhost:8080' + selectedMember.image"
               class="img-thumbnail rounded-circle shadow-sm" alt="Uploaded Image" width="50" height="50" />
           </div>
         </div>

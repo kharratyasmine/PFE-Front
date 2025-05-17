@@ -3,7 +3,7 @@
 
     <!-- Actions -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-       <h5>{{ 'Related Tasks' | translate }}</h5>
+      <h5>{{ 'Related Tasks' | translate }}</h5>
       <button class="btn btn-outline-success btn-sm" (click)="openModal()">
         <i class="fas fa-plus"></i> {{ 'add task' | translate }}
       </button>
@@ -68,7 +68,8 @@
                 <tr [ngClass]="{'bg-light': taskIndex % 2 === 0}" [attr.data-new-task]="j === 0 ? 'true' : 'false'">
                   <td *ngIf="j === 0" [attr.rowspan]="task.assignments.length" class="align-middle">{{ task.id }}</td>
                   <td *ngIf="j === 0" [attr.rowspan]="task.assignments.length" class="align-middle">{{ task.name }}</td>
-                  <td *ngIf="j === 0" [attr.rowspan]="task.assignments.length" class="align-middle">{{ task.description }}</td>
+                  <td *ngIf="j === 0" [attr.rowspan]="task.assignments.length" class="align-middle">{{ task.description
+                    }}</td>
                   <td>{{ getMemberName(a.teamMemberId) }}</td>
                   <td *ngIf="j === 0" [attr.rowspan]="task.assignments.length" class="align-middle">
                     <span class="badge rounded-pill" [ngClass]="{
@@ -80,14 +81,12 @@
                   </td>
                   <td>
                     <div class="progress" style="height: 20px;">
-                      <div class="progress-bar" role="progressbar" [style.width]="a.progress + '%'" 
-                           [ngClass]="{
+                      <div class="progress-bar" role="progressbar" [style.width]="a.progress + '%'" [ngClass]="{
                              'bg-danger': a.progress < 25,
                              'bg-warning': a.progress >= 25 && a.progress < 50,
                              'bg-info': a.progress >= 50 && a.progress < 75,
                              'bg-success': a.progress >= 75
-                           }"
-                           aria-valuenow="a.progress" aria-valuemin="0" aria-valuemax="100">{{a.progress}}%</div>
+                           }" aria-valuenow="a.progress" aria-valuemin="0" aria-valuemax="100">{{a.progress}}%</div>
                     </div>
                   </td>
 
@@ -239,7 +238,8 @@
           <div class="col-md-6">
             <div class="mb-2"><strong>{{ 'ID' | translate }}:</strong> {{ selectedTaskDetails?.id }}</div>
             <div class="mb-2"><strong>{{ 'Task name' | translate }}:</strong> {{ selectedTaskDetails?.name }}</div>
-            <div class="mb-2"><strong>{{ 'Description' | translate }}:</strong> {{ selectedTaskDetails?.description }}</div>
+            <div class="mb-2"><strong>{{ 'Description' | translate }}:</strong> {{ selectedTaskDetails?.description }}
+            </div>
           </div>
           <div class="col-md-6">
             <div class="mb-2">
@@ -251,66 +251,82 @@
                 'bg-danger': selectedTaskDetails?.status === 'BLOCKED'
               }">{{ getStatusLabel(selectedTaskDetails?.status || 'TODO') }}</span>
             </div>
-            <div class="mb-2"><strong>{{ 'Start date' | translate }}:</strong> {{ selectedTaskDetails?.dateDebut | date:'dd/MM/yyyy' }}</div>
-            <div class="mb-2"><strong>{{ 'End date' | translate }}:</strong> {{ selectedTaskDetails?.dateFin | date:'dd/MM/yyyy' }}</div>
+            <div class="mb-2"><strong>{{ 'Start date' | translate }}:</strong> {{ selectedTaskDetails?.dateDebut |
+              date:'dd/MM/yyyy' }}</div>
+            <div class="mb-2"><strong>{{ 'End date' | translate }}:</strong> {{ selectedTaskDetails?.dateFin |
+              date:'dd/MM/yyyy' }}</div>
           </div>
         </div>
 
         <!-- Calendrier de travail par membre -->
         <h5 class="border-bottom pb-2 mb-4">{{ 'Work Calendar' | translate }}</h5>
-        
+
         <div *ngFor="let a of selectedTaskDetails?.assignments || []; let i = index" class="mb-4 pb-3 border-bottom">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <h6 class="mb-0">{{ getMemberName(a.teamMemberId) }}</h6>
             <div>
-              <span class="badge bg-success me-2">{{ 'Estimated' | translate }}: {{ a.estimatedStartDate | date:'dd/MM/yyyy' }} - {{ a.estimatedEndDate | date:'dd/MM/yyyy' }}</span>
+              <span class="badge bg-success me-2">{{ 'Estimated' | translate }}: {{ a.estimatedStartDate |
+                date:'dd/MM/yyyy' }} - {{ a.estimatedEndDate | date:'dd/MM/yyyy' }}</span>
               <button class="btn btn-sm btn-outline-primary" (click)="openWorkDayModal(a)">
                 {{ 'Add Work Entry' | translate }}
               </button>
             </div>
           </div>
-          
+
           <!-- Calendrier -->
           <div class="calendar-container">
             <table class="table table-sm table-bordered calendar-table">
               <thead class="table-light">
                 <tr>
-                  <th *ngFor="let day of getWorkingDays(a.estimatedStartDate, a.estimatedEndDate)" class="text-center">
+                  <th *ngFor="let day of getAllWorkedDays(a)" class="text-center">
                     {{ day | date:'dd/MM' }}<br>
                     <small>{{ day | date:'EEE' }}</small>
                   </th>
                 </tr>
               </thead>
+              <!-- ======= HTML Angular Template corrigé ======= -->
               <tbody>
                 <tr>
-                  <td *ngFor="let day of getWorkingDays(a.estimatedStartDate, a.estimatedEndDate)" class="text-center py-3"
-                      [ngClass]="{
-                        'bg-success bg-opacity-25': getMemberWorkStatus(a.teamMemberId, day) === 'full',
-                        'bg-warning bg-opacity-25': getMemberWorkStatus(a.teamMemberId, day) === 'half',
-                        'bg-danger bg-opacity-25': getMemberWorkStatus(a.teamMemberId, day) === 'leave'
-                      }">
+                  <td *ngFor="let day of getAllWorkedDays(a)" class="text-center py-3" [ngClass]="{
+      'bg-success bg-opacity-25': getMemberWorkStatus(a.teamMemberId, day) === 'full',
+      'bg-warning bg-opacity-25': getMemberWorkStatus(a.teamMemberId, day) === 'half',
+      'bg-danger bg-opacity-25': getMemberWorkStatus(a.teamMemberId, day) === 'leave',
+      'border border-primary': isOutOfEstimatedRange(day, a.estimatedStartDate, a.estimatedEndDate)
+    }">
+
                     <div class="dropdown">
                       <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         <i class="fas" [ngClass]="{
-                          'fa-check-circle text-success': getMemberWorkStatus(a.teamMemberId, day) === 'full',
-                          'fa-adjust text-warning': getMemberWorkStatus(a.teamMemberId, day) === 'half',
-                          'fa-times-circle text-danger': getMemberWorkStatus(a.teamMemberId, day) === 'leave',
-                          'fa-circle text-secondary': getMemberWorkStatus(a.teamMemberId, day) === 'none'
-                        }"></i>
+            'fa-check-circle text-success': getMemberWorkStatus(a.teamMemberId, day) === 'full',
+            'fa-adjust text-warning': getMemberWorkStatus(a.teamMemberId, day) === 'half',
+            'fa-times-circle text-danger': getMemberWorkStatus(a.teamMemberId, day) === 'leave',
+            'fa-circle text-secondary': getMemberWorkStatus(a.teamMemberId, day) === 'none'
+          }"></i>
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" (click)="setMemberWorkStatus(a.teamMemberId, day, 'full')">{{ 'Full day' | translate }}</a></li>
-                        <li><a class="dropdown-item" (click)="setMemberWorkStatus(a.teamMemberId, day, 'half')">{{ 'Half day' | translate }}</a></li>
-                        <li><a class="dropdown-item" (click)="setMemberWorkStatus(a.teamMemberId, day, 'leave')">{{ 'Leave' | translate }}</a></li>
-                        <li><a class="dropdown-item" (click)="setMemberWorkStatus(a.teamMemberId, day, 'none')">{{ 'No data' | translate }}</a></li>
+                        <li><a class="dropdown-item" (click)="setMemberWorkStatus(a.teamMemberId, day, 'full')">{{ 'Full
+                            day' | translate }}</a></li>
+                        <li><a class="dropdown-item" (click)="setMemberWorkStatus(a.teamMemberId, day, 'half')">{{ 'Half
+                            day' | translate }}</a></li>
+                        <li><a class="dropdown-item" (click)="setMemberWorkStatus(a.teamMemberId, day, 'leave')">{{
+                            'Leave' | translate }}</a></li>
+                        <li><a class="dropdown-item" (click)="setMemberWorkStatus(a.teamMemberId, day, 'none')">{{ 'No
+                            data' | translate }}</a></li>
                       </ul>
                     </div>
                   </td>
+                  <!-- Bouton d'ajout d'un jour hors estimation -->
+                  <td class="text-center py-3">
+                    <button class="btn btn-outline-primary btn-sm" (click)="addWorkDayOutsideRange(a)">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </td>
                 </tr>
               </tbody>
+
             </table>
           </div>
-          
+
           <!-- Légende du calendrier -->
           <div class="d-flex justify-content-end mt-2">
             <span class="me-3"><i class="fas fa-check-circle text-success"></i> {{ 'Full day' | translate }}</span>
@@ -318,7 +334,7 @@
             <span class="me-3"><i class="fas fa-times-circle text-danger"></i> {{ 'Leave' | translate }}</span>
             <span><i class="fas fa-circle text-secondary"></i> {{ 'No data' | translate }}</span>
           </div>
-          
+
           <!-- Résumé des jours travaillés -->
           <div class="row mt-3">
             <div class="col-md-3">
@@ -395,7 +411,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeWorkDayModal()">{{ 'Cancel' | translate }}</button>
+        <button type="button" class="btn btn-secondary" (click)="closeWorkDayModal()">{{ 'Cancel' | translate
+          }}</button>
         <button type="button" class="btn btn-primary" (click)="saveWorkDay()">{{ 'Save' | translate }}</button>
       </div>
     </div>
@@ -406,7 +423,9 @@
   .calendar-container {
     overflow-x: auto;
   }
-  .calendar-table th, .calendar-table td {
+
+  .calendar-table th,
+  .calendar-table td {
     min-width: 60px;
     vertical-align: middle;
   }
