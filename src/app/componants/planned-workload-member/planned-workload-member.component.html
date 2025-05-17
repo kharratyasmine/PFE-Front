@@ -1,0 +1,58 @@
+<div class="container mt-4">
+  <div class="mb-3 d-flex justify-content-between align-items-center">
+    <h5>{{ 'Related Planned Workloads' | translate }}</h5>
+    <button class="btn btn-outline-success  " (click)="downloadExcel()"> <i class="fas fa-download"></i>
+    </button>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-bordered text-center table-sm align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th class="align-middle">{{ 'Resource' | translate }}</th>
+          <th class="align-middle">{{ 'Role' | translate }}</th>
+          <th *ngFor="let month of months" class="align-middle">{{ month }}</th>
+          <th class="align-middle">{{ 'Total' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let member of members">
+          <td class="align-middle">{{ member.name }}</td>
+          <td class="align-middle">{{ member.role }}</td>
+          <td *ngFor="let month of months" class="align-middle">
+            <div class="d-flex align-items-center justify-content-center">
+              <span>{{ editedWorkloads[member.id!][month] }}</span>
+              <button class="btn btn-sm btn-light ms-2" (click)="openEditModal(member, month)">
+                <i class="bi bi-pencil"></i>
+              </button>
+            </div>
+          </td>
+          <td class="fw-bold text-primary align-middle">
+            {{ getTotalForMember(member.id!) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal de modification de la charge -->
+<div class="modal fade" id="editWorkloadModal" tabindex="-1" aria-labelledby="editWorkloadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editWorkloadModalLabel">{{ 'Edit Workload' | translate }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedMember">
+        <p><strong>{{ 'Member' | translate }}:</strong> {{ selectedMember.name }}</p>
+        <p><strong>{{ 'Month' | translate }}:</strong> {{ selectedMonth }}</p>
+        <input type="number" class="form-control" [(ngModel)]="editedValue" min="0" />
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel' | translate }}</button>
+        <button class="btn btn-primary" (click)="saveEditedWorkload()">{{ 'Save' | translate }}</button>
+      </div>
+    </div>
+  </div>
+</div>

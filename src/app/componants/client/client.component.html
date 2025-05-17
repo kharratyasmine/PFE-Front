@@ -4,7 +4,7 @@
   <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
       <li class="breadcrumb-item">
-        <a routerLink="/Dashboard">🏠{{ 'DASHBOARD' | translate }}</a>
+        <a routerLink="/dashboard">🏠{{ 'DASHBOARD' | translate }}</a>
       </li>
       <li class="breadcrumb-item active" aria-current="page">
         <a routerLink="/Client">{{ 'CUSTOMER_LIST' | translate }}</a>
@@ -27,35 +27,38 @@
   <table *ngIf="filteredClients.length > 0; else noClients"
     class="table table-bordered table-hover text-center shadow-sm">
     <thead>
-      <tr>
-        <th>{{ 'Company_Name' | translate }}</th>
-        <th>{{ 'RESPONSIBLE' | translate }}</th>
-        <th>{{ 'EMAIL' | translate }}</th>
-        <th>{{ 'PHONE' | translate }}</th>
-        <th>{{ 'ADDRESS' | translate }}</th>
-        <th>{{ 'ACTIONS' | translate }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let client of filteredClients | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
+  <tr>
+    <th>{{ 'Company_Name' | translate }}</th>
+    <th>{{ 'RESPONSIBLE' | translate }}</th>
+    <th *ngIf="role === 'ADMIN' || role === 'QUALITE'">{{ 'EMAIL' | translate }}</th>
+    <th *ngIf="role === 'ADMIN'">{{ 'PHONE' | translate }}</th>
+    <th *ngIf="role === 'ADMIN'">{{ 'ADDRESS' | translate }}</th>
+    <th>{{ 'ACTIONS' | translate }}</th>
+  </tr>
+</thead>
 
-        <td>{{ client.company }}</td>
-        <td>
-          <div *ngFor="let name of client.salesManagers" class="d-block mb-1">
-            {{ name }}
-          </div>
-        </td>
-        <td>{{ client.email }}</td>
-        <td>{{ client.contact }}</td>
-        <td>{{ client.address }}</td>
-        <td>
-          <button class="btn btn-outline-success btn-sm me-2" (click)="openModal(client)"> <i
-              class="fas fa-edit"></i></button>
-          <button class="btn btn-outline-danger btn-sm" (click)="deleteClient(client.id!)"><i
-              class="fas fa-trash"></i></button>
-        </td>
-      </tr>
-    </tbody>
+    <tbody>
+  <tr *ngFor="let client of filteredClients | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
+    <td>{{ client.company }}</td>
+    <td>
+      <div *ngFor="let name of client.salesManagers" class="d-block mb-1">
+        {{ name }}
+      </div>
+    </td>
+    <td *ngIf="role === 'ADMIN' || role === 'QUALITE'">{{ client.email }}</td>
+    <td *ngIf="role === 'ADMIN'">{{ client.contact }}</td>
+    <td *ngIf="role === 'ADMIN'">{{ client.address }}</td>
+    <td>
+      <button class="btn btn-outline-success btn-sm me-2" (click)="openModal(client)">
+        <i class="fas fa-edit"></i>
+      </button>
+      <button class="btn btn-outline-danger btn-sm" (click)="deleteClient(client.id!)">
+        <i class="fas fa-trash"></i>
+      </button>
+    </td>
+  </tr>
+</tbody>
+
   </table>
   <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
   <ng-template #noClients>

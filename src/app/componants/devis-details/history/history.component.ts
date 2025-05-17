@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { HistoryService } from 'src/app/services/history.service';
 import { GroupedHistory, History } from 'src/app/model/history.model';
 import { ActivatedRoute } from '@angular/router';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-history',
@@ -15,13 +16,16 @@ export class HistoryComponent implements OnInit {
   sharedDescription: string = '';
   currentVersion: string = '';
   newActions: History[] = [];
-
+  users: any[] = []; 
   constructor(
     private historyService: HistoryService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
+    this.loadUsers(); // ✅ Toujours charger les utilisateurs
+  
     if (this.devisId) {
       this.loadHistories(this.devisId);
     } else {
@@ -33,6 +37,7 @@ export class HistoryComponent implements OnInit {
       }
     }
   }
+  
 
   loadHistories(devisId: number): void {
     this.historyService.getByDevisId(devisId).subscribe({
@@ -43,6 +48,12 @@ export class HistoryComponent implements OnInit {
         this.currentVersion = (max + 1).toString().padStart(2, '0');
       },
       error: err => console.error('❌ Erreur chargement historiques :', err)
+    });
+  }
+  loadUsers(): void {
+    this.userService.getUsers().subscribe({
+      next: (data) => this.users = data,
+      error: (err) => console.error("Erreur chargement utilisateurs :", err)
     });
   }
 

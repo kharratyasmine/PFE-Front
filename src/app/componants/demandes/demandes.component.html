@@ -28,17 +28,18 @@
       <td>{{ demande.requirements }}</td>
       <td>
         <ul class="list-group">
-          <li *ngFor="let memberId of demande.teamMemberIds" class="list-group-item">
-            {{ getMemberName(memberId) }}
+          <li *ngFor="let name of getDisplayedMembers(demande)" class="list-group-item">
+            {{ name }}
           </li>
         </ul>
       </td>
+
       <td>
-        
+
         <button class="btn btn-outline-success btn-sm" (click)="openModal(demande)">
           <i class="fas fa-pencil-alt"></i>
         </button>
-        <button class="btn btn-outline-danger btn-sm"(click)="deleteDemande(demande.id!)">
+        <button class="btn btn-outline-danger btn-sm" (click)="deleteDemande(demande.id!)">
           <i class="fas fa-trash-alt"></i>
         </button>
       </td>
@@ -50,7 +51,6 @@
   <p class="text-muted">{{ 'no requests' | translate }}</p>
 </ng-template>
 
-<!-- Modal Bootstrap 5 -->
 <div class="modal fade" id="demandeModal" tabindex="-1" aria-labelledby="demandeModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">

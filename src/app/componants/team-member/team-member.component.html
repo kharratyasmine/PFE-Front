@@ -4,7 +4,7 @@
   <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
       <li class="breadcrumb-item">
-        <a routerLink="/Dashboard">🏠 {{ 'DASHBOARD' | translate }}</a>
+        <a routerLink="/dashboard">🏠 {{ 'DASHBOARD' | translate }}</a>
       </li>
       <li class="breadcrumb-item">
         <a routerLink="/teamMember">{{'Members' | translate}}</a>
@@ -44,43 +44,41 @@
         <th>{{'NAME' | translate}}</th>
         <th>{{'INITIAL'|translate}}</th>
         <th>{{'Qualification'|translate}}</th>
-        <th>{{'Holiday'|translate}}</th>
         <th style="width: 25%;">{{'Start_Date' | translate }}</th>
         <th>{{ 'EXPERIENCE' | translate }}</th>
         <th>{{ 'ROLE' | translate }}</th>
         <th>{{ 'COST' | translate }}</th>
         <th>{{ 'NOTE' | translate }}</th>
-        <th >{{ 'ACTIONS' | translate }}</th>
+        <th>{{ 'ACTIONS' | translate }}</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let member of filteredMembers | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
         <td>
-          <img *ngIf="member.image" [src]="member.image" class="img-thumbnail rounded-circle shadow-sm"
-            alt="Photo du membre" width="80" height="80" />
+          <img *ngIf="member.image" [src]="'http://localhost:8080' + member.image"
+            class="img-thumbnail rounded-circle shadow-sm" alt="Photo du membre" width="80" height="80" />
+
         </td>
         <td class="fw-bold">{{ member.name }}</td>
         <td>{{ member.initial }}</td>
         <td class="text-uppercase">{{ member.jobTitle }}</td>
-        <td>
+     <!--   <td>
           <span *ngFor="let day of member.holiday" class="badge badge-transparent">
             {{ day }}
           </span>
-        </td>
-        
+        </td>-->
 
-        <td ><span class="badge badge-transparent">{{ member.startDate | date:'yyyy-MM-dd' }}</span></td>
+
+        <td><span class="badge badge-transparent">{{ member.startDate | date:'yyyy-MM-dd' }}</span></td>
         <td>{{ member.experienceRange }}</td>
 
         <td>{{ member.role }}</td>
         <td class="fw-bold text-success">{{ member.cost }}</td>
         <td>{{ member.note }}</td>
         <td>
-         
+
           <div class="d-flex justify-content-end align-items-center">
-            <a [routerLink]="['/teamMemberDetails']" class="btn btn-outline-secondary btn-sm me-2">
-              <i class="fas fa-eye"></i>
-            </a>
+
             <button class="btn btn-outline-success btn-sm me-2" (click)="openModal(member)">
               <i class="fas fa-edit"></i>
             </button>
@@ -99,94 +97,100 @@
 
 
   <!-- Modale d'ajout / modification d'un membre -->
-  <dialog id="teamMemberModal">
-    <div class="dialog-header">
-      <span>{{ selectedMember && selectedMember.id ? ('Edit Member' | translate) : ('Add New Member' | translate)
-        }}</span>
-      <button class="close-btn" (click)="closeModal()">&times;</button>
+  <div class="modal fade" id="teamMemberModal" tabindex="-1" aria-labelledby="teamMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="teamMemberModalLabel">
+            {{ selectedMember && selectedMember.id ? ('Edit Member' | translate) : ('Add New Member' | translate) }}
+          </h5>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label"> {{ 'NAME' | translate }} </label>
+            <input type="text" class="form-control" [(ngModel)]="selectedMember.name" name="name"
+              (change)="onNameChange()" />
+            <div class="mb-3">
+            </div>
+            <label class="form-label">{{ 'INITIAL' | translate }} </label>
+            <input type="text" class="form-control" [(ngModel)]="selectedMember.initial" name="initial"
+              (input)="initialModified = true" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">{{ 'Qualification' | translate }} </label>
+            <input type="text" class="form-control" [(ngModel)]="selectedMember.jobTitle" name="role" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">📅 {{ 'Start_Date' | translate }}</label>
+            <input type="date" class="form-control" [(ngModel)]="selectedMember.startDate" name="startDate"
+              (change)="updateExperienceFromStartDate()" />
+          </div>
+
+
+          <div class="mb-3">
+            <label class="form-label">📊 {{ 'EXPERIENCE' | translate }}</label>
+            <input type="text" class="form-control" [value]="selectedMember.experienceRange" readonly />
+            <small class="form-text text-muted">
+              Plage : {{ selectedMember.experienceRange || 'Inconnue' }}
+            </small>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">{{ 'ROLE' | translate }}</label>
+            <select class="form-select" [(ngModel)]="selectedMember.role" name="role"
+              (change)="roleModified = true; onSeniorityChange()">
+              <option *ngFor="let role of senioriteOptions" [value]="role">
+                {{ role }}
+              </option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label>{{ 'COST' | translate }}</label>
+            <input type="number" [(ngModel)]="selectedMember.cost" (input)="costModified = true" class="form-control"
+              name="cout" />
+          </div>
+        <!--    <div class="mb-3">
+            <label class="form-label">📆{{ 'Holiday' | translate }}</label>
+            <input type="date" #holidayInput class="form-control" (change)="addHoliday(holidayInput.value)" />
+          </div>
+         -->
+          <div class="mb-3" *ngIf="selectedMember.holiday && selectedMember.holiday.length > 0">
+            <span class="badge bg-primary me-1" *ngFor="let date of selectedMember.holiday">
+              {{ date }}
+              <i class="fas fa-times cursor-pointer text-white" (click)="removeHoliday(date)"></i>
+            </span>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">📝 {{ 'NOTE' | translate }}</label>
+            <input type="text" class="form-control" [(ngModel)]="selectedMember.note" name="note" required />
+          </div>
+          <!-- Zone de Dropzone pour l'image -->
+          <div class="col-12">
+            <label class="form-label">{{ 'UPLOAD_IMAGE' | translate }}</label>
+            <ngx-dropzone (change)="onSelect($event)" class="d-block mx-auto border rounded p-3">
+              <ngx-dropzone-label class="fw-bold text-center">
+                🚀 Drop an image here
+              </ngx-dropzone-label>
+              <ngx-dropzone-preview *ngFor="let f of files" [removable]="true" (removed)="onRemove(f)">
+                <ngx-dropzone-label class="text-muted">
+                  {{ f.name }} ({{ f.type }})
+                </ngx-dropzone-label>
+              </ngx-dropzone-preview>
+            </ngx-dropzone>
+          </div>
+
+          <!-- Aperçu de l'image -->
+          <div class="col-12 text-center mt-3">
+            <img *ngIf="selectedMember.image"  [src]="'http://localhost:8080' + selectedMember.image"
+              class="img-thumbnail rounded-circle shadow-sm" alt="Uploaded Image" width="50" height="50" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">❌ {{ 'CANCEL' | translate }}</button>
+          <button type="button" class="btn btn-primary" (click)="saveTeamMember()">✅ {{ 'SAVE' | translate }}</button>
+        </div>
+      </div>
     </div>
-
-    <div class="dialog-body">
-
-      <label class="form-label"> {{ 'NAME' | translate }} </label>
-      <input type="text" class="form-control" [(ngModel)]="selectedMember.name" name="name" (change)="onNameChange()" />
-
-
-      <label class="form-label">{{ 'INITIAL' | translate }} </label>
-      <input type="text" class="form-control" [(ngModel)]="selectedMember.initial" name="initial"
-        (input)="initialModified = true" />
-
-
-      <label class="form-label">{{ 'Qualification' | translate }} </label>
-      <input type="text" [(ngModel)]="selectedMember.jobTitle" name="role" />
-      <!-- 📅 Date de début -->
-      <div class="mb-3">
-        <label class="form-label">📅 {{ 'Start_Date' | translate }}</label>
-        <input type="date" class="form-control" [(ngModel)]="selectedMember.startDate" name="startDate"
-          (change)="updateExperienceFromStartDate()" />
-      </div>
-
-      <!-- 🔢 Plage d'expérience -->
-      <div class="mb-3">
-        <label class="form-label">📊 {{ 'EXPERIENCE' | translate }}</label>
-        <input type="text" class="form-control" [value]="selectedMember.experienceRange" readonly />
-        <small class="form-text text-muted">
-          Plage : {{ selectedMember.experienceRange || 'Inconnue' }}
-        </small>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">{{ 'ROLE' | translate }}</label>
-        <select class="form-select" [(ngModel)]="selectedMember.role" name="role"
-          (change)="roleModified = true; onSeniorityChange()">
-          <option *ngFor="let role of senioriteOptions" [value]="role">
-            {{ role }}
-          </option>
-        </select>
-      </div>
-
-
-      <label>{{ 'COST' | translate }}</label>
-      <input type="number" [(ngModel)]="selectedMember.cost" (input)="costModified = true" class="form-control"
-        name="cout" />
-
-      <label class="form-label">📆{{ 'Holiday' | translate }}</label>
-      <input type="date" #holidayInput class="form-control" (change)="addHoliday(holidayInput.value)" />
-
-      <!-- Affichage des jours sélectionnés -->
-      <div *ngIf="selectedMember.holiday && selectedMember.holiday.length > 0">
-        <span class="badge bg-primary me-1" *ngFor="let date of selectedMember.holiday">
-          {{ date }}
-          <i class="fas fa-times cursor-pointer text-white" (click)="removeHoliday(date)"></i>
-        </span>
-      </div>
-
-      <label class="form-label">📝 {{ 'NOTE' | translate }}</label>
-      <input type="text" [(ngModel)]="selectedMember.note" name="note" required />
-
-      <!-- Zone de Dropzone pour l'image -->
-      <div class="col-12">
-        <label class="form-label">{{ 'UPLOAD_IMAGE' | translate }}</label>
-        <ngx-dropzone (change)="onSelect($event)" class="d-block mx-auto border rounded p-3">
-          <ngx-dropzone-label class="fw-bold text-center">
-            🚀 Drop an image here
-          </ngx-dropzone-label>
-          <ngx-dropzone-preview *ngFor="let f of files" [removable]="true" (removed)="onRemove(f)">
-            <ngx-dropzone-label class="text-muted">
-              {{ f.name }} ({{ f.type }})
-            </ngx-dropzone-label>
-          </ngx-dropzone-preview>
-        </ngx-dropzone>
-      </div>
-
-      <!-- Aperçu de l'image -->
-      <div class="col-12 text-center mt-3">
-        <img *ngIf="selectedMember.image" [src]="selectedMember.image" class="img-thumbnail rounded-circle shadow-sm"
-          alt="Uploaded Image" width="100" height="100" />
-      </div>
-    </div>
-
-    <div class="dialog-footer">
-      <button class="btn btn-secondary" (click)="closeModal()">❌ {{ 'CANCEL' | translate }}</button>
-      <button class="btn btn-primary" (click)="saveTeamMember()">✅ {{ 'SAVE' | translate }}</button>
-    </div>
-  </dialog>
+  </div>

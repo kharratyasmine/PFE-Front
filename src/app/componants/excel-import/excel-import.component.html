@@ -1,0 +1,16 @@
+<div class="container mt-4">
+    <h3>Importer un fichier Excel</h3>
+    <input type="file" (change)="onFileSelected($event)" />
+  
+    <div *ngIf="parsedData">
+      <div *ngFor="let sheetName of getSheetNames()">
+        <h5 class="mt-4">{{ sheetName }}</h5>
+        <table class="table table-bordered">
+          <tr *ngFor="let row of parsedData[sheetName]">
+            <td *ngFor="let cell of row">{{ cell }}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  

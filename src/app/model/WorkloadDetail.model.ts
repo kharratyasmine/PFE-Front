@@ -5,7 +5,10 @@ export interface WorkloadDetail {
     period: string;
     estimatedWorkload: number;
     publicHolidays: number;
-    actualWorkload: number;
-    devis?: Devis;
+    publicHolidayDates?: string[];
+    numberOfResources: number
+    totalEstimatedWorkload: number;
+    note :string;
+    devisId?: Devis;
   }
   

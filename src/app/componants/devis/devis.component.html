@@ -1,5 +1,11 @@
+
+
 <div class="container mt-4">
-  <h3 class="mt-4">Technical and Financial Proposal Project</h3>
+
+<div class="mb-3 d-flex justify-content-between align-items-center">
+  <h5>{{ 'Technical and Financial Proposal Project' | translate }}</h5>
+
+</div>
   <table class="table table-bordered table-hover text-center shadow-sm">
     <thead>
       <tr>
@@ -15,12 +21,12 @@
         <td>{{ devis.reference }}</td>
         <td>{{ devis.creationDate | date }}</td>
         <td>
-          <!-- Link to view Devis details -->
-     
-                   <button class="btn btn-outline-secondary btn-sm me-2" (click)="openDevisDetailsModal(devis.id!)">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                  
+
+          <!-- Button to view Devis --> 
+          <button class="btn btn-outline-secondary btn-sm me-2" (click)="openDevisDetailsModal(devis.id!)">
+            <i class="fas fa-eye"></i>
+          </button>
+
           <!-- Button to edit Devis -->
           <button class="btn btn-outline-success btn-sm me-2" (click)="editDevis(devis)">
             <i class="fas fa-pencil-alt"></i>
@@ -31,15 +37,16 @@
             <i class="fas fa-trash-alt"></i>
           </button>
 
-       
+
         </td>
       </tr>
     </tbody>
   </table>
 </div>
 
-<!-- Modal d'édition -->
-<div class="modal fade show d-block" tabindex="-1" role="dialog" *ngIf="isModalEditOpen" style="background-color: rgba(0,0,0,0.5);">
+
+<div class="modal fade show d-block" tabindex="-1" role="dialog" *ngIf="isModalEditOpen"
+  style="background-color: rgba(0,0,0,0.5);">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -66,7 +73,8 @@
           </div>
           <div class="mb-3">
             <label>Validité de la proposition</label>
-            <input type="text" [(ngModel)]="selectedDevis!.proposalValidity" name="proposalValidity" class="form-control" />
+            <input type="text" [(ngModel)]="selectedDevis!.proposalValidity" name="proposalValidity"
+              class="form-control" />
           </div>
           <div class="mb-3">
             <label>Auteur</label>

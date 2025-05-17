@@ -1,33 +1,35 @@
-.container {
-  max-width: 100%;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-.table-responsive {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  background-color: transparent;
-}
-
-.table {
-  min-width: 1200px; /* Force la largeur si trop de colonnes */
-}
-
-
-.table td {
-  white-space: nowrap;
-  text-align: center;
-  vertical-align: middle;
-}
-
-thead th {
-  background: #ececec;
-  color: #343a40;
-  text-align: center;
-}
-/* Titre */
+/* Style général */
+.mb-3.d-flex {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px !important;
+  }
+  thead th {
+    background: #ececec;
+    color: #343a40;
+    text-align: center;
+  }
+  .mb-3.d-flex h5 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .btn-outline-success {
+    border-color: #28a745;
+    color: #28a745;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-outline-success:hover {
+    background-color: #28a745;
+    color: white;
+    transform: translateY(-1px);
+  }
+  
+  /* Titre */
 h2 {
   color: #2c3e50;
   font-weight: 600;
@@ -35,27 +37,6 @@ h2 {
   position: relative;
   display: inline-block;
 }
-
-
-
-h2::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, #3498db, #9b59b6);
-  border-radius: 3px;
-}
-
-
-input::placeholder {
-  font-style: italic;
-  color: #aaa;
-}
-
 /* Breadcrumb */
 .breadcrumb {
   background-color: #f8f9fa !important;
@@ -78,172 +59,6 @@ input::placeholder {
   color: #2c3e50;
   font-weight: 500;
 }
-
-/* Barre de recherche et boutons */
-.d-flex.justify-content-between {
-  margin-bottom: 25px;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-dialog {
-  border: none;
-  border-radius: 10px;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.table {
-  
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 14px;
-}
-
-.table thead th {
-  background-color: #f8f9fa;
-  color: #333;
-  text-align: center;
-  vertical-align: middle;
-  padding: 10px;
-  border-bottom: 2px solid #dee2e6;
-  white-space: nowrap;
-}
-
-.table tbody td {
-  vertical-align: middle;
-  text-align: center;
-  padding: 10px;
-  border-top: 1px solid #e3e3e3;
-  word-break: break-word;
-}
-
-.table-hover tbody tr:hover {
-  background-color: #f1f1f1;
-}
-
-.table ul {
-  padding-left: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.card-header h4 {
-  font-size: 50px;
-  color: #555;
-}
-
-.btn-sm i {
-  font-size: 12px;
-}
-
-@media (max-width: 1200px) {
-  .table thead {
-    font-size: 12px;
-  }
-
-  .table tbody {
-    font-size: 12px;
-  }
-
-  .table thead th, .table tbody td {
-    padding: 8px;
-  }
-}
-.table-responsive {
-  overflow-x: auto;
-  background-color: #ffffff;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  padding-bottom: 10px;
-}
-
-
-.pagination-controls {
-  margin-top: 10px;
-}
-
-.dialog-body .form-group {
-  margin-bottom: 15px;
-}
-
-.dialog-body .form-group label {
-  font-weight: 500;
-}
-
-/* ✅ Style général de la modale */
-dialog {
-width: 50%;
-max-width: 600px;
-border: none;
-border-radius: 8px;
-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-padding: 20px;
-background-color: white;
-margin-top: 80px;
-}
-
-/* ✅ En-tête de la modale */
-.dialog-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-font-size: 18px;
-font-weight: bold;
-padding-bottom: 10px;
-border-bottom: 2px solid #ddd;
-}
-
-/* ✅ Bouton de fermeture */
-.close-btn {
-background: none;
-border: none;
-font-size: 24px;
-cursor: pointer;
-color: red;
-}
-
-/* ✅ Corps du formulaire */
-.dialog-body {
-display: flex;
-flex-direction: column;
-gap: 10px;
-padding: 15px 0;
-}
-
-.dialog-body label {
-font-weight: bold;
-margin-top: 5px;
-}
-
-.dialog-body input,
-.dialog-body textarea {
-width: 100%;
-padding: 8px;
-border: 1px solid #ccc;
-border-radius: 4px;
-font-size: 14px;
-}
-
-/* ✅ Pied de page de la modale */
-.dialog-footer {
-display: flex;
-justify-content: flex-end;
-gap: 10px;
-padding-top: 10px;
-border-top: 2px solid #ddd;
-}
-
-.dialog-footer .btn {
-padding: 8px 15px;
-font-size: 14px;
-cursor: pointer;
-border-radius: 5px;
-}
-
 .btn {
   border-radius: 8px;
   padding: 8px 16px;
@@ -288,52 +103,90 @@ border-radius: 5px;
   padding: 5px 10px;
   font-size: 0.875rem;
 }
-
-/* ✅ Rendre la modale responsive */
-@media (max-width: 768px) {
-dialog {
-  width: 90%;
-}
-}
-.container {
-  max-width: 95%;
+/* ✅ Style pour centrer le modal dans la page sans chevaucher sidebar/nav */
+.modal-dialog {
+  margin: 2rem auto !important;
+  max-width: 700px; /* ✅ ajuste selon la taille que tu veux */
 }
 
-/* Donne un petit arrondi et ombre portée aux cartes (déjà en partie géré par .card + .shadow) */
-.card {
-  border-radius: 8px;
+.modal-backdrop.show {
+  opacity: 0.2; /* optionnel : un fond plus léger */
 }
 
-/* Personnalise la couleur du header */
-.card-header {
-  font-weight: 500;
+/* ✅ Empêche le modal de sortir de l'écran */
+.modal-dialog {
+  max-width: 700px;
+  margin: 1.75rem auto;
 }
 
-/* Espace entre les cartes */
-.card + .card {
-  margin-top: 1rem;
+.modal-content {
+  max-height: 90vh;           /* Empêche que ça dépasse l'écran */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Centrer le contenu si besoin, etc. */
-.table td,
-.table th {
-  vertical-align: middle;
-  text-align: center;
+.modal-body {
+  overflow-y: auto;
+  max-height: 60vh;           /* Fait défiler le contenu au lieu du modal entier */
+  padding: 1rem;
 }
-.assignment-box {
-  background-color: #fefefe;
-  border-left: 4px solid #0d6efd;
-  transition: box-shadow 0.3s ease;
-}
+ /* ✅ En-tête de la modale */
+ .dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+  }
 
-.assignment-box:hover {
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.assignment-box label {
-  font-size: 13px;
-  font-weight: 500;
-}
-
-
-
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+  }
+  
+  /* Styles pour le tableau */
+  .table-bordered {
+    border: 1px solid #dee2e6;
+  }
+  
+  .table-bordered th,
+  .table-bordered td {
+    border: 1px solid #dee2e6;
+  }
+  
+  thead th {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  
+  /* Alternance des couleurs pour les tâches */
+  tbody tr.bg-light {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+  
+  /* Amélioration pour différencier les tâches */
+  tbody tr:first-child,
+  tbody tr[data-new-task="true"] {
+    border-top: 2px solid #adb5bd;
+  }
+  
+  /* Barre de progression */
+  .progress {
+    height: 20px !important;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .progress-bar {
+    text-align: center;
+    font-weight: 600;
+    transition: width 0.6s ease;
+  }
+  

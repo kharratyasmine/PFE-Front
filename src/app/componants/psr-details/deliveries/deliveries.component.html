@@ -1,0 +1,191 @@
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h3 class="text-primary mb-0">
+              <i class="fas fa-box-open me-2"></i> Project Deliveries
+            </h3>
+            <button class="btn btn-outline-success btn-sm"(click)="openModal()">
+              <i class="fas fa-plus"></i> Add Delivery
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="py-3">ID</th>
+                  <th class="py-3">Deliverable</th>
+                  <th class="py-3">Description</th>
+                  <th class="py-3">Version</th>
+                  <th class="py-3">Planned</th>
+                  <th class="py-3">Effective</th>
+                  <th class="py-3">Status</th>
+                  <th class="py-3">Support</th>
+                  <th class="py-3">Feedback</th>
+                  <th class="py-3 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let d of deliveries; let i = index" 
+                    [ngClass]="{ 
+                      'table-success': d.customerFeedback === 'Accepted', 
+                      'table-danger': d.customerFeedback === 'Refused',
+                      'table-light': i % 2 === 0 && d.customerFeedback !== 'Accepted' && d.customerFeedback !== 'Refused'
+                    }">
+                  <td class="align-middle">{{ d.id }}</td>
+                  <td class="align-middle fw-bold">{{ d?.deliveriesName || 'N/A' }}</td>
+                  <td class="align-middle" [innerHTML]="d.description === 'Final Delivery' ? '<span class=\'badge bg-dark\'>' + d.description + '</span>' : d.description"></td>
+                  <td class="align-middle"><span class="badge bg-secondary">{{ d.version }}</span></td>
+                  <td class="align-middle">{{ d.plannedDate | date:'dd MMM yyyy' }}</td>
+                  <td class="align-middle">{{ d.effectiveDate | date:'dd MMM yyyy' }}</td>
+                  <td class="align-middle">
+                    <span class="badge" 
+                          [ngClass]="{
+                            'bg-success': d.status === 'Delivered', 
+                            'bg-warning': d.status === 'Planned',
+                            'bg-danger': d.status === 'Late'
+                          }">
+                      {{ d.status }}
+                    </span>
+                  </td>
+                  <td class="align-middle">
+                    <span *ngIf="d.deliverySupport">
+                      <i class="fas" 
+                         [ngClass]="{
+                           'fa-envelope': d.deliverySupport === 'Email',
+                           'fa-cloud': d.deliverySupport === 'Cloud',
+                           'fa-server': d.deliverySupport === 'FTP',
+                           'fa-box': d.deliverySupport === 'Physical'
+                         }">
+                      </i>
+                      {{ d.deliverySupport }}
+                    </span>
+                    <span *ngIf="!d.deliverySupport">-</span>
+                  </td>
+                  <td class="align-middle">
+                    <span class="badge" 
+                          [ngClass]="{
+                            'bg-success': d.customerFeedback === 'Accepted',
+                            'bg-danger': d.customerFeedback === 'Refused',
+                            'bg-secondary': d.customerFeedback === 'No Feedback'
+                          }">
+                      {{ d.customerFeedback }}
+                    </span>
+                  </td>
+                  <td class="align-middle text-center">
+                    <div class="btn-group">
+                      <button class="btn btn-sm btn-outline-primary" (click)="openModal(d)" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger" (click)="deleteDelivery(d.id)" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="deliveries.length === 0">
+                  <td colspan="10" class="text-center py-5 text-muted">
+                    <i class="fas fa-inbox fa-3x mb-3"></i>
+                    <p>No deliveries found for this project</p>
+                    <button class="btn btn-primary" (click)="openModal()">Add your first delivery</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="deliveryModal" tabindex="-1" aria-labelledby="deliveryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deliveryModalLabel">
+          <i class="fas" [ngClass]="{'fa-plus': !isEditMode, 'fa-pencil-alt': isEditMode}"></i>
+          {{ isEditMode ? 'Edit' : 'Add New' }} Delivery
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedDelivery">
+        <div class="mb-3">
+          <label class="form-label">Deliverable Name</label>
+          <input class="form-control" placeholder="Enter deliverable name" [(ngModel)]="selectedDelivery.deliveriesName" />
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <input class="form-control" placeholder="Enter description" [(ngModel)]="selectedDelivery.description" />
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Version</label>
+            <input class="form-control" placeholder="e.g. v1.0.0" [(ngModel)]="selectedDelivery.version" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Status</label>
+            <select class="form-select" [(ngModel)]="selectedDelivery.status">
+              <option value="Planned">Planned</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Late">Late</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Planned Date</label>
+            <input class="form-control" type="date" [(ngModel)]="selectedDelivery.plannedDate" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Effective Date</label>
+            <input class="form-control" type="date" [(ngModel)]="selectedDelivery.effectiveDate" />
+          </div>
+        </div>
+        
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Delivery Support</label>
+            <select class="form-select" [(ngModel)]="selectedDelivery.deliverySupport">
+              <option value="">-- Select Support --</option>
+              <option value="Email">Email</option>
+              <option value="FTP">FTP</option>
+              <option value="Cloud">Cloud</option>
+              <option value="Physical">Physical</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Customer Feedback</label>
+            <select class="form-select" [(ngModel)]="selectedDelivery.customerFeedback">
+              <option value="No Feedback">No Feedback</option>
+              <option value="Accepted">Accepted</option>
+              <option value="Refused">Refused</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="alert alert-info mt-3 d-flex align-items-center" *ngIf="selectedDelivery.psrId">
+          <i class="fas fa-info-circle me-2"></i>
+          <small>This delivery will be associated with PSR ID: <strong>{{ selectedDelivery.psrId }}</strong></small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-success" (click)="saveDelivery()">
+          <i class="fas fa-save me-1"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  

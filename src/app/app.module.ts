@@ -20,7 +20,6 @@ import { MyProfilComponent } from './componants/my-profil/my-profil.component';
 import { ProjectDetailsComponent } from './componants/project-details/project-details.component';
 import { DevisComponent } from './componants/devis/devis.component';
 import { DemandesComponent } from './componants/demandes/demandes.component';
-import { PlannedWorkloadComponent } from './componants/planned-workload/planned-workload.component';
 import { LoginComponent } from './componants/login/login.component';
 import { RegisterComponent } from './componants/register/register.component';
 import { TeamMemberDetailsComponent } from './componants/team-member-details/team-member-details.component';
@@ -40,6 +39,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 // Traduction
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -52,7 +52,17 @@ import { WorkloadComponent } from './componants/devis-details/workload/workload.
 import { FinancialComponent } from './componants/devis-details/financial/financial.component';
 import { InvoicingComponent } from './componants/devis-details/invoicing/invoicing.component';
 import { HistoryComponent } from './componants/devis-details/history/history.component';
-
+import { PlannedWorkloadMemberComponent } from './componants/planned-workload-member/planned-workload-member.component';
+import { ExcelImportComponent } from './componants/excel-import/excel-import.component';
+import { PsrComponent } from './componants/psr/psr.component';
+import { PsrDetailsComponent } from './componants/psr-details/psr-details.component';
+import { DeliveriesComponent } from './componants/psr-details/deliveries/deliveries.component';
+import { PsrCoverComponent } from './componants/psr-details/psr-cover/psr-cover.component';
+import { PsrWeeklyComponent } from './componants/psr-details/psr-weekly/psr-weekly.component';
+import { PsrRisksComponent } from './componants/psr-details/psr-risks/psr-risks.component';
+import { PsrPlanningComponent } from './componants/psr-details/psr-planning/psr-planning.component';
+import { NgxEchartsModule } from 'ngx-echarts';
+import { TeamOrganizationComponent } from './componants/psr-details/team-organization/team-organization.component';
 
 
 // Fonction de chargement i18n
@@ -75,7 +85,6 @@ export function HttpLoaderFactory(http: HttpClient) {
     MyProfilComponent,
     ProjectDetailsComponent,
     DevisComponent,
-    PlannedWorkloadComponent,
     DemandesComponent,
     LoginComponent,
     RegisterComponent,
@@ -86,6 +95,19 @@ export function HttpLoaderFactory(http: HttpClient) {
     FinancialComponent,
     InvoicingComponent,
     HistoryComponent,
+    PlannedWorkloadMemberComponent,
+    ExcelImportComponent,
+    PsrComponent,
+    PsrDetailsComponent,
+    DeliveriesComponent,
+    PsrCoverComponent,
+    PsrWeeklyComponent,
+    PsrRisksComponent,
+    PsrPlanningComponent,
+    TeamOrganizationComponent,
+   
+
+   
   
  
   
@@ -98,7 +120,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     FormsModule,
     ReactiveFormsModule,
     NgxDropzoneModule,
+    NgxMatSelectSearchModule,
     NgxPaginationModule,
+     NgxEchartsModule, 
     // Initialisation d'angular-calendar avec DateAdapter (basé sur date-fns)
     CalendarModule.forRoot({
       provide: DateAdapter,

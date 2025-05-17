@@ -1,0 +1,106 @@
+/* Style général */
+.mb-3.d-flex {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 25px !important;
+  }
+  
+  .mb-3.d-flex h5 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .btn-outline-success {
+    border-color: #28a745;
+    color: #28a745;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-outline-success:hover {
+    background-color: #28a745;
+    color: white;
+    transform: translateY(-1px);
+  }
+  
+  /* Titre */
+h2 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 25px;
+  position: relative;
+  display: inline-block;
+}
+/* Breadcrumb */
+.breadcrumb {
+  background-color: #f8f9fa !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 8px !important;
+  padding: 12px 16px !important;
+}
+
+.breadcrumb-item a {
+  color: #6c757d;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.breadcrumb-item a:hover {
+  color: #3498db;
+}
+
+.breadcrumb-item.active {
+  color: #2c3e50;
+  font-weight: 500;
+}
+.btn {
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-outline-primary {
+  color: #3498db;
+  border-color: #3498db;
+}
+
+.btn-outline-primary:hover {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-outline-success {
+  color: #2ecc71;
+  border-color: #2ecc71;
+}
+
+.btn-outline-success:hover {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.btn-outline-danger {
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+
+.btn-outline-danger:hover {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.875rem;
+}
+thead th {
+  background: #ececec;
+  color: #343a40;
+  text-align: center;
+}

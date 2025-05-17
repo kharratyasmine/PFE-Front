@@ -4,7 +4,7 @@
   <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
       <li class="breadcrumb-item">
-        <a routerLink="/Dashboard">🏠 {{ 'dashboard' | translate }}</a>
+        <a routerLink="/dashboard">🏠 {{ 'dashboard' | translate }}</a>
       </li>
       <li class="breadcrumb-item">
         <a routerLink="/project">📁 {{ 'projects' | translate }}</a>
@@ -57,12 +57,15 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" routerLink="Task" routerLinkActive="active">✅ {{ 'tasks' | translate }}</a>
-        </li>
+        </li> 
         <li class="nav-item">
-          <a class="nav-link" routerLink="plannedWorkload" routerLinkActive="active">📄 {{ 'planned workload' | translate }}</a>
+          <a class="nav-link" routerLink="plannedWorkloadMember" routerLinkActive="active">📄 {{ 'planned Workload Member' | translate }}</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" routerLink="devis" routerLinkActive="active">📄 {{ 'quotes' | translate }}</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="psr" routerLinkActive="active">📄 {{ 'Project Status Reports' | translate }}</a>
         </li>
       </ul>
 

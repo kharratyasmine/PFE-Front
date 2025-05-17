@@ -1,49 +1,62 @@
 <div class="container-fluid py-4">
-  <!-- Distribution List Section -->
-  <div class="card shadow-sm mb-4">
-    <div class="card-header" style="background-color: #3498db; color: white;">
-      <h5 class="mb-0"><i class="fas fa-list-check me-2"></i> Distribution List</h5>
-    </div>
-    <div class="card-body p-0">
+  <!-- Main wrapper with shadow and rounded corners for all content -->
+  <div class="bg-white rounded-3 shadow-sm p-4 mb-4">
+    
+    <!-- Distribution List Section -->
+    <div class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-primary mb-0">
+          <i class="fas fa-list-check me-2"></i>Distribution List
+        </h5>
+      </div>
+      
       <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead style="background-color: #3498db; color: white;">
+        <table class="table table-bordered table-hover align-middle rounded overflow-hidden">
+          <thead class="bg-primary text-white">
             <tr>
-              <th style="width: 25%;">Name</th>
-              <th style="width: 25%;">Function</th>
-              <th style="width: 10%;">P</th>
-              <th style="width: 10%;">C</th>
-              <th style="width: 10%;">Action</th>
+              <th>Name</th>
+              <th>Function</th>
+              <th width="60" class="text-center">P</th>
+              <th width="60" class="text-center">C</th>
+              <th width="80" class="text-center">Action</th>
             </tr>
           </thead>
           <tbody>
-            <!-- Customer Group -->
-            <tr class="bg-light">
-              <td colspan="5" class="fw-bold text-start"><i class="fas fa-users me-2"></i> Customer Name</td>
+            <!-- Customer Section -->
+            <tr class="bg-light fw-bold">
+              <td colspan="5"><i class="fas fa-users me-2"></i> Customer Name</td>
             </tr>
             <tr *ngFor="let dist of customerDistributions">
-              <td class="text-start">{{ dist.name }}</td>
+              <td>{{ dist.name }}</td>
               <td>{{ dist.function || '-' }}</td>
-              <td><span class="badge bg-warning text-dark" *ngIf="dist.partial">✕</span></td>
-              <td><span class="badge bg-success text-white" *ngIf="dist.complete">✕</span></td>
-              <td>
-                <button class="btn btn-sm btn-outline-primary" (click)="openEditModal(dist)" title="Edit" >
+              <td class="text-center">
+                <i *ngIf="dist.partial" class="fas fa-check-circle text-warning"></i>
+              </td>
+              <td class="text-center">
+                <i *ngIf="dist.complete" class="fas fa-check-circle text-success"></i>
+              </td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-primary rounded-pill" (click)="openEditModal(dist)">
                   <i class="fas fa-edit"></i>
                 </button>
               </td>
             </tr>
-
-            <!-- TELNET Group -->
-            <tr class="bg-light">
-              <td colspan="5" class="fw-bold text-start"><i class="fas fa-network-wired me-2"></i> TELNET</td>
+      
+            <!-- TELNET Section -->
+            <tr class="bg-light fw-bold">
+              <td colspan="5"><i class="fas fa-network-wired me-2"></i> TELNET</td>
             </tr>
             <tr *ngFor="let dist of telnetDistributions">
-              <td class="text-start">{{ dist.name }}</td>
+              <td>{{ dist.name }}</td>
               <td>{{ dist.function || '-' }}</td>
-              <td><span class="badge bg-warning text-dark" *ngIf="dist.partial">✕</span></td>
-              <td><span class="badge bg-success text-white" *ngIf="dist.complete">✕</span></td>
-              <td>
-                <button class="btn btn-sm btn-outline-primary" (click)="openEditModal(dist)" title="Edit" >
+              <td class="text-center">
+                <i *ngIf="dist.partial" class="fas fa-check-circle text-warning"></i>
+              </td>
+              <td class="text-center">
+                <i *ngIf="dist.complete" class="fas fa-check-circle text-success"></i>
+              </td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-primary rounded-pill" (click)="openEditModal(dist)">
                   <i class="fas fa-edit"></i>
                 </button>
               </td>
@@ -52,35 +65,131 @@
         </table>
       </div>
     </div>
+
+    <hr class="my-4">
+
+    <!-- Visas Section -->
+    <div class="mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold text-primary mb-0">
+          <i class="fas fa-file-signature me-2"></i>Visas
+        </h5>
+        <button class="btn btn-primary btn-sm rounded-pill px-3" (click)="openAddVisaModal()">
+          <i class="fas fa-plus me-1"></i> Add Visa
+        </button>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle rounded overflow-hidden">
+          <thead class="bg-primary text-white">
+            <tr>
+              <th>Action</th>
+              <th>Name</th>
+              <th>Date</th>
+              <th>Visa</th>
+              <th width="80" class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let visa of visas">
+              <td>{{ visa.action }}</td>
+              <td>{{ visa.name }}</td>
+              <td>{{ visa.date | date: 'dd/MM/yyyy' }}</td>
+              <td><span class="badge bg-primary rounded-pill px-3">{{ visa.visa }}</span></td>
+              <td class="text-center">
+                <button class="btn btn-sm btn-outline-primary rounded-pill" (click)="openEditVisaModal(visa)">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="!visas || visas.length === 0">
+              <td colspan="5" class="text-center py-3 text-muted">No visas found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <hr class="my-4">
+
+    <!-- Proposal Summary Section -->
+    <div>
+      <h5 class="fw-bold text-primary mb-3">
+        <i class="fas fa-clipboard-list me-2"></i>Proposal Summary
+      </h5>
+      
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="card border-0 bg-light h-100">
+            <div class="card-body">
+              <h6 class="card-subtitle mb-3 text-muted">Customer & Project</h6>
+              <div class="mb-3">
+                <div class="fw-bold text-primary small mb-1">Customer</div>
+                <div>{{ proposalSummary.customer }}</div>
+              </div>
+              <div class="mb-3">
+                <div class="fw-bold text-primary small mb-1">Project</div>
+                <div>{{ proposalSummary.project }}</div>
+              </div>
+              <div>
+                <div class="fw-bold text-primary small mb-1">Type</div>
+                <div>{{ proposalSummary.projectType }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="card border-0 bg-light h-100">
+            <div class="card-body">
+              <h6 class="card-subtitle mb-3 text-muted">Timeline & Validity</h6>
+              <div class="mb-3">
+                <div class="fw-bold text-primary small mb-1">Proposal Validity</div>
+                <div>{{ proposalSummary.proposalValidity }}</div>
+              </div>
+              <div class="mb-3">
+                <div class="fw-bold text-primary small mb-1">Start Date</div>
+                <div>{{ proposalSummary.possibleStartDate | date: 'dd/MM/yyyy' }}</div>
+              </div>
+              <div>
+                <div class="fw-bold text-primary small mb-1">End Date</div>
+                <div>{{ proposalSummary.estimatedEndDate | date: 'dd/MM/yyyy' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- Modals -->
   <!-- Edit Distribution Modal -->
   <div class="modal fade" [class.show]="isEditModalOpen" [style.display]="isEditModalOpen ? 'block' : 'none'" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 shadow-lg">
-        <div class="modal-header" style="background-color: #3498db; color: white;">
+      <div class="modal-content border-0 shadow-lg rounded-3">
+        <div class="modal-header bg-primary text-white">
           <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Distribution</h5>
           <button type="button" class="btn-close btn-close-white" (click)="closeEditModal()"></button>
         </div>
         <div class="modal-body">
           <form *ngIf="distributionToEdit">
             <div class="mb-3">
-              <label class="form-label">Name</label>
-              <input class="form-control" [(ngModel)]="distributionToEdit.name" name="name" readonly>
+              <label class="form-label text-muted">Name</label>
+              <input class="form-control form-control-lg" [(ngModel)]="distributionToEdit.name" name="name" readonly>
             </div>
             <div class="mb-3">
-              <label class="form-label">Function</label>
+              <label class="form-label text-muted">Function</label>
               <input class="form-control" [(ngModel)]="distributionToEdit.function" name="function">
             </div>
             <div class="mb-3">
               <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="partialSwitch" [(ngModel)]="distributionToEdit.partial" name="partial" style="background-color: #00b4d8;">
+                <input class="form-check-input" type="checkbox" id="partialSwitch" [(ngModel)]="distributionToEdit.partial" name="partial">
                 <label class="form-check-label" for="partialSwitch">Partial</label>
               </div>
             </div>
             <div class="mb-3">
               <div class="form-check form-switch">
-                <input class="form-check-input" type="checkbox" id="completeSwitch" [(ngModel)]="distributionToEdit.complete" name="complete" style="background-color: #00b4d8;">
+                <input class="form-check-input" type="checkbox" id="completeSwitch" [(ngModel)]="distributionToEdit.complete" name="complete">
                 <label class="form-check-label" for="completeSwitch">Complete</label>
               </div>
             </div>
@@ -88,62 +197,22 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-outline-secondary" (click)="closeEditModal()">Cancel</button>
-          <button class="btn btn-primary" (click)="saveEditedDistribution()" >
+          <button class="btn btn-primary" (click)="saveEditedDistribution()">
             <i class="fas fa-save me-1"></i> Save
           </button>
         </div>
       </div>
     </div>
   </div>
-  <hr>
-  <!-- Visas Section -->
-  <div class="card shadow-sm mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #3498db; color: white;">
-      <h5 class="mb-0"><i class="fas fa-file-signature me-2"></i> Visas</h5>
-      <button class="btn btn-sm btn-light" (click)="openAddVisaModal()">
-        <i class="fas fa-plus me-1"></i> Add Visa
-      </button>
-    </div>
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-          <thead style="background-color: #3498db; color: white;">
-            <tr>
-              <th>Action</th>
-              <th>Name</th>
-              <th>Date</th>
-              <th>Visa</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let visa of visas">
-              <td class="fw-semibold" style="color: #3498db;">{{ visa.action }}</td>
-              <td>{{ visa.name }}</td>
-              <td>{{ visa.date | date:'mediumDate' }}</td>
-              <td>
-                <span class="badge bg-info text-dark">{{ visa.visa }}</span>
-              </td>
-              <td>
-                <button class="btn btn-sm btn-outline-primary" (click)="openEditVisaModal(visa)" title="Edit" style="border-color: #00b4d8; color: #00b4d8;">
-                  <i class="fas fa-edit"></i>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
- 
+
   <!-- Visa Modal -->
   <div class="modal fade" [class.show]="isVisaModalOpen" [style.display]="isVisaModalOpen ? 'block' : 'none'" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 shadow-lg">
+      <div class="modal-content border-0 shadow-lg rounded-3">
         <div *ngIf="visaErrorMessage" class="alert alert-danger m-3">
           <i class="fas fa-exclamation-circle me-2"></i>{{ visaErrorMessage }}
         </div>
-        <div class="modal-header" style="background-color: #3498db; color: white;">
+        <div class="modal-header bg-primary text-white">
           <h5 class="modal-title">
             <i class="fas" [class.fa-plus]="!currentVisa.id" [class.fa-edit]="currentVisa.id"></i>
             {{ currentVisa.id ? 'Edit Visa' : 'Add Visa' }}
@@ -153,7 +222,7 @@
         <div class="modal-body">
           <form>
             <div class="mb-3">
-              <label class="form-label">Action</label>
+              <label class="form-label text-muted">Action</label>
               <select class="form-select" [(ngModel)]="currentVisa.action" name="action">
                 <option *ngFor="let act of availableActions" [value]="act" [disabled]="isActionUsed(act)">
                   {{ act }}
@@ -161,7 +230,7 @@
               </select>
             </div>
             <div class="mb-3">
-              <label class="form-label">Name</label>
+              <label class="form-label text-muted">Name</label>
               <select class="form-select" [(ngModel)]="currentVisa.name" name="name">
                 <option *ngFor="let user of users" [value]="user.firstname + ' ' + user.lastname">
                   {{ user.firstname }} {{ user.lastname }}
@@ -169,89 +238,20 @@
               </select>
             </div>
             <div class="mb-3">
-              <label class="form-label">Date</label>
+              <label class="form-label text-muted">Date</label>
               <input type="date" class="form-control" [(ngModel)]="currentVisa.date" name="date" />
             </div>
             <div class="mb-3">
-              <label class="form-label">Visa</label>
+              <label class="form-label text-muted">Visa</label>
               <input class="form-control" [(ngModel)]="currentVisa.visa" name="visa" />
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button class="btn btn-outline-secondary" (click)="closeVisaModal()">Cancel</button>
-          <button class="btn btn-primary" (click)="saveEditedVisa()" style="background-color: #00b4d8; border-color: #00b4d8;">
+          <button class="btn btn-primary" (click)="saveEditedVisa()">
             <i class="fas fa-save me-1"></i> Save
           </button>
-        </div>
-      </div>
-    </div>
-  </div>
-<hr>
-  <!-- Proposal Summary Section -->
-  <div class="card shadow-sm">
-    <div class="card-header" style="background-color: #3498db; color: white;">
-      <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i> Proposal Summary</h5>
-    </div>
-    <div class="card-body">
-      <div class="row" *ngIf="proposalSummary">
-        <div class="col-md-6">
-          <div class="d-flex mb-3">
-            <div class="flex-shrink-0 me-3" style="color: #3498db;">
-              <i class="fas fa-building fs-4"></i>
-            </div>
-            <div>
-              <h6 class="mb-1 text-muted">Customer</h6>
-              <p class="mb-0 fs-5">{{ proposalSummary.customer }}</p>
-            </div>
-          </div>
-          <div class="d-flex mb-3">
-            <div class="flex-shrink-0 me-3" style="color: #3498db;">
-              <i class="fas fa-project-diagram fs-4"></i>
-            </div>
-            <div>
-              <h6 class="mb-1 text-muted">Project</h6>
-              <p class="mb-0 fs-5">{{ proposalSummary.project }}</p>
-            </div>
-          </div>
-          <div class="d-flex mb-3">
-            <div class="flex-shrink-0 me-3" style="color: #3498db;">
-              <i class="fas fa-tag fs-4"></i>
-            </div>
-            <div>
-              <h6 class="mb-1 text-muted">Type</h6>
-              <p class="mb-0 fs-5">{{ proposalSummary.projectType }}</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="d-flex mb-3">
-            <div class="flex-shrink-0 me-3" style="color: #3498db;">
-              <i class="fas fa-calendar-check fs-4"></i>
-            </div>
-            <div>
-              <h6 class="mb-1 text-muted">Proposal Validity</h6>
-              <p class="mb-0 fs-5">{{ proposalSummary.proposalValidity }}</p>
-            </div>
-          </div>
-          <div class="d-flex mb-3">
-            <div class="flex-shrink-0 me-3" style="color: #3498db;">
-              <i class="fas fa-calendar-day fs-4"></i>
-            </div>
-            <div>
-              <h6 class="mb-1 text-muted">Start Date</h6>
-              <p class="mb-0 fs-5">{{ proposalSummary.possibleStartDate | date:'mediumDate' }}</p>
-            </div>
-          </div>
-          <div class="d-flex">
-            <div class="flex-shrink-0 me-3" style="color: #3498db;">
-              <i class="fas fa-calendar-times fs-4"></i>
-            </div>
-            <div>
-              <h6 class="mb-1 text-muted">End Date</h6>
-              <p class="mb-0 fs-5">{{ proposalSummary.estimatedEndDate | date:'mediumDate' }}</p>
-            </div>
-          </div>
         </div>
       </div>
     </div>

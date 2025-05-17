@@ -27,8 +27,11 @@
             <small>
               🎓 {{ member.role }} | 💰 {{ member.cost }} TND<br />
               🕒 {{ 'allocation' | translate }} :
-              <span class="fw-bold">{{ member.allocation! * 100 | number:'1.0-0' }}%</span>
-              <button class="btn btn-outline-primary btn-sm ms-2" (click)="openAllocationModal(member)">
+              <span class="fw-bold">
+                {{ (member.allocationByTeamId?.[team.id]?.value ?? 0) * 100 | number:'1.0-0' }}
+              </span>
+        
+              <button class="btn btn-outline-primary btn-sm ms-2" (click)="openAllocationModal(member, team.id)">
                 ✏️ {{ 'edit' | translate }}
               </button>
             </small>

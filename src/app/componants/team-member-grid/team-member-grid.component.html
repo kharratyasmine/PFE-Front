@@ -9,7 +9,7 @@
    <nav aria-label="breadcrumb" class="mb-3">
     <ol class="breadcrumb bg-light p-2 rounded shadow-sm">
       <li class="breadcrumb-item">
-        <a routerLink="/Dashboard">🏠 Dashboard</a>
+        <a routerLink="/dashboard">🏠 Dashboard</a>
       </li>
       <li class="breadcrumb-item">
         <a routerLink="/TeamMember"> Membres</a>
@@ -59,10 +59,12 @@
                     <!-- Member image -->
                     <img
                       class="img-fluid"
-                      [src]="member.image"
+                      [src]="'http://localhost:8080' + member.image"
                       alt="Photo du membre"
                     />
-                  </div>
+
+
+
                   <div class="student-content">
                     <h5>{{ member.name }}</h5>
                     <p><strong>Initial :</strong> {{ member.initial }}</p>

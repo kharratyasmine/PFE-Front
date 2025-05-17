@@ -12,6 +12,7 @@ export class LoginComponent {
   loginForm: FormGroup;
   errorMessage: string = '';
   loading = false;
+  showPassword: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -39,7 +40,7 @@ export class LoginComponent {
       next: (response) => {
         console.log('✅ Authentification réussie:', response);
         this.authService.saveToken(response.access_token, response.refresh_token);
-        this.router.navigate(['/Dashboard']);
+        this.router.navigate(['/dashboard']);
       },
       error: (error) => {
         console.error('❌ Erreur de login:', error);

@@ -1,0 +1,105 @@
+<!-- Modal Centré avec fond semi-transparent -->
+<div class="custom-modal-overlay">
+  <div class="custom-modal-container">
+    
+    <!-- Contenu du Modal -->
+    <div class="custom-modal-content bg-white rounded-lg shadow-xl">
+      
+      <!-- En-tête -->
+      <div class="modal-header-container">
+        <div class="devis-header d-flex justify-content-between align-items-start flex-wrap px-3 py-2">
+          <!-- Left Side: Title + Meta -->
+          <div class="d-flex flex-column">
+            <div class="d-flex align-items-center mb-2">
+              <i class="fas fa-file-invoice text-primary me-2 fs-4"></i>
+              <h4 class="mb-0 text-primary fw-bold">PSR n° {{ psr?.reference }}</h4>
+            </div>
+            <div class="text-muted small d-flex flex-wrap gap-3">
+              <div><i class="fas fa-user me-1"></i><strong>Auteur :</strong> {{ psr?.authorName || 'Non spécifié' }}</div>
+              <div><i class="fas fa-tag me-1"></i><strong>Édition :</strong> {{ psr?.edition || 'Non spécifié' }}</div>
+              <div><i class="fas fa-calendar-alt me-1"></i><strong>Date :</strong> {{ psr?.reportDate | date }}</div>
+              <div><i class="fas fa-lightbulb me-1"></i><strong>Statut :</strong> 
+                <span [ngClass]="{
+                  'badge bg-success': psr?.overallStatus === 'Completed',
+                  'badge bg-warning text-dark': psr?.overallStatus === 'In Progress',
+                  'badge bg-danger': psr?.overallStatus === 'Blocked',
+                  'badge bg-info': psr?.overallStatus !== 'Completed' && psr?.overallStatus !== 'In Progress' && psr?.overallStatus !== 'Blocked'
+                }">{{ psr?.overallStatus || 'Non spécifié' }}</span>
+              </div>
+            </div>
+          </div>
+        
+          <!-- Right Side: Buttons -->
+          <div class="d-flex gap-2 mt-2 mt-md-0">
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="downloadPsr()" *ngIf="psr?.id">
+              <i class="fas fa-download me-1"></i> Télécharger
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="activeModal.dismiss()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+        <!-- Loading Indicator -->
+        <div class="text-center py-5" *ngIf="!psr">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+          </div>
+          <p class="mt-2 text-muted">Chargement des détails du PSR...</p>
+        </div>
+
+        <!-- Content When Loaded -->
+        <div *ngIf="psr">
+          <ul class="nav nav-tabs">
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'teamOrganization'" (click)="setActiveTab('teamOrganization')">
+                <i class="fas fa-users me-1"></i> Team Organization
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'weekly'" (click)="setActiveTab('weekly')">
+                <i class="fas fa-calendar-week me-1"></i> Weekly Report
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'risks'" (click)="setActiveTab('risks')">
+                <i class="fas fa-exclamation-triangle me-1"></i> Risks
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'deliveries'" (click)="setActiveTab('deliveries')">
+                <i class="fas fa-truck me-1"></i> Deliveries
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'planning'" (click)="setActiveTab('planning')">
+                <i class="fas fa-project-diagram me-1"></i> Planning
+              </a>
+            </li>
+          </ul>
+
+          <div class="tab-content mt-3">
+            <div *ngIf="activeTab === 'teamOrganization'" class="tab-pane fade show active">
+              <app-team-organization *ngIf="psr.id" [psrId]="psr.id"></app-team-organization>
+            </div>
+            <div *ngIf="activeTab === 'weekly'" class="tab-pane fade show active">
+              <app-psr-weekly *ngIf="psr.id" [psrId]="psr.id"></app-psr-weekly>
+            </div>
+            <div *ngIf="activeTab === 'risks'" class="tab-pane fade show active">
+              <app-psr-risks *ngIf="psr.id" [psrId]="psr.id"></app-psr-risks>
+            </div>
+            <div *ngIf="activeTab === 'deliveries'" class="tab-pane fade show active">
+              <app-deliveries *ngIf="psr.id" [psrId]="psr.id"></app-deliveries>
+            </div>
+            <div *ngIf="activeTab === 'planning'" class="tab-pane fade show active">
+              <app-psr-planning *ngIf="psr.id" [psrId]="psr.id"></app-psr-planning>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

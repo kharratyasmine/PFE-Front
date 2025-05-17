@@ -32,5 +32,19 @@ export class UserService {
   getRoles(): Observable<string[]> { // ✅ Retourne un tableau de string depuis l'API
     return this.http.get<string[]>(`${this.apiUrl}/roles`);
   }
-  
+
+
+updateProfileWithPhoto(data: any, photoFile?: File): Observable<any> {
+  const formData = new FormData();
+  formData.append('data', JSON.stringify(data));
+  if (photoFile) {
+    formData.append('photo', photoFile);
+  }
+  return this.http.patch(`${this.apiUrl}/users/profile`, formData);
+}
+
+updateMyProfile(data: User): Observable<User> {
+  return this.http.put<User>(`${this.apiUrl}/users/me`, data);
+}
+
 }

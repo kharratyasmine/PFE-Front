@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Client } from 'src/app/model/client.model';
+import { AuthService } from 'src/app/services/auth.service';
 import { ClientService } from 'src/app/services/client.service';
 
 
@@ -14,13 +15,14 @@ export class ClientComponent implements OnInit {
   filteredClients: Client[] = [];
   modalInstance: any;
   selectedClient: Client = { id: 0, company: '',salesManagers: [], email: '', contact: '', address: '' };
-
+  role: string = '';
   currentPage: number = 1;
-  itemsPerPage: number = 6; // Nombre d'éléments par page
+  itemsPerPage: number = 5; // Nombre d'éléments par page
   translate: any;
-  constructor(private clientService: ClientService) { }
+  constructor(private clientService: ClientService ,private authService: AuthService) { }
 
   ngOnInit(): void {
+    this.role = this.authService.getUserRole(); // 📌 récupère le rôle depuis le token
     this.getClients();
   }
 

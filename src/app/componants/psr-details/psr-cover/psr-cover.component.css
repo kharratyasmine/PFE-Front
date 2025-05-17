@@ -1,0 +1,68 @@
+.cover-container {
+    padding: 20px;
+    background: white;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  
+  .cover-header {
+    border: 2px solid #ccc;
+    padding: 10px;
+    background: #e6e6e6;
+  }
+  
+  .logo {
+    width: 120px;
+  }
+  
+  .report-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    text-align: center;
+  }
+  
+  .report-meta p {
+    margin: 0;
+    font-size: 12px;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .label {
+    font-weight: bold;
+    color: #0047ab;
+  }
+  
+  .date-label {
+    font-style: italic;
+    color: #555;
+  }
+  
+  .doc-type-row {
+    background: #f2f2f2;
+    padding: 8px;
+    margin-top: 15px;
+    border: 1px solid #ccc;
+  }
+  
+  .section-title {
+    background: #d6ebff;
+    font-weight: bold;
+    padding: 6px;
+    margin-top: 20px;
+  }
+  
+  .summary-text {
+    background: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ddd;
+  }
+  
+  .summary-text p {
+    margin: 0;
+  }  

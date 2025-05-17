@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { TeamMember } from '../model/TeamMember.model';
 import * as XLSX from 'xlsx';
+import { WorkEntry } from '../model/work-entry.model';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class TeamMemberService {
   constructor(private http: HttpClient) { }
 
   getTeamMemberById(id: number): Observable<TeamMember> {
-    return this.http.get<TeamMember>(`http://localhost:8080/${id}`);
+    return this.http.get<TeamMember>(`${this.apiUrl}/${id}`);
   }
 
   getMembersByTeamId(teamId: number): Observable<TeamMember[]> {
@@ -21,13 +22,8 @@ export class TeamMemberService {
   }
 
   getAllTeamMembers(): Observable<TeamMember[]> {
-    return this.http.get<TeamMember[]>(this.apiUrl);
-  }
-
-  getMembersByProject(projectId: number): Observable<TeamMember[]> {
-    return this.http.get<TeamMember[]>(`http://localhost:8080/projects/${projectId}/members`);
-  }
-  
+    return this.http.get<TeamMember[]>(`${this.apiUrl}`);
+  }  
 
   addTeamMember(teamMember: TeamMember): Observable<TeamMember> {
     return this.http.post<TeamMember>(`${this.apiUrl}`, teamMember);
@@ -69,5 +65,8 @@ export class TeamMemberService {
     return this.http.get(`${this.apiUrl}/by-team-project`, { params });
   }
 
-  
+  getWorkEntriesByMember(memberId: number) {
+  return this.http.get<WorkEntry[]>(`/api/work-entries/member/${memberId}`);
+}
+
 }

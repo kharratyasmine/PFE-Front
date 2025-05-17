@@ -1,165 +1,167 @@
 /* Conteneur principal */
 .register-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-    padding: 20px;
-  }
-  
-  /* Carte d'inscription */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  padding: 20px;
+}
+
+/* Carte d'inscription */
+.register-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  width: 100%;
+  max-width: 550px;
+  transition: transform 0.3s ease;
+}
+
+.register-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Logo */
+.logo-telnet {
+  max-width: 150px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+/* Titre */
+.register-card h3 {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 25px;
+  font-size: 22px;
+  text-align: center;
+  position: relative;
+}
+
+.register-card h3::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: #27ae60;
+  margin: 12px auto 0;
+}
+
+/* Formulaire */
+.register-card form {
+  margin-top: 15px;
+}
+
+/* Groupes de champs */
+.row {
+  margin-left: -8px;
+  margin-right: -8px;
+}
+
+.row > .col {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Labels */
+.form-label {
+  font-weight: 500;
+  color: #34495e;
+  margin-bottom: 8px;
+  display: block;
+  font-size: 14px;
+}
+
+/* Champs de formulaire */
+.form-control,
+.form-select {
+  border: 1px solid #dfe6e9;
+  border-radius: 6px;
+  padding: 12px 15px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #27ae60;
+  box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+  outline: none;
+}
+
+/* Messages d'erreur */
+.text-danger {
+  font-size: 13px;
+  margin-top: 5px;
+  color: #e74c3c;
+  display: block;
+}
+
+/* Bouton d'inscription */
+.btn-success {
+  background-color: #27ae60;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  background-color: #219653;
+  transform: translateY(-2px);
+}
+
+.btn-success:disabled {
+  background-color: #95a5a6;
+  transform: none;
+  cursor: not-allowed;
+}
+
+/* Spinner de chargement */
+.spinner-border {
+  vertical-align: middle;
+  margin-right: 8px;
+  color: white;
+}
+
+/* Lien de redirection */
+.text-center a {
+  color: #27ae60;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.text-center a:hover {
+  color: #219653;
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
   .register-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
-    padding: 40px;
-    width: 100%;
-    max-width: 550px;
-    transition: transform 0.3s ease;
+    padding: 30px 20px;
   }
-  
-  .register-card:hover {
-    transform: translateY(-3px);
-  }
-  
-  /* Logo */
-  .logo-telnet {
-    max-width: 180px;
-    height: auto;
-    margin-bottom: 10px;
-  }
-  
-  /* Titre */
+
   .register-card h3 {
-    color: #2c3e50;
-    font-weight: 600;
-    margin-bottom: 25px;
-    font-size: 22px;
-    text-align: center;
-    position: relative;
+    font-size: 20px;
   }
-  
-  .register-card h3::after {
-    content: "";
-    display: block;
-    width: 60px;
-    height: 3px;
-    background: #27ae60;
-    margin: 12px auto 0;
-  }
-  
-  /* Formulaire */
-  .register-card form {
-    margin-top: 15px;
-  }
-  
-  /* Groupes de champs */
+
   .row {
-    margin-left: -8px;
-    margin-right: -8px;
+    flex-direction: column;
   }
-  
+
   .row > .col {
-    padding-left: 8px;
-    padding-right: 8px;
+    margin-bottom: 15px;
   }
-  
-  /* Labels */
-  .form-label {
-    font-weight: 500;
-    color: #34495e;
-    margin-bottom: 8px;
-    display: block;
-    font-size: 14px;
+
+  .row > .col:last-child {
+    margin-bottom: 0;
   }
-  
-  /* Champs de formulaire */
-  .form-control, .form-select {
-    border: 1px solid #dfe6e9;
-    border-radius: 6px;
-    padding: 12px 15px;
-    font-size: 15px;
-    transition: all 0.3s ease;
-    width: 100%;
-  }
-  
-  .form-control:focus, .form-select:focus {
-    border-color: #27ae60;
-    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
-    outline: none;
-  }
-  
-  /* Messages d'erreur */
-  .text-danger {
-    font-size: 13px;
-    margin-top: 5px;
-    color: #e74c3c;
-    display: block;
-  }
-  
-  /* Bouton d'inscription */
-  .btn-success {
-    background-color: #27ae60;
-    border: none;
-    padding: 12px;
-    font-size: 16px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-success:hover {
-    background-color: #219653;
-    transform: translateY(-2px);
-  }
-  
-  .btn-success:disabled {
-    background-color: #95a5a6;
-    transform: none;
-    cursor: not-allowed;
-  }
-  
-  /* Spinner de chargement */
-  .spinner-border {
-    vertical-align: middle;
-    margin-right: 8px;
-    color: white;
-  }
-  
-  /* Lien de redirection */
-  .text-center a {
-    color: #27ae60;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s ease;
-  }
-  
-  .text-center a:hover {
-    color: #219653;
-    text-decoration: underline;
-  }
-  
-  /* Responsive */
-  @media (max-width: 576px) {
-    .register-card {
-      padding: 30px 20px;
-    }
-    
-    .register-card h3 {
-      font-size: 20px;
-    }
-    
-    .row {
-      flex-direction: column;
-    }
-    
-    .col {
-      margin-bottom: 15px;
-    }
-    
-    .col:last-child {
-      margin-bottom: 0;
-    }
-  }
+}

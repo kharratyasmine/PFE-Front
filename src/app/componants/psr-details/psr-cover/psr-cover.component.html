@@ -1,0 +1,128 @@
+<div class="cover-container">
+  <div class="d-flex justify-content-end mb-2">
+    <button class="btn btn-outline-primary btn-sm" (click)="openEditModal(editModal)">
+      ✏️ Modifier
+    </button>
+  </div>
+
+  <!-- 🔹 En-tête -->
+  <div class="cover-header d-flex justify-content-between align-items-center">
+    <img src="../../../../assets/img/telnet-logo.png" alt="Telnet Logo" class="logo">
+    <div class="report-title">{{ psr.reportTitle }}</div>
+    <div *ngIf="psr" class="report-meta">
+      <p><strong>Ref:</strong> {{ psr.reference }}</p>
+      <p><strong>Edition:</strong> {{ psr.edition }}</p>
+      <p><strong>Date:</strong> {{ psr.date | date }}</p>
+      <p><strong>Author:</strong> {{ psr.authorName }}</p>
+    </div>
+  </div>
+
+  <!-- 🔹 Informations principales -->
+  <div class="info-grid">
+    <div class="label">Prepared By:</div><div>{{ psr.preparedBy }}</div><div class="date-label">Date:</div><div>{{ psr.approvedByDate| date }}</div>
+    <div class="label">Verified By:</div><div>{{ psr.approvedBy }}</div><div class="date-label">Date:</div><div>{{ psr.approvedByDate| date }}</div>
+    <div class="label">Validated By:</div><div>{{ psr.validatedBy }}</div><div class="date-label">Date:</div><div>{{ psr.validatedByDate| date }}</div>
+    <div class="label">Week:</div><div colspan="3">{{ psr.week }}</div>
+    <div class="label">Document Status:</div><div colspan="3">{{ psr.status }}</div>
+  </div>
+
+  <!-- 🔹 Type et projet -->
+  <div class="doc-type-row">
+    <span><strong>Document Type:</strong></span> Project Status Report
+  </div>
+  <div class="doc-type-row">
+    <span><strong>Project:</strong></span> {{ psr.projectName }}
+  </div>
+
+  <!-- 🔹 Résumé -->
+  <div class="section-title">Summary</div>
+  <p class="summary-text">
+    This document presents a weekly Project Status Report for TELNET team activities on <strong>{{ psr.projectName }}</strong> Project.
+  </p>
+
+  <!-- 🔹 Diffusion List -->
+  <div class="section-title">Diffusion List</div>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Location</th>
+        <th>Principal List (To)</th>
+        <th>Secondary List (Cc)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ psr.authorName }}</td>
+        <td>Tunisia</td>
+        <td>{{ psr.preparedBy }}</td>
+        <td>{{ psr.validatedBy }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #editModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">✏️ Modifier la Cover Page</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <form #editForm="ngForm">
+    <div class="modal-body">
+
+      <div *ngFor="let action of actions; let i = index" class="row mb-3 align-items-end">
+        <div class="col-md-3">
+          <label>Action</label>
+          <input class="form-control" [(ngModel)]="action.type" name="actionType{{i}}" />
+        </div>
+        <div class="col-md-4">
+          <label>Name</label>
+          <select class="form-select" [(ngModel)]="action.name" name="actionName{{i}}">
+            <option *ngFor="let user of users" [value]="user">{{ user }}</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label>Date</label>
+          <input type="date" class="form-control" [(ngModel)]="action.date" name="actionDate{{i}}" />
+        </div>
+        <div class="col-md-1">
+          <button type="button" class="btn btn-danger" (click)="removeAction(i)">
+            🗑️
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="btn btn-outline-primary btn-sm" (click)="addAction()">
+        ➕ Ajouter une action
+      </button>
+
+      <!-- Autres champs -->
+      <div class="mt-3">
+        <label>Week</label>
+        <input type="text" class="form-control" [(ngModel)]="psr.week" name="week" />
+      </div>
+
+      <div class="mt-2">
+        <label>Status</label>
+        <input type="text" class="form-control" [(ngModel)]="psr.status" name="status" />
+      </div>
+
+      <div class="mt-2">
+        <label>Reference</label>
+        <input type="text" class="form-control" [(ngModel)]="psr.reference" name="reference" />
+      </div>
+
+      <div class="mt-2">
+        <label>Edition</label>
+        <input type="text" class="form-control" [(ngModel)]="psr.edition" name="edition" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Annuler</button>
+      <button type="button" class="btn btn-success" (click)="save(modal)">💾 Enregistrer</button>
+    </div>
+  </form>
+</ng-template>
+

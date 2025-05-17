@@ -93,7 +93,7 @@ export class AppComponent implements OnInit {
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
     console.log('Sidebar toggled, new state:', this.isSidebarCollapsed);
-  
+
     // Appliquer ou retirer la classe pour ajuster la largeur du contenu principal
     const pageWrapper = document.querySelector('.page-wrapper');
     if (this.isSidebarCollapsed) {
@@ -102,6 +102,39 @@ export class AppComponent implements OnInit {
       pageWrapper?.classList.remove('with-collapsed-sidebar');
     }
   }
-  
+  notificationCount = 0; // ou selon tes données
+  hasNotifications = true;
+
+  notifications = [
+    {
+      sender: "Carlson Tech",
+      action: "has approved",
+      detail: "your estimate",
+      img: "assets/img/profiles/avatar-02.jpg",
+      time: "4 mins ago"
+    },
+    {
+      sender: "International Software Inc",
+      action: "has sent you an invoice in the amount of",
+      detail: "$218",
+      img: "assets/img/profiles/avatar-11.jpg",
+      time: "6 mins ago"
+    },
+    {
+      sender: "John Hendry",
+      action: "sent a cancellation request",
+      detail: "Apple iPhone XR",
+      img: "assets/img/profiles/avatar-17.jpg",
+      time: "8 mins ago"
+    },
+    {
+      sender: "Mercury Software Inc",
+      action: "added a new product",
+      detail: "Apple MacBook Pro",
+      img: "assets/img/profiles/avatar-13.jpg",
+      time: "12 mins ago"
+    }
+  ];
+
 
 }

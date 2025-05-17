@@ -7,6 +7,7 @@ import { Client } from 'src/app/model/client.model';
 import { User } from 'src/app/model/user.model';
 import { Team } from 'src/app/model/Team.model';
 import { TeamMemberAllocation } from 'src/app/model/MemberAllocation.model';
+import * as bootstrap from 'bootstrap';
 
 @Component({
   selector: 'app-project',
@@ -21,14 +22,11 @@ export class ProjectComponent implements OnInit {
   allTeams: Team[] = [];
   currentPage: number = 1;
   itemsPerPage: number = 10;
-
   clients: Client[] = [];
   users: User[] = [];
-
   isEditMode: boolean = false;
   statusList = Object.values(Status);
   status = Status;
-
   teamMembersByTeam: { [teamId: number]: any[] } = {};
   allocations: { [key: string]: number } = {}; // key = memberId-projectId
   allocationsByProject: TeamMemberAllocation[] = [];
@@ -54,7 +52,7 @@ export class ProjectComponent implements OnInit {
     private projectService: ProjectService,
     private clientService: ClientService,
     private userService: UserService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadClients();
@@ -68,7 +66,7 @@ export class ProjectComponent implements OnInit {
         this.projects = data;
         console.log("📦 Projets chargés :", this.projects);
         this.filteredProjects = [...this.projects];
-  
+
         // Charger toutes les équipes pour le select multiple du modal
         this.projectService.getAllTeams().subscribe(teamData => {
           this.allTeams = teamData;
@@ -78,7 +76,7 @@ export class ProjectComponent implements OnInit {
     );
   }
 
-  
+
   loadClients(): void {
     this.clientService.getAllClients().subscribe({
       next: (data) => this.clients = data,
@@ -94,51 +92,54 @@ export class ProjectComponent implements OnInit {
   }
   private modalInstance!: bootstrap.Modal;
 
+  openModal(project?: Project): void {
+    this.selectedProject = project ? { ...project } : {
+      id: 0, name: '', description: '', projectType: '',
+      startDate: '', endDate: '', activity: '', technologie: '', clientId: null, userId: null,
+      status: Status.EN_COURS, userName: '', teams: [], devisList: [], demandes: []
+    };
+
+    this.isEditMode = !!project;
+
+    const modalElement = document.getElementById('projectModal');
+    if (modalElement) {
+      this.modalInstance = new bootstrap.Modal(modalElement);
+      this.modalInstance.show();
+    }
+  }
+
+
+
 
   // Remplace cette méthode :
-openModal(project?: Project): void {
-  this.selectedProject = project ? { ...project } : {
-    id: 0, name: '', description: '', projectType: '',
-    startDate: '', endDate: '', activity: '', technologie: '', clientId: null, userId: null, status: Status.EN_COURS,
-    userName: '', teams: [], devisList: [], demandes: []
-  };
-  this.isEditMode = !!project;
+  closeModal(): void {
+    if (this.modalInstance) {
+      this.modalInstance.hide();
+    }
+  }
 
-  // 💡 On utilise <dialog>
-  const modal = document.getElementById('projectModal') as HTMLDialogElement;
-  if (modal) modal.showModal();
-}
 
-  
-
- // Remplace cette méthode :
-closeModal(): void {
-  const modal = document.getElementById('projectModal') as HTMLDialogElement;
-  if (modal) modal.close();
-}
-
-  
   saveProject(): void {
     // ✅ On extrait uniquement les IDs des équipes
     const teamIds = (this.selectedProject.teams || [])
-    .map(team => team.id)
-    .filter((id): id is number => id !== undefined);
-  
-  const projectToSend: ProjectDTO = {
-    id: this.selectedProject.id,
-    name: this.selectedProject.name,
-    description: this.selectedProject.description,
-    projectType: this.selectedProject.projectType,
-    startDate: this.selectedProject.startDate,
-    endDate: this.selectedProject.endDate,
-    activity: this.selectedProject.activity,
-    technologie: this.selectedProject.technologie,
-    status: this.selectedProject.status,
-    clientId: this.selectedProject.clientId!, // 👈 vérifie bien qu’il n’est pas null
-    userId: this.selectedProject.userId!,
-    teamIds: teamIds
-  };
-   
+      .map(team => team.id)
+      .filter((id): id is number => id !== undefined);
+
+    const projectToSend: ProjectDTO = {
+      id: this.selectedProject.id,
+      name: this.selectedProject.name,
+      description: this.selectedProject.description,
+      projectType: this.selectedProject.projectType,
+      startDate: this.selectedProject.startDate,
+      endDate: this.selectedProject.endDate,
+      activity: this.selectedProject.activity,
+      technologie: this.selectedProject.technologie,
+      status: this.selectedProject.status,
+      clientId: this.selectedProject.clientId!, // 👈 vérifie bien qu’il n’est pas null
+      userId: this.selectedProject.userId!,
+      teamIds: teamIds
+    };
+
     if (this.selectedProject.id && this.isEditMode) {
       this.projectService.updateProject(this.selectedProject.id, projectToSend).subscribe(() => {
         this.loadProjects();
@@ -151,22 +152,22 @@ closeModal(): void {
       });
     }
   }
-  
- // isTeamSelected(team: Team): boolean {
-   // return this.selectedProject.teams.some(t => t.id === team.id);
- // }
-  
- // toggleTeamSelection(team: Team, event: Event): void {
-   // const checkbox = event.target as HTMLInputElement;
-   // if (checkbox.checked) {
-      // Ajoute si coché
-   //   this.selectedProject.teams.push(team);
+
+  // isTeamSelected(team: Team): boolean {
+  // return this.selectedProject.teams.some(t => t.id === team.id);
+  // }
+
+  // toggleTeamSelection(team: Team, event: Event): void {
+  // const checkbox = event.target as HTMLInputElement;
+  // if (checkbox.checked) {
+  // Ajoute si coché
+  //   this.selectedProject.teams.push(team);
   //  } else {
   //    // Retire si décoché
- //     this.selectedProject.teams = this.selectedProject.teams.filter(t => t.id !== team.id);
+  //     this.selectedProject.teams = this.selectedProject.teams.filter(t => t.id !== team.id);
   //  }
- // }
-  
+  // }
+
 
   deleteProject(id: number): void {
     if (confirm("Voulez-vous supprimer ce projet ?")) {
@@ -182,8 +183,8 @@ closeModal(): void {
     this.filteredProjects = this.projects.filter(project =>
       project.name.toLowerCase().includes(searchTerm) ||
       project.description.toLowerCase().includes(searchTerm) ||
-      project.projectType.toLowerCase().includes(searchTerm) 
-     );
+      project.projectType.toLowerCase().includes(searchTerm)
+    );
     this.currentPage = 1;
   }
 
@@ -193,33 +194,33 @@ closeModal(): void {
       [Status.TERMINE]: "Terminé",
       [Status.EN_ATTENTE]: "En attente",
       [Status.ANNULE]: "Annulé",
-     
+
     };
     return labels[status] || "INCONNU";
   }
-  
 
-loadAllocations(projectId: number) {
-  this.projectService.getAllocations(projectId).subscribe(data => {
-    this.allocationsByProject = data;
-  });
-}
 
-downloadExcel(): void {
-  this.projectService.downloadExcel(this.projects).subscribe(
-    data => {
-      const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'task.xlsx';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    },
-    error => console.error('Erreur lors du téléchargement Excel :', error)
-  );
-}
+  loadAllocations(projectId: number) {
+    this.projectService.getAllocations(projectId).subscribe(data => {
+      this.allocationsByProject = data;
+    });
+  }
+
+  downloadExcel(): void {
+    this.projectService.downloadExcel(this.projects).subscribe(
+      data => {
+        const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'task.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error => console.error('Erreur lors du téléchargement Excel :', error)
+    );
+  }
 
 }

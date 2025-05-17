@@ -1,0 +1,138 @@
+<div class="container-fluid">
+  <!-- En-tête du rapport -->
+  <div class="row mb-3">
+    <div class="col-12 text-center">
+      <h5 class="fw-bold">Weekly Report</h5>
+    </div>
+  </div>
+
+  <!-- Section: Heures travaillées par projet/module -->
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h6 class="mb-0">Hours Worked by Project / Module</h6>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+          <thead class="table-light">
+            <tr>
+              <th>Project</th>
+              <th>Worked Days</th>
+              <th>Estimated Days</th>
+              <th>Effort Variance (%)</th>
+              <th>Chart</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let report of weeklyReports">
+              <td>{{ report.projectName }}</td>
+              <td class="text-center">{{ report.workingDays }}</td>
+              <td class="text-center">{{ report.estimatedDays }}</td>
+              <td class="text-center" [ngClass]="{'text-danger bg-danger-subtle': report.effortVariance > 0}">
+                {{ (report.effortVariance * 100) | number:'1.0-0' }}%
+              </td>
+              <td>
+                <div class="progress" style="height: 20px;">
+                  <div class="progress-bar bg-success" 
+                       [style.width]="(report.workingDays / report.estimatedDays * 100) + '%'"
+                       [attr.aria-valuenow]="report.workingDays"
+                       aria-valuemin="0" 
+                       [attr.aria-valuemax]="report.estimatedDays">
+                    {{ report.workingDays }}
+                  </div>
+                  <div class="progress-bar bg-danger" 
+                       *ngIf="report.effortVariance > 0"
+                       [style.width]="(report.effortVariance * 100) + '%'">
+                    {{ (report.effortVariance * report.estimatedDays) | number:'1.0-1' }}
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr class="table-secondary fw-bold">
+              <td>Totals</td>
+              <td class="text-center">{{ getTotalWorkingDays() }}</td>
+              <td class="text-center">{{ getTotalEstimatedDays() }}</td>
+              <td class="text-center" [ngClass]="{'text-danger bg-danger-subtle': getTotalVariancePercentage() > 0}">
+                {{ getTotalVariancePercentage() | number:'1.0-0' }}%
+              </td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Graphique hebdomadaire -->
+      <div class="row mt-4">
+        <div class="col-12">
+          <div class="chart-container" style="position: relative; height:200px;">
+            <canvas id="weeklyWorkloadChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Effort Variance -->
+  <div class="card mb-4">
+    <div class="card-header bg-light">
+      <h6 class="mb-0">Effort Variance</h6>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <h6 class="text-center mb-3">Weekly Effort Variance</h6>
+          <div class="chart-container" style="position: relative; height:200px;">
+            <canvas id="weeklyEffortChart"></canvas>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <h6 class="text-center mb-3">Monthly Consolidated Effort Variance</h6>
+          <div class="chart-container" style="position: relative; height:200px;">
+            <canvas id="monthlyEffortChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Actions -->
+  <div class="card">
+    <div class="card-header bg-light">
+      <h6 class="mb-0">Actions</h6>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Risk</th>
+              <th>Who</th>
+              <th>What</th>
+              <th>When</th>
+              <th>Status</th>
+              <th>Owner</th>
+              <th>Priority</th>
+              <th>Comments</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let action of actions">
+              <td>{{ action.date | date:'dd/MM/yyyy' }}</td>
+              <td>{{ action.type }}</td>
+              <td>{{ action.risk }}</td>
+              <td>{{ action.who }}</td>
+              <td>{{ action.what }}</td>
+              <td>{{ action.when | date:'dd/MM/yyyy' }}</td>
+              <td>{{ action.status }}</td>
+              <td>{{ action.owner }}</td>
+              <td>{{ action.priority }}</td>
+              <td>{{ action.comments }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

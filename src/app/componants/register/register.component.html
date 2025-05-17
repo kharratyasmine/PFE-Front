@@ -1,79 +1,157 @@
-<div class="register-container">
-    <div class="register-card">
-      <!-- ✅ Logo Telnet -->
-      <div class="text-center mb-3">
-        <img src="../../../assets/img/telnet-logo.jpg" alt="Telnet Logo" class="logo-telnet">
+<div class="login-background position-relative" style="min-height: 100vh; background-color: #f5f7fa; overflow: hidden;">
+  <!-- Motifs d'arrière-plan décoratifs -->
+  <div class="position-absolute" style="top: -100px; right: -100px; width: 300px; height: 300px; border-radius: 50%; background: linear-gradient(45deg, #007bff, #00a7fd); opacity: 0.1;"></div>
+  <div class="position-absolute" style="bottom: -150px; left: -150px; width: 400px; height: 400px; border-radius: 50%; background: linear-gradient(45deg, #007bff, #0056b3); opacity: 0.1;"></div>
+  <div class="position-absolute" style="top: 20%; right: 10%; width: 20px; height: 20px; border-radius: 50%; background-color: #007bff; opacity: 0.3;"></div>
+  <div class="position-absolute" style="top: 30%; left: 15%; width: 15px; height: 15px; border-radius: 50%; background-color: #007bff; opacity: 0.2;"></div>
+  <div class="position-absolute" style="bottom: 20%; right: 20%; width: 25px; height: 25px; border-radius: 50%; background-color: #007bff; opacity: 0.2;"></div>
+  <div class="position-absolute" style="top: 60%; left: 5%; width: 10px; height: 10px; border-radius: 50%; background-color: #007bff; opacity: 0.3;"></div>
+  <div class="position-absolute" style="top: 80%; right: 30%; width: 12px; height: 12px; border-radius: 50%; background-color: #007bff; opacity: 0.2;"></div>
+  
+  <!-- Lignes décoratives -->
+  <div class="position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(#007bff 1px, transparent 1px); background-size: 50px 50px; opacity: 0.03;"></div>
+
+  <!-- Conteneur principal -->
+  <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh; position: relative; z-index: 1;">
+    <div class="row justify-content-center w-100">
+      <div class="col-md-10 col-xl-9">
+        <div class="card border-0 rounded-4 shadow-lg overflow-hidden">
+          <div class="row g-0">
+            <!-- Côté gauche - Image -->
+            <div class="col-lg-5 bg-primary position-relative">
+              <!-- Motif décoratif sur le côté gauche -->
+              <div class="position-absolute w-100 h-100" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 40 40\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M0 0h20v20H0V0zm20 20h20v20H20V20z\'%3E%3C/path%3E%3C/g%3E%3C/svg%3E'); background-size: 30px 30px;"></div>
+              
+              <div class="d-flex flex-column justify-content-center align-items-center p-4 h-100 position-relative">
+                <div class="text-center text-white">
+                  <div class="bg-white rounded-circle mx-auto p-4 d-flex align-items-center justify-content-center mb-4 shadow-sm" style="width: 180px; height: 180px;">
+                    <img src="../../../assets/img/telnet-logo.jpg" alt="Telnet Logo" class="img-fluid" style="max-width: 140px;">
+                  </div>
+                  <h3 class="fw-bold mb-3">WorkPilot</h3>
+                  <p class="mb-0 opacity-75">Votre portail de gestion de projets</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Côté droit - Formulaire -->
+            <div class="col-lg-7">
+              <div class="card-body p-4 p-lg-5">
+                <div class="d-lg-none text-center mb-4">
+                  <img src="../../../assets/img/telnet-logo.jpg" alt="Telnet Logo" class="img-fluid" style="max-width: 100px;">
+                </div>
+                
+                <h2 class="fw-bold text-primary mb-4">Créer un compte</h2>
+                
+                <!-- Formulaire d'inscription -->
+                <form [formGroup]="registerForm" (ngSubmit)="register()">
+                  <!-- Prénom & Nom -->
+                  <div class="row mb-3">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                      <label for="firstname" class="form-label">Prénom</label>
+                      <div class="input-group">
+                        <span class="input-group-text">
+                          <i class="fas fa-user text-primary"></i>
+                        </span>
+                        <input id="firstname" class="form-control" formControlName="firstname" placeholder="Prénom">
+                      </div>
+                      <div class="text-danger small mt-1" *ngIf="registerForm.get('firstname')?.touched && registerForm.get('firstname')?.invalid">
+                        Prénom requis (min. 2 caractères)
+                      </div>
+                    </div>
+                
+                    <div class="col-md-6">
+                      <label for="lastname" class="form-label">Nom</label>
+                      <div class="input-group">
+                        <span class="input-group-text">
+                          <i class="fas fa-user text-primary"></i>
+                        </span>
+                        <input id="lastname" class="form-control" formControlName="lastname" placeholder="Nom">
+                      </div>
+                      <div class="text-danger small mt-1" *ngIf="registerForm.get('lastname')?.touched && registerForm.get('lastname')?.invalid">
+                        Nom requis (min. 2 caractères)
+                      </div>
+                    </div>
+                  </div>
+                
+                  <!-- Email -->
+                  <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <div class="input-group">
+                      <span class="input-group-text">
+                        <i class="fas fa-envelope text-primary"></i>
+                      </span>
+                      <input id="email" type="email" class="form-control" formControlName="email" placeholder="Email">
+                    </div>
+                    <div class="text-danger small mt-1" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+                      Email invalide ou requis
+                    </div>
+                  </div>
+                
+                  <!-- Password -->
+                  <div class="row mb-3">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                      <label for="password" class="form-label">Mot de passe</label>
+                      <div class="input-group">
+                        <span class="input-group-text">
+                          <i class="fas fa-lock text-primary"></i>
+                        </span>
+                        <input id="password" type="password" class="form-control" formControlName="password" placeholder="Mot de passe">
+                      </div>
+                    </div>
+                
+                    <div class="col-md-6">
+                      <label for="confirmPassword" class="form-label">Confirmer</label>
+                      <div class="input-group">
+                        <span class="input-group-text">
+                          <i class="fas fa-lock text-primary"></i>
+                        </span>
+                        <input id="confirmPassword" type="password" class="form-control" formControlName="confirmPassword" placeholder="Confirmation">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-danger small mb-3" *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched">
+                    <i class="fas fa-exclamation-circle me-1"></i> Les mots de passe ne correspondent pas
+                  </div>
+                
+                  <!-- Rôle -->
+                  <div class="mb-4">
+                    <label for="role" class="form-label">Rôle</label>
+                    <div class="input-group">
+                      <span class="input-group-text">
+                        <i class="fas fa-user-tag text-primary"></i>
+                      </span>
+                      <select id="role" class="form-select" formControlName="role">
+                        <option value="" disabled selected>Choisir un rôle</option>
+                        <option value="USER">Utilisateur</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="MANAGER">Manager</option>
+                        <option value="QUALITE">QUALITE</option>
+                      </select>
+                    </div>
+                  </div>
+                
+                  <!-- Submit -->
+                  <button class="btn btn-primary w-100 py-2 mb-3" type="submit" [disabled]="loading || registerForm.invalid">
+                    <span *ngIf="!loading"><i class="fas fa-user-plus me-2"></i>S'inscrire</span>
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    <span *ngIf="loading">Création...</span>
+                  </button>
+                
+                  <!-- Redirection -->
+                  <div class="text-center mt-3 pt-3 border-top">
+                    <p class="mb-0">Déjà inscrit? 
+                      <a routerLink="/login" class="text-decoration-none fw-medium text-primary ms-1">
+                        Connectez-vous
+                      </a>
+                    </p>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-  
-      <h3 class="text-center">📝 Créer un compte</h3>
-  
-      <form [formGroup]="registerForm" (ngSubmit)="register()">
-  
-        <!-- 👤 Prénom & Nom -->
-        <div class="row">
-          <div class="col">
-            <label for="firstname" class="form-label">Prénom</label>
-            <input id="firstname" class="form-control" formControlName="firstname" placeholder="Prénom">
-            <div class="text-danger" *ngIf="registerForm.get('firstname')?.touched && registerForm.get('firstname')?.invalid">
-              Prénom requis (min. 2 caractères)
-            </div>
-          </div>
-  
-          <div class="col">
-            <label for="lastname" class="form-label">Nom</label>
-            <input id="lastname" class="form-control" formControlName="lastname" placeholder="Nom">
-            <div class="text-danger" *ngIf="registerForm.get('lastname')?.touched && registerForm.get('lastname')?.invalid">
-              Nom requis (min. 2 caractères)
-            </div>
-          </div>
-        </div>
-  
-        <!-- 📧 Email -->
-        <div class="mt-3">
-          <label for="email" class="form-label">Email</label>
-          <input id="email" type="email" class="form-control" formControlName="email" placeholder="Email">
-          <div class="text-danger" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
-            Email invalide ou requis
-          </div>
-        </div>
-  
-        <!-- 🔒 Password -->
-        <div class="row mt-3">
-          <div class="col">
-            <label for="password" class="form-label">Mot de passe</label>
-            <input id="password" type="password" class="form-control" formControlName="password" placeholder="Mot de passe">
-          </div>
-  
-          <div class="col">
-            <label for="confirmPassword" class="form-label">Confirmer</label>
-            <input id="confirmPassword" type="password" class="form-control" formControlName="confirmPassword" placeholder="Confirmation">
-          </div>
-        </div>
-        <div class="text-danger" *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched">
-          Les mots de passe ne correspondent pas
-        </div>
-  
-        <!-- 👤 Rôle -->
-        <div class="mt-3">
-          <label for="role" class="form-label">Rôle</label>
-          <select id="role" class="form-select" formControlName="role">
-            <option value="" disabled selected>Choisir un rôle</option>
-            <option value="USER">Utilisateur</option>
-            <option value="ADMIN">Admin</option>
-            <option value="MANAGER">Manager</option>
-          </select>
-        </div>
-  
-        <!-- 🔘 Submit -->
-        <button class="btn btn-success w-100 mt-3" type="submit" [disabled]="loading || registerForm.invalid">
-          <span *ngIf="!loading">S'inscrire</span>
-          <span *ngIf="loading" class="spinner-border spinner-border-sm" role="status"></span>
-          <span *ngIf="loading"> Création...</span>
-        </button>
-  
-        <!-- 🔁 Redirection -->
-        <p class="text-center mt-3">Déjà inscrit ? <a routerLink="/login">Connectez-vous</a></p>
-      </form>
     </div>
   </div>
+</div>
   

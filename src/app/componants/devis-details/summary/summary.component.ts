@@ -21,7 +21,6 @@ export class SummaryComponent implements OnInit {
   isEditModalOpen = false;
   distributionToEdit: Distribution | null = null;
   visaErrorMessage: string | null = null;
-
   visas: Visa[] = [];
   users: User[] = [];
 

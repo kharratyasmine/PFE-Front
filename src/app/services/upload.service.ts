@@ -6,10 +6,6 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class UploadService {
-  
-  private cloudName = 'dvvr5uv1d';  // 🔥 Remplace par ton Cloud Name Cloudinary
-  private uploadPreset = 'PFE-Workpilot';  // 🔥 Remplace par ton upload preset (configuré dans Cloudinary)
-
   constructor(private http: HttpClient) {}
 
   /**
@@ -17,8 +13,8 @@ export class UploadService {
    * @param file FormData contenant l'image à uploader
    * @returns Observable avec les données de l'image
    */
-  uploadImage(file: FormData): Observable<any> {
-    const url = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`;
-    return this.http.post(url, file);
-  }
+uploadTeamMemberImage(id: number, data: FormData) {
+  return this.http.post(`http://localhost:8080/teamMembers/${id}/upload-image`, data);
+}
+
 }

@@ -1,58 +1,97 @@
-<!-- 💡 Conteneur centré -->
-<div class="custom-modal-wrapper">
-
-  <div class="modal-content custom-modal-content bg-white shadow">
+<!-- Modal Centré avec fond semi-transparent -->
+<div class="custom-modal-overlay">
+  <div class="custom-modal-container">
     
-    <!-- Header -->
-    <div class="modal-header d-flex flex-column align-items-start border-bottom">
-      <div class="w-100 d-flex justify-content-between align-items-start">
-        <h5 class="modal-title text-primary d-flex align-items-center">
-          <i class="fas fa-file-invoice me-2"></i>
-          <span>Devis n° {{ devis?.reference }}</span>
-        </h5>
-        <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss()"></button>
-      </div>
-      <div class="mt-2 ms-1">
-        <small><strong>Auteur :</strong> {{ devis?.author }}</small><br />
-        <small><strong>Edition :</strong> {{ devis?.edition }}</small>
-      </div>
-      <button class="btn btn-outline-primary btn-sm" (click)="downloadWord()">
-        <i class="fas fa-file-word"></i> Exporter Word
-      </button>
+    <!-- Contenu du Modal -->
+    <div class="custom-modal-content bg-white rounded-lg shadow-xl">
       
-    </div>
-
-    <!-- Body -->
-    <div class="modal-body">
-
-      <ul class="nav nav-tabs">
-        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#summary">Résumé</a></li>
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#history">History</a></li>
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#workload">Workload PROPOSAL</a></li>
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#financial">FINANCIAL PROPOSAL</a></li>
-        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#invoicing">Invoicing PROPOSAL</a></li>
-      </ul>
-
-      <div class="tab-content mt-3">
-        <div id="summary" class="tab-pane fade show active">
-          <app-summary *ngIf="devis?.id" [devisId]="devis?.id"></app-summary>
-        </div>
-        <div id="history" class="tab-pane fade">
-          <app-history *ngIf="devis?.id" [devisId]="devis?.id"></app-history>
-        </div>
-        <div id="workload" class="tab-pane fade">
-          <app-workload *ngIf="devis?.id" [devisId]="devis?.id"></app-workload>
-        </div>
-       
-        <div id="financial" class="tab-pane fade">
-          <app-financial *ngIf="devis?.id" [devisId]="devis?.id"></app-financial>
-        </div>
-        <div id="invoicing" class="tab-pane fade">
-          <app-invoicing *ngIf="devis?.id" [devisId]="devis?.id"></app-invoicing>
+      <!-- En-tête -->
+      <div class="modal-header-container">
+        <div class="devis-header d-flex justify-content-between align-items-start flex-wrap px-3 py-2">
+          <!-- Left Side: Title + Meta -->
+          <div class="d-flex flex-column">
+            <div class="d-flex align-items-center mb-2">
+              <i class="fas fa-file-invoice text-primary me-2 fs-4"></i>
+              <h4 class="mb-0 text-primary fw-bold">Devis n° {{ devis?.reference }}</h4>
+            </div>
+            <div class="text-muted small d-flex flex-wrap gap-3">
+              <div><i class="fas fa-user me-1"></i><strong>Auteur :</strong> {{ devis?.author || 'Non spécifié' }}</div>
+              <div><i class="fas fa-tag me-1"></i><strong>Édition :</strong> {{ devis?.edition || 'Non spécifié' }}</div>
+              <div><i class="fas fa-calendar-alt me-1"></i><strong>Date :</strong> {{ devis?.creationDate | date }}</div>
+            </div>
+          </div>
+        
+          <!-- Right Side: Buttons -->
+          <div class="d-flex gap-2 mt-2 mt-md-0">
+            <button class="btn btn-outline-primary btn-sm" (click)="downloadWord()">
+              <i class="fas fa-file-word me-1"></i> Exporter
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" (click)="activeModal.dismiss()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
         </div>
       </div>
 
-    </div>
+      <!-- Body -->
+      <div class="modal-body">
+        <!-- Loading Indicator -->
+        <div class="text-center py-5" *ngIf="!devis">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+          </div>
+          <p class="mt-2 text-muted">Chargement des détails du devis...</p>
+        </div>
 
+        <!-- Content When Loaded -->
+        <div *ngIf="devis">
+          <ul class="nav nav-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" data-bs-toggle="tab" href="#summary">
+                <i class="fas fa-clipboard-list me-1"></i> Résumé
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#history">
+                <i class="fas fa-history me-1"></i> History
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#workload">
+                <i class="fas fa-tasks me-1"></i> Workload
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#financial">
+                <i class="fas fa-chart-line me-1"></i> Financial
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-bs-toggle="tab" href="#invoicing">
+                <i class="fas fa-file-invoice-dollar me-1"></i> Invoicing
+              </a>
+            </li>
+          </ul>
+
+          <div class="tab-content mt-3">
+            <div id="summary" class="tab-pane fade show active">
+              <app-summary *ngIf="devis?.id" [devisId]="devis.id"></app-summary>
+            </div>
+            <div id="history" class="tab-pane fade">
+              <app-history *ngIf="devis?.id" [devisId]="devis.id"></app-history>
+            </div>
+            <div id="workload" class="tab-pane fade">
+              <app-workload *ngIf="devis?.id" [devisId]="devis.id"></app-workload>
+            </div>
+            <div id="financial" class="tab-pane fade">
+              <app-financial *ngIf="devis?.id" [devisId]="devis.id"></app-financial>
+            </div>
+            <div id="invoicing" class="tab-pane fade">
+              <app-invoicing *ngIf="devis?.id" [devisId]="devis.id"></app-invoicing>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

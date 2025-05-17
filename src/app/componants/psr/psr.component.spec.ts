@@ -1,0 +1,21 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { PsrComponent } from './psr.component';
+
+describe('PsrComponent', () => {
+  let component: PsrComponent;
+  let fixture: ComponentFixture<PsrComponent>;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [PsrComponent]
+    });
+    fixture = TestBed.createComponent(PsrComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

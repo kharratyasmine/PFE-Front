@@ -2,8 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DevisService } from '../../services/devis.service';
 import { Devis } from 'src/app/model/devis.model';
-import { FinancialDetailService } from 'src/app/services/financialDetail.service';
-import { FinancialDetail } from 'src/app/model/FinancialDetail.model';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
@@ -14,8 +12,8 @@ import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 export class DevisDetailsComponent implements OnInit {
   @Input() selectedDevisForDetails!: Devis;
   devis?: Devis;
-  devisList: Devis[] = []; // à remplir dynamiquement depuis le service
-  @Input() devisId!: number; // Reçu depuis la modale
+  devisList: Devis[] = [];
+  @Input() devisId!: number; 
   distribution = {
     client: { partial: false, complete: false },
     user: { partial: false, complete: true }
@@ -30,7 +28,6 @@ export class DevisDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private devisService: DevisService,
-    private financialDetailService: FinancialDetailService,
     public activeModal: NgbActiveModal,
   ) { }
 

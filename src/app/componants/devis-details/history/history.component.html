@@ -85,9 +85,14 @@
                 </div>
 
                 <div class="action-name">
-                  <label>Nom</label>
-                  <input type="text" class="form-control" [(ngModel)]="action.name" [name]="'name' + i" />
+                  <label class="form-label">Name</label>
+                  <select class="form-select" [(ngModel)]="action.name" name="name">
+                    <option *ngFor="let user of users" [value]="user.firstname + ' ' + user.lastname">
+                      {{ user.firstname }} {{ user.lastname }}
+                    </option>
+                  </select>
                 </div>
+                
 
                 <div class="action-date">
                   <label>Date</label>

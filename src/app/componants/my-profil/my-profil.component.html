@@ -1,161 +1,285 @@
-<div class="container my-5">
+<div class="profile-container min-vh-100">
   <!-- Loading State -->
-  <div *ngIf="isLoading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
+  <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center min-vh-100">
+    <div class="text-center">
+      <div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Chargement du profil...</p>
     </div>
-    <p class="mt-3">Loading your profile...</p>
   </div>
 
   <!-- Error Message -->
-  <div *ngIf="errorMessage" class="alert alert-danger">
-    {{ errorMessage }}
+  <div *ngIf="errorMessage" class="alert alert-danger shadow-sm mx-auto my-5" style="max-width: 800px;">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage }}
   </div>
 
   <!-- Profile Content -->
-  <div *ngIf="!isLoading && !errorMessage">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bold">My Profile</h2>
-      <div class="badge bg-primary rounded-pill">Member</div>
-    </div>
-
-    <div class="row g-4">
-      <!-- Photo Column -->
-      <div class="col-lg-4">
-        <div class="card shadow-sm">
-          <div class="card-body text-center">
-            <div class="profile-pic mb-3">
-              <img
-                [src]="user.photoUrl || 'assets/avatar.png'"
-                alt="Profile Photo"
-                class="rounded-circle img-thumbnail"
-                style="width: 150px; height: 150px; object-fit: cover;"
-              />
-            </div>
-
-            <h4>{{ user.firstname }} {{ user.lastname }}</h4>
-            <p class="text-muted">{{ user.email }}</p>
-
-            <div class="d-grid gap-2">
-              <input 
-                type="file" 
-                id="photoUpload"
-                (change)="updatePhoto($event)" 
-                class="form-control d-none"
-                accept="image/*"
-              />
-              <label for="photoUpload" class="btn btn-outline-primary">
-                <i class="bi bi-camera me-2"></i>Change Photo
-              </label>
-              <button class="btn btn-outline-danger" (click)="deletePhoto()">
-                <i class="bi bi-trash me-2"></i>Remove Photo
-              </button>
+  <div *ngIf="!isLoading && !errorMessage" class="profile-content">
+    <!-- Header Banner -->
+    <div class="profile-header bg-gradient position-relative mb-5">
+      <div class="container position-relative py-5">
+        <div class="row align-items-end">
+          <div class="col-md-8 col-lg-6 text-dark">
+            <div class="d-flex align-items-center">
+              <div class="position-relative me-4">
+                <img [src]="getPhotoUrl()" alt="Profile Photo" class="profile-avatar shadow-lg border border-4 border-white" />
+                <div class="position-absolute bottom-0 end-0">
+                  <label for="photoUpload" class="btn btn-sm btn-light rounded-circle p-2 shadow-sm">
+                    <i class="bi bi-camera"></i>
+                  </label>
+                  <input type="file" id="photoUpload" (change)="updatePhoto($event)" class="d-none" accept="image/*" />
+                </div>
+              </div>
+              <div>
+                <h1 class="display-6 fw-bold mb-0">{{ user.firstname }} {{ user.lastname }}</h1>
+                <div class="text-dark opacity-75 d-flex align-items-center mt-1">
+                  <i class="bi bi-envelope me-2"></i>
+                  <span>{{ user.email }}</span>
+                </div>
+              </div>
             </div>
           </div>
+      
         </div>
       </div>
+    </div>
 
-      <!-- Info Column -->
-      <div class="col-lg-8">
-        <!-- Personal Info Card -->
-        <div class="card shadow-sm mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Personal Information</h5>
-            <button class="btn btn-sm" 
-                    [class.btn-primary]="!isEditingPersonal"
-                    [class.btn-outline-secondary]="isEditingPersonal"
-                    (click)="toggleEditPersonal()">
-              {{ isEditingPersonal ? 'Cancel' : 'Edit' }}
-            </button>
+    <!-- Main content -->
+    <div class="container">
+      <div class="row g-4">
+        <!-- Left sidebar with quick info -->
+        <div class="col-lg-4">
+          <!-- Contact Info Card -->
+          <div class="card border-0 rounded-4 shadow-sm mb-4 hover-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">
+                  <i class="bi bi-person-lines-fill text-primary me-2"></i>Contact
+                </h5>
+                <span class="badge rounded-pill text-bg-light">Membre</span>
+              </div>
+              
+              <div class="mb-3">
+                <div class="d-flex align-items-center text-muted mb-2">
+                  <i class="bi bi-envelope-fill me-3 text-primary"></i>
+                  <span>{{ user.email }}</span>
+                </div>
+                <div class="d-flex align-items-center text-muted mb-0" *ngIf="user.phoneNumber">
+                  <i class="bi bi-telephone-fill me-3 text-primary"></i>
+                  <span>{{ user.phoneNumber }}</span>
+                </div>
+                <div class="d-flex align-items-center text-muted" *ngIf="!user.phoneNumber">
+                  <i class="bi bi-telephone-fill me-3 text-muted"></i>
+                  <span class="fst-italic">Aucun numéro ajouté</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="card-body">
-            <form (ngSubmit)="savePersonalInfo()">
-              <div class="row mb-3">
-                <label class="col-sm-3 col-form-label">First Name</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" 
-                         [class.bg-light]="!isEditingPersonal"
-                         [readonly]="!isEditingPersonal" 
-                         [(ngModel)]="user.firstname"
-                         name="firstname"
-                         required>
-                </div>
-              </div>
-              <div class="row mb-3">
-                <label class="col-sm-3 col-form-label">Last Name</label>
-                <div class="col-sm-9">
-                  <input type="text" class="form-control" 
-                         [class.bg-light]="!isEditingPersonal"
-                         [readonly]="!isEditingPersonal" 
-                         [(ngModel)]="user.lastname"
-                         name="lastname"
-                         required>
-                </div>
-              </div>
-              <div class="row mb-3">
-                <label class="col-sm-3 col-form-label">Email</label>
-                <div class="col-sm-9">
-                  <input type="email" class="form-control" 
-                         [class.bg-light]="!isEditingPersonal"
-                         [readonly]="!isEditingPersonal" 
-                         [(ngModel)]="user.email"
-                         name="email"
-                         required>
-                </div>
-              </div>
-              <div class="row mb-3">
-                <label class="col-sm-3 col-form-label">Phone</label>
-                <div class="col-sm-9">
-                  <input type="tel" class="form-control" 
-                         [class.bg-light]="!isEditingPersonal"
-                         [readonly]="!isEditingPersonal" 
-                         [(ngModel)]="user.phoneNumber"
-                         name="phoneNumber">
-                </div>
-              </div>
 
-              <div class="text-end" *ngIf="isEditingPersonal">
-                <button type="submit" class="btn btn-success">
-                  <i class="bi bi-check-circle me-2"></i>Save Changes
+          <!-- Address Card -->
+          <div class="card border-0 rounded-4 shadow-sm hover-card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">
+                  <i class="bi bi-geo-alt-fill text-primary me-2"></i>Adresse
+                </h5>
+                <button class="btn btn-sm btn-light rounded-pill shadow-sm" (click)="toggleEditAddress()">
+                  <i class="bi bi-pencil-fill me-1"></i>
+                  Éditer
                 </button>
               </div>
-            </form>
+              
+              <div *ngIf="!isEditingAddress">
+                <p class="mb-0" *ngIf="user.address">{{ user.address }}</p>
+                <p class="text-muted fst-italic mb-0" *ngIf="!user.address">Aucune adresse spécifiée</p>
+              </div>
+              
+              <form *ngIf="isEditingAddress" (ngSubmit)="saveAddressInfo()" class="mt-3">
+                <div class="form-floating mb-3">
+                  <textarea class="form-control" style="height: 100px" [(ngModel)]="user.address" name="address" placeholder="Votre adresse"></textarea>
+                  <label>Votre adresse</label>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <button type="button" class="btn btn-light me-2" (click)="toggleEditAddress()">Annuler</button>
+                  <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+              </form>
+            </div>
           </div>
+          
+  
         </div>
-
-        <!-- Address Card -->
-        <div class="card shadow-sm">
-          <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Address Information</h5>
-            <button class="btn btn-sm" 
-                    [class.btn-primary]="!isEditingAddress"
-                    [class.btn-outline-secondary]="isEditingAddress"
-                    (click)="toggleEditAddress()">
-              {{ isEditingAddress ? 'Cancel' : 'Edit' }}
-            </button>
-          </div>
-          <div class="card-body">
-            <form (ngSubmit)="saveAddressInfo()">
-              <div class="row mb-3">
-                <label class="col-sm-3 col-form-label">Address</label>
-                <div class="col-sm-9">
-                  <textarea class="form-control" rows="3"
-                            [class.bg-light]="!isEditingAddress"
-                            [readonly]="!isEditingAddress" 
-                            [(ngModel)]="user.address"
-                            name="address"></textarea>
-                </div>
-              </div>
-
-              <div class="text-end" *ngIf="isEditingAddress">
-                <button type="submit" class="btn btn-success">
-                  <i class="bi bi-check-circle me-2"></i>Save Changes
+        
+        <!-- Right content with main info -->
+        <div class="col-lg-8">
+          <div class="card border-0 rounded-4 shadow-sm mb-4 hover-card">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="card-title mb-0">
+                  <i class="bi bi-person-fill text-primary me-2"></i>Informations personnelles
+                </h4>
+                <button class="btn btn-sm btn-light rounded-pill shadow-sm" (click)="toggleEditPersonal()">
+                  <i [class]="isEditingPersonal ? 'bi bi-x-lg me-1' : 'bi bi-pencil-fill me-1'"></i>
+                  {{ isEditingPersonal ? 'Annuler' : 'Éditer' }}
                 </button>
               </div>
-            </form>
+              
+              <form (ngSubmit)="savePersonalInfo()">
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" [class.bg-light]="!isEditingPersonal"
+                        [readonly]="!isEditingPersonal" [(ngModel)]="user.firstname" name="firstname" 
+                        id="firstname" placeholder="Prénom" required>
+                      <label for="firstname">Prénom</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="text" class="form-control" [class.bg-light]="!isEditingPersonal"
+                        [readonly]="!isEditingPersonal" [(ngModel)]="user.lastname" name="lastname"
+                        id="lastname" placeholder="Nom" required>
+                      <label for="lastname">Nom</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="email" class="form-control" [class.bg-light]="!isEditingPersonal"
+                        [readonly]="!isEditingPersonal" [(ngModel)]="user.email" name="email"
+                        id="email" placeholder="Email" required>
+                      <label for="email">Email</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="tel" class="form-control" [class.bg-light]="!isEditingPersonal"
+                        [readonly]="!isEditingPersonal" [(ngModel)]="user.phoneNumber" name="phoneNumber"
+                        id="phoneNumber" placeholder="Téléphone">
+                      <label for="phoneNumber">Téléphone</label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-end mt-4" *ngIf="isEditingPersonal">
+                  <button type="submit" class="btn btn-primary rounded-pill px-4">
+                    <i class="bi bi-check-circle me-2"></i>Enregistrer
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Password Change Card -->
+          <div class="card border-0 rounded-4 shadow-sm hover-card">
+            <div class="card-body p-4">
+              <h4 class="card-title mb-4">
+                <i class="bi bi-shield-lock-fill text-primary me-2"></i>Changer le mot de passe
+              </h4>
+              
+              <form (ngSubmit)="changePassword()">
+                <div class="row g-4">
+                  <div class="col-md-12">
+                    <div class="form-floating">
+                      <input type="password" class="form-control" [(ngModel)]="passwordForm.currentPassword" 
+                        name="currentPassword" id="currentPassword" placeholder="Mot de passe actuel" required>
+                      <label for="currentPassword">Mot de passe actuel</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="password" class="form-control" [(ngModel)]="passwordForm.newPassword" 
+                        name="newPassword" id="newPassword" placeholder="Nouveau mot de passe" required>
+                      <label for="newPassword">Nouveau mot de passe</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating">
+                      <input type="password" class="form-control" [(ngModel)]="passwordForm.confirmationPassword" 
+                        name="confirmationPassword" id="confirmationPassword" placeholder="Confirmation" required>
+                      <label for="confirmationPassword">Confirmation</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="mt-4">
+                  <button type="submit" class="btn btn-primary rounded-pill px-4">
+                    <i class="bi bi-check-circle me-2"></i>Mettre à jour
+                  </button>
+                  
+                  <div *ngIf="passwordError" class="alert alert-danger mt-3">
+                    <i class="bi bi-exclamation-triangle me-2"></i>{{ passwordError }}
+                  </div>
+                  <div *ngIf="passwordSuccess" class="alert alert-success mt-3">
+                    <i class="bi bi-check-circle me-2"></i>{{ passwordSuccess }}
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+.profile-container {
+  background-color: #f5f7fa;
+}
+
+.profile-header {
+  background: linear-gradient(135deg, #4a6cf7 0%, #2b50ed 100%);
+  min-height: 200px;
+  border-radius: 0 0 40px 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.hover-card {
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+  color: #000000;
+}
+
+.form-control:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+  color: #000000;
+}
+
+.text-primary {
+  color: #000000 !important;
+}
+
+.btn-primary {
+  background-color: #000000;
+  border-color: #000000;
+}
+
+.btn-primary:hover {
+  background-color: #333333;
+  border-color: #333333;
+}
+
+.btn-light {
+  color: #000000;
+}
+</style>

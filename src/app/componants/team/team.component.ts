@@ -35,48 +35,145 @@ export class TeamComponent implements OnInit {
       this.loadTeams();
     });
   }
-
   loadTeams(): void {
-    this.projectService.getProjectById(this.projectId).subscribe(project => {
-      this.project = project;
-      this.teams = project.teams || [];
-    });
-  }
+  this.projectService.getProjectById(this.projectId).subscribe(project => {
+    this.project = project;
 
-  openAllocationModal(member: TeamMember): void {
-    this.selectedMember = member;
-    this.selectedAllocation = (member.allocation ?? 0) * 100;
+    this.teams = (project.teams || []).map(team => {
+      const realMembers = team.members.map(member => {
+        const allocation = member.allocation ?? 0;
+        const allocationId = member.allocationId ?? null;
+
+        return {
+          ...structuredClone(member),
+          allocationByTeamId: {
+            [team.id]: {
+              value: allocation,
+              id: allocationId
+            }
+          }
+        };
+      });
+
+      // 🔄 Ajouter les FakeMembers associés à une demande si cette team est générée automatiquement
+      const fakeMembers: TeamMember[] = [];
+
+      (project.demandes || []).forEach(demande => {
+        if (demande.generatedTeamId === team.id && demande.fakeMembers) {
+          demande.fakeMembers.forEach(fake => {
+            fakeMembers.push({
+              id: -Math.floor(Math.random() * 1000000), 
+              name: fake.name,
+              initial: fake.initial,
+              jobTitle: "Temporaire",
+              holiday: [],
+              role: fake.role,
+              cost: this.estimateCostByRole(fake.role),
+              note: fake.note ?? "",
+              image: "assets/img/profiles/default-avatar.jpg",
+              experienceRange: "-",
+              teams: [team.id],
+              allocationByTeamId: {
+                [team.id]: {
+                  value: 0,
+                  id: null
+                }
+              }
+            });
+          });
+        }
+      });
+
+      return {
+        ...team,
+        members: [...realMembers, ...fakeMembers]
+      };
+    });
+  });
+}
+
+
+  
+  
+
+  openAllocationModal(member: TeamMember, teamId: number): void {
+    this.selectedTeamId = teamId;
+    this.selectedMember = structuredClone(member); // 🛠️ Cloner pour éviter effet de bord
+    const allocationInfo = this.selectedMember.allocationByTeamId?.[teamId];
+    this.selectedAllocation = (allocationInfo?.value ?? 0) * 100;
+  
     const modalEl = document.getElementById('allocationModal');
-    if (modalEl) new bootstrap.Modal(modalEl).show();
+    if (modalEl) bootstrap.Modal.getOrCreateInstance(modalEl).show();
   }
+  
+  
 
   saveAllocation(): void {
+    if (this.selectedTeamId === null) {
+      alert("❌ Aucune équipe sélectionnée.");
+      return;
+    }
+  
+    const teamIdStr = String(this.selectedTeamId);
     const payload = {
       memberId: this.selectedMember.id,
       projectId: this.projectId,
+      teamId: this.selectedTeamId,
       allocation: this.selectedAllocation / 100
     };
-
-    const handleSuccess = (allocationId?: number) => {
-      this.allocations[this.selectedMember.id!] = this.selectedAllocation;
-      for (let team of this.teams) {
-        const member = team.members.find(m => m.id === this.selectedMember.id);
-        if (member) {
-          member.allocation = payload.allocation;
-          if (allocationId) member.allocationId = allocationId;
+  
+    const teamIndex = this.teams.findIndex(t => t.id === this.selectedTeamId);
+    if (teamIndex !== -1) {
+      const team = this.teams[teamIndex];
+      const memberIndex = team.members.findIndex(m => m.id === this.selectedMember.id);
+  
+      if (memberIndex !== -1) {
+        const member = team.members[memberIndex];
+        const allocationInfo = member.allocationByTeamId?.[teamIdStr];
+  
+        const updateLocalMember = (allocationId?: number) => {
+          team.members[memberIndex] = {
+            ...member,
+            allocationByTeamId: {
+              ...member.allocationByTeamId,
+              [teamIdStr]: {
+                value: payload.allocation,
+                id: allocationId ?? allocationInfo?.id ?? null
+              }
+            }
+          };
+  
+          this.teams[teamIndex] = { ...team };
+          this.hideModal('allocationModal');
+        };
+  
+        if (allocationInfo?.id) {
+          this.projectService.updateAllocation(allocationInfo.id, payload)
+            .subscribe(() => updateLocalMember(allocationInfo.id!));
+        } else {
+          this.projectService.createAllocation(payload)
+            .subscribe((response: { id: number }) => updateLocalMember(response.id));
         }
       }
-      this.hideModal('allocationModal');
-    };
-
-    if (this.selectedMember.allocationId) {
-      this.projectService.updateAllocation(this.selectedMember.allocationId, payload)
-        .subscribe(() => handleSuccess());
-    } else {
-      this.projectService.createAllocation(payload)
-        .subscribe((response: { id: number }) => handleSuccess(response.id));
     }
   }
+  
+  estimateCostByRole(role: string): number {
+  switch (role.toUpperCase()) {
+    case 'JUNIOR':
+      return 200;
+    case 'INTERMEDIAIRE':
+      return 350;
+    case 'SENIOR':
+      return 500;
+    case 'SENIOR_MANAGER':
+      return 800;
+    default:
+      return 100;
+  }
+}
+
+  
 
   hideModal(modalId: string): void {
     const modalEl = document.getElementById(modalId);
@@ -120,13 +217,16 @@ export class TeamComponent implements OnInit {
     });
   }
 
-  addMemberToTeam(): void {
-    if (this.selectedMemberIdToAdd && this.teamToAddMemberTo) {
-      this.projectService.addMemberToTeam(this.teamToAddMemberTo.id, this.selectedMemberIdToAdd).subscribe(() => {
-        alert("✅ Membre ajouté !");
-        this.loadTeams();
-        this.closeModal('addMemberModal');
-      });
-    }
+ addMemberToTeam(): void {
+  if (this.selectedMemberIdToAdd && this.selectedMemberIdToAdd > 0 && this.teamToAddMemberTo) {
+    this.projectService.addMemberToTeam(this.teamToAddMemberTo.id, this.selectedMemberIdToAdd).subscribe(() => {
+      alert("✅ Membre ajouté !");
+      this.loadTeams();
+      this.closeModal('addMemberModal');
+    });
+  } else {
+    alert("❌ Vous ne pouvez pas ajouter un membre fictif manuellement !");
   }
+}
+
 }

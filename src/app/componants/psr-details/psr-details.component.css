@@ -1,0 +1,109 @@
+/* Modal Overlay */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal Container */
+.custom-modal-container {
+  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Modal Content */
+.custom-modal-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Modal Header */
+.modal-header-container {
+  background: linear-gradient(to right, #f8f9fa, #e9ecef);
+  border-bottom: 1px solid #dee2e6;
+  border-radius: 8px 8px 0 0;
+}
+
+.devis-header {
+  padding: 1rem;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Tab Styling */
+.nav-tabs {
+  border-bottom: 2px solid #dee2e6;
+}
+
+.nav-tabs .nav-link {
+  margin-bottom: -2px;
+  border: none;
+  color: #6c757d;
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #495057;
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+.nav-tabs .nav-link.active {
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+  background-color: transparent;
+}
+
+/* Tab Content */
+.tab-content {
+  padding: 1.5rem 0.5rem;
+}
+
+/* Close Button Animation */
+.btn-outline-secondary {
+  transition: all 0.2s ease;
+}
+
+.btn-outline-secondary:hover {
+  transform: rotate(90deg);
+  background-color: #f8f9fa;
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+/* Make the modal responsive */
+@media (max-width: 768px) {
+  .custom-modal-container {
+    width: 95%;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+  
+  .nav-tabs .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+}

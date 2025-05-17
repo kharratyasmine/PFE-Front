@@ -36,5 +36,8 @@ export class WorkloadDetailService {
 
     return this.http.put<WorkloadDetail>(`${this.apiUrl}/${id}`, detail, { headers });
   }
+  getTotalWorkloadByDevisId(devisId: number) {
+    return this.http.get<number>(`/workload-details/devis/${devisId}/total`);
+  }
   
 }

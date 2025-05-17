@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Role } from 'src/app/model/role.enum';
 import { User } from 'src/app/model/user.model';
 import { AuthService } from 'src/app/services/auth.service';
+import { UploadService } from 'src/app/services/upload.service';
 
 @Component({
   selector: 'app-my-profil',
@@ -26,11 +27,18 @@ export class MyProfilComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService,private uploadService: UploadService ) {}
 
   ngOnInit(): void {
     this.loadUserData();
   }
+getPhotoUrl(): string {
+  if (!this.user || !this.user.photoUrl) return 'assets/avatar.png';
+
+  // Supprime les doublons de /uploads/
+  const cleanPath = this.user.photoUrl.replace(/^\/?uploads\//, '');
+  return `http://localhost:8080/uploads/${cleanPath}`;
+}
 
   loadUserData(): void {
     const email = this.authService.getUserEmail();
@@ -79,7 +87,7 @@ export class MyProfilComponent implements OnInit {
       'Content-Type': 'application/json'
     });
 
-    this.http.put<User>(`http://localhost:8080/users/${this.user.id}`, this.user, { headers })
+    this.http.put<User>('http://localhost:8080/users/me', this.user, { headers })
       .subscribe({
         next: (updated) => {
           this.user = updated;
@@ -101,7 +109,7 @@ export class MyProfilComponent implements OnInit {
       'Content-Type': 'application/json'
     });
 
-    this.http.put<User>(`http://localhost:8080/users/${this.user.id}`, this.user, { headers })
+    this.http.put<User>('http://localhost:8080/users/me', this.user, { headers })
       .subscribe({
         next: (updated) => {
           this.user = updated;
@@ -116,25 +124,26 @@ export class MyProfilComponent implements OnInit {
 
   updatePhoto(event: any): void {
     const file = event.target.files[0];
-    if (!file || !this.user) return;
-
+    if (!file) return;
+  
     const token = this.authService.getAccessToken();
     const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`  // ne PAS ajouter Content-Type ici
     });
-
+  
     const formData = new FormData();
-    formData.append('file', file);
-
-    this.http.post(`http://localhost:8080/users/${this.user.id}/photo`, formData, { headers })
+    formData.append("data", new Blob([JSON.stringify(this.user)], { type: 'application/json' }));
+    formData.append("photo", file);
+  
+    this.http.patch('http://localhost:8080/users/me/general-infos', formData, { headers })
       .subscribe({
-        next: () => this.loadUserData(),
-        error: (err) => {
-          console.error('Error uploading photo:', err);
-          this.errorMessage = 'Failed to upload photo';
-        }
+        next: (res) => console.log('✅ Upload réussi', res),
+        error: (err) => console.error('❌ Erreur upload photo :', err)
       });
   }
+  
+  
+  
 
   deletePhoto(): void {
     if (!this.user) return;
@@ -144,7 +153,8 @@ export class MyProfilComponent implements OnInit {
       'Authorization': `Bearer ${token}`
     });
 
-    this.http.delete(`http://localhost:8080/users/${this.user.id}/photo`, { headers })
+    this.http.delete(`http://localhost:8080/users/me/photo`, { headers })
+
       .subscribe({
         next: () => {
           this.user.photoUrl = '';
@@ -155,4 +165,32 @@ export class MyProfilComponent implements OnInit {
         }
       });
   }
+
+  passwordForm = {
+  currentPassword: '',
+  newPassword: '',
+  confirmationPassword: ''
+};
+
+passwordError = '';
+passwordSuccess = '';
+
+changePassword(): void {
+  const token = this.authService.getAccessToken();
+  const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+
+  this.http.patch('http://localhost:8080/users/change-password', this.passwordForm, { headers })
+    .subscribe({
+      next: () => {
+        this.passwordSuccess = 'Mot de passe mis à jour avec succès';
+        this.passwordError = '';
+        this.passwordForm = { currentPassword: '', newPassword: '', confirmationPassword: '' };
+      },
+      error: (err) => {
+        this.passwordSuccess = '';
+        this.passwordError = err.error.message || 'Erreur lors de la mise à jour';
+      }
+    });
+}
+
 }

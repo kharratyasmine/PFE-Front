@@ -52,8 +52,8 @@ export class ProjectService {
 
   // 🔹 Supprimer un projet par ID
   deleteProject(id: number): Observable<any> {
-    return this.http.delete(`http://localhost:8080/projects/${id}`, { responseType: 'text' }); // ✅ Ajout de { responseType: 'text' }
-  }
+    return this.http.delete(`http://localhost:8080/projects/${id}`, { responseType: 'text' });
+    }
   downloadExcel(project: Project[]): Observable<Blob> {
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(project);
     const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
@@ -130,7 +130,10 @@ export class ProjectService {
   addMemberToTeam(teamId: number, memberId: number): Observable<any> {
     return this.http.put(`${this.teamApiUrl}/${teamId}/add-member/${memberId}`, {});
   }
-
-
+  
+  getMembersByProject(projectId: number): Observable<TeamMember[]> {
+    return this.http.get<TeamMember[]>(`http://localhost:8080/projects/${projectId}/members`);
+  }
+  
 
 }

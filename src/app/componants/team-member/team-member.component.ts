@@ -4,6 +4,7 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { UploadService } from 'src/app/services/upload.service';
 import { TeamMember } from 'src/app/model/TeamMember.model';
+import * as bootstrap from 'bootstrap';
 
 
 @Component({
@@ -20,8 +21,6 @@ export class TeamMemberComponent implements OnInit {
   costModified: boolean = false;
   roleModified: boolean = false;
   initialModified: boolean = false;
-
-
   selectedMember: TeamMember = this.getEmptyTeamMember();
 
   currentPage: number = 1;
@@ -44,30 +43,29 @@ export class TeamMemberComponent implements OnInit {
     this.uploadFiles();
   }
 
-  uploadFiles(): void {
-    if (!this.files[0]) {
-      alert("Veuillez sélectionner une image.");
-      return;
-    }
+ uploadFiles(): void {
+  if (!this.files[0]) {
+    alert("Veuillez sélectionner une image.");
+    return;
+  }
 
-    const file_data = this.files[0];
-    const data = new FormData();
-    data.append('file', file_data);
-    data.append('upload_preset', 'PFE-Workpilot');
-    data.append('cloud_name', 'dvvr5uv1d');
+  const file = this.files[0];
+  const formData = new FormData();
+  formData.append("image", file);
 
-    this.uploadService.uploadImage(data).subscribe(
-      (res: any) => {
-        console.log("✅ Image uploadée sur Cloudinary :", res);
-        this.imageUrl = res.url;
-        this.selectedMember.image = res.url;
+  this.uploadService.uploadTeamMemberImage(this.selectedMember.id!, formData)
+    .subscribe({
+      next: (res: any) => {
+        console.log("✅ Image enregistrée localement :", res);
+        this.selectedMember.image = res.imagePath;
         this.imageUploaded = true;
       },
-      (error) => {
-        console.error("❌ Erreur lors de l'upload de l'image", error);
+      error: (err) => {
+        console.error("❌ Erreur upload image :", err);
       }
-    );
-  }
+    });
+}
+
 
   onRemove(file: File): void {
     console.log("🗑 Fichier retiré :", file);
@@ -135,7 +133,7 @@ export class TeamMemberComponent implements OnInit {
       cost: 0,
       experienceRange: '',
       startDate: '',
-      team: [],
+      teams: [],
     
     };
   }
@@ -221,9 +219,13 @@ export class TeamMemberComponent implements OnInit {
   }
 
   closeModal(): void {
-    const modal = document.getElementById('teamMemberModal') as HTMLDialogElement;
-    if (modal) modal.close();
+    const modalElement = document.getElementById('teamMemberModal');
+    if (modalElement) {
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      modal?.hide();
+    }
   }
+  
 
   openModal(member?: TeamMember): void {
     if (member) {
@@ -232,10 +234,15 @@ export class TeamMemberComponent implements OnInit {
       this.selectedMember = this.getEmptyTeamMember();
     }
     this.costModified = false;
-    const modal = document.getElementById('teamMemberModal') as HTMLDialogElement;
-    if (modal) modal.showModal();
+    this.initialModified = false;
+  
+    const modalElement = document.getElementById('teamMemberModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }
   }
-
+  
   downloadExcel(): void {
     this.teamMemberService.downloadExcel(this.teamMembers).pipe(
       catchError(error => {

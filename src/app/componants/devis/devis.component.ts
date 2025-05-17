@@ -20,7 +20,7 @@ export class DevisComponent implements OnInit {
   selectedDevis: Devis | null = null; // Pour le modal
   isModalEditOpen = false;
   projectId: number | null = null;
-
+ @Input() devisId!: number;
   constructor(
     private fb: FormBuilder,
     private devisService: DevisService,
@@ -130,5 +130,10 @@ export class DevisComponent implements OnInit {
     this.selectedDevisId = undefined;
   }
 
+    downloadWord(): void {
+    if (this.devisId) {
+      this.devisService.downloadDevisWord(this.devisId);
+    }
+  }
   
 }

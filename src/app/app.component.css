@@ -291,3 +291,61 @@
 .language-drop {
   margin-right: 10px; /* Espace entre le sélecteur de langue et les autres éléments */
 }
+.header-right {
+  gap: 1rem;
+}
+
+.user-text h6 {
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+.user-text small {
+  color: rgba(255, 255, 255, 0.75);
+}
+.header-right i.fa-chevron-down {
+  font-size: 0.7rem;
+}
+.notification-drop .fa-bell {
+  font-size: 1.25rem;
+}
+
+.notification-drop .badge {
+  font-size: 0.65rem;
+  padding: 0.25em 0.4em;
+}
+.header-right {
+  gap: 1rem;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 0.65rem;
+  padding: 0.2em 0.4em;
+  transform: translate(50%, -50%);
+}
+.btn-icon {
+  border: none;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.flag-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-img {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  
+}

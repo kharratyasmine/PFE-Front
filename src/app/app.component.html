@@ -5,27 +5,24 @@
     <header class="header" style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
              box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
       <div class="header-container">
-       
+
         <!-- Partie gauche avec bouton et logo -->
         <div class="header-left">
-           <a routerLink="/dashboard" class="logo">
-          <img src="assets/img/telnet-logo.jpg" alt="Logo" />
-        </a>
           <button class="sidebar-toggle" (click)="toggleSidebar()">
             <i class="fas fa-bars"></i>
           </button>
+          <a routerLink="/dashboard" class="logo">
+            <img src="assets/img/telnet-logo.png" alt="Logo" />
+          </a>
+
         </div>
 
         <!-- Barre de recherche centrale -->
+
         <div class="search-container">
           <form class="search-form" (ngSubmit)="onSearch()">
-            <input
-              type="text"
-              [(ngModel)]="searchTerm"
-              [ngModelOptions]="{ standalone: true }"
-              placeholder="Rechercher..."
-              class="search-input"
-            />
+            <input type="text" [(ngModel)]="searchTerm" [ngModelOptions]="{ standalone: true }"
+              placeholder="Rechercher..." class="search-input" />
             <button class="search-button" type="submit">
               <i class="fas fa-search"></i>
             </button>
@@ -33,135 +30,90 @@
         </div>
 
         <!-- Partie droite avec langue et profil -->
-        <div class="header-right">
-          <!-- Choix de langue -->
-          <!-- Menu utilisateur -->
-      <ul class="nav user-menu">
-        <!-- choix de la langue -->
-        <li class="nav-item dropdown language-drop me-2">
-          <a
-            href="#"
-            class="dropdown-toggle nav-link header-nav-list"
-            data-bs-toggle="dropdown"
-          >
-            <img src="assets/img/icons/header-icon-01.svg" alt />
-          </a>
-          <div
-            class="dropdown-menu"
-            style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1);"
-          >
-            <a class="dropdown-item" href="javascript:;" (click)="changeLanguage('en')">🇬🇧 English</a>
-            <a class="dropdown-item" href="javascript:;" (click)="changeLanguage('fr')">🇫🇷 Français</a>
+        <div class="header-tools d-flex align-items-center gap-3 pe-4">
+
+          <!-- Notification -->
+          <button class="btn btn-icon rounded-circle">
+            <i class="fas fa-bell"></i>
+          </button>
+
+          <!-- Langue -->
+          <div class="dropdown">
+            <button class="btn btn-icon rounded-circle" data-bs-toggle="dropdown">
+              <img src="assets/img/icons/header-icon-01.svg" alt="EN" class="flag-icon">
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" (click)="changeLanguage('en')">🇺🇸 English</a></li>
+              <li><a class="dropdown-item" (click)="changeLanguage('fr')">🇫🇷 Français</a></li>
+            </ul>
           </div>
-        </li>
 
-        <!-- profil utilisateur -->
-        <li class="nav-item dropdown has-arrow new-user-menus">
-          
-          <a
-            href="#"
-            class="dropdown-toggle nav-link"
-            data-bs-toggle="dropdown"
-            style="padding: 5px 10px;"
-            color="black"
-          >
-            <div class="user-img">
-              <img
-                [src]="userImage"
-                class="rounded-circle"
-                width="36"
-                alt="user image"
-                style="border: 2px solid rgba(255,255,255,0.5);"
-              />
+          <!-- Profil -->
+          <div class="dropdown d-flex align-items-center">
+            <img *ngIf="userImage" [src]="userImage" alt="Profile" width="32" height="32" class="rounded-circle me-2" />
 
-               <li class="nav-item dropdown has-arrow new-user-menus">
-      
-              <div class="user-text" style="color: white;">
-                <h6 style="margin-bottom: 0; font-weight: 600;">{{ userName }}</h6>
-                <p class="text-muted mb-0" style="color: rgba(255,255,255,0.7); font-size: 0.8rem;">
-                  Connecté
-                </p>
-              </div>
+            <div class="text-start d-none d-md-block">
+              <div class="fw-bold text-dark">{{ userName }}</div>
+              <small class="text-muted">Connecté</small>
             </div>
-          </a>
-          <div
-            class="dropdown-menu dropdown-menu-end"
-            style="border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1);"
-          >
-            <a class="dropdown-item" routerLink="/profile" style="border-left: 3px solid #3498db;">
-              <i class="fas fa-user me-2 text-primary"></i> Mon profil
-            </a>
-            <a class="dropdown-item" (click)="logout()" style="border-left: 3px solid #e74c3c;">
-              <i class="fas fa-sign-out-alt me-2 text-danger"></i> Déconnexion
-            </a>
-          </div>
-        </li>
-      </ul>
+            <button class="btn btn-sm text-white ms-2" data-bs-toggle="dropdown">
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" [routerLink]="'/profile'">Mon profil</a></li>
 
+              <li><a class="dropdown-item text-danger" (click)="logout()">Déconnexion</a></li>
+            </ul>
+          </div>
         </div>
+
+
+
       </div>
+
     </header>
 
     <!-- ======= SIDEBAR ======= -->
-    <div
-      class="sidebar"
-      id="sidebar"
-      [ngClass]="{ 'collapsed': isSidebarCollapsed }"
-      style="background: #2c3e50; color: black;"
-    >
+    <div class="sidebar" id="sidebar" [ngClass]="{ 'collapsed': isSidebarCollapsed }"
+      style="background: #2c3e50; color: black;">
 
 
       <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
           <ul>
-            <li class="menu-title" style="color: rgba(255, 255, 255, 0.7); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+            <li class="menu-title"
+              style="color: rgba(255, 255, 255, 0.7); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
               <span>Menu Principal</span>
             </li>
             <li>
-              <a
-                class="nav-link"
-                routerLink="/Dashboard"
-                routerLinkActive="active"
-                [style.borderLeft]="isActive('/Dashboard') ? '3px solid #3498db' : '3px solid transparent'"
-                [style.background]="isActive('/Dashboard') ? 'rgba(255,255,255,0.1)' : 'transparent'"
-                style="color: white;"
-              >
+              <a class="nav-link" routerLink="/dashboard" routerLinkActive="active"
+                [style.borderLeft]="isActive('/dashboard') ? '3px solid #3498db' : '3px solid transparent'"
+                [style.background]="isActive('/dashboard') ? 'rgba(255,255,255,0.1)' : 'transparent'"
+                style="color: white;">
                 <i class="fas fa-home me-2"></i> Dashboard
               </a>
             </li>
             <li>
-              <a
-                class="nav-link"
-                routerLink="/Client"
-                routerLinkActive="active"
+              <a class="nav-link" routerLink="/Client" routerLinkActive="active"
                 [style.borderLeft]="isActive('/Client') ? '3px solid #2ecc71' : '3px solid transparent'"
                 [style.background]="isActive('/Client') ? 'rgba(255,255,255,0.1)' : 'transparent'"
-                style="color: white;"
-              >
+                style="color: white;">
                 <i class="fas fa-users me-2"></i> Clients
               </a>
             </li>
             <li>
-              <a
-                class="nav-link"
-                routerLink="/TeamMember"
-                routerLinkActive="active"
+              <a class="nav-link" routerLink="/TeamMember" routerLinkActive="active"
                 [style.borderLeft]="isActive('/TeamMember') ? '3px solid #f39c12' : '3px solid transparent'"
                 [style.background]="isActive('/TeamMember') ? 'rgba(255,255,255,0.1)' : 'transparent'"
-                style="color: white;"
-              >
+                style="color: white;">
                 <i class="fas fa-user-friends me-2"></i> Équipe
               </a>
             </li>
             <li>
-              <a
-                class="nav-link"
-                routerLink="/project"
-                routerLinkActive="active"
+              <a class="nav-link" routerLink="/project" routerLinkActive="active"
                 [style.borderLeft]="isActive('/project') ? '3px solid #9b59b6' : '3px solid transparent'"
                 [style.background]="isActive('/project') ? 'rgba(255,255,255,0.1)' : 'transparent'"
-                style="color: white;"
-              >
+                style="color: white;">
                 <i class="fas fa-folder me-2"></i> Projets
               </a>
             </li>
@@ -172,11 +124,8 @@
     <!-- /SIDEBAR -->
 
     <!-- ======= MAIN CONTENT ======= -->
-    <div
-      class="page-wrapper"
-      [ngClass]="{ 'with-collapsed-sidebar': isSidebarCollapsed }"
-      style="background-color: #f5f7fa;"
-    >
+    <div class="page-wrapper" [ngClass]="{ 'with-collapsed-sidebar': isSidebarCollapsed }"
+      style="background-color: #f5f7fa;">
       <router-outlet></router-outlet>
     </div>
     <!-- /MAIN CONTENT -->

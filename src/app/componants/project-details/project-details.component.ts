@@ -42,8 +42,7 @@ export class ProjectDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private projectService: ProjectService,
     private clientService: ClientService,
-    private userService: UserService,
-    private demandeService: DemandeService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
