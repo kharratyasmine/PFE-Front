@@ -20,7 +20,7 @@ export class MyProfilComponent implements OnInit {
     address: '',
     photoUrl: '',
     password: '',
-    role: Role.USER
+    role: Role.ADMIN
   };
   isEditingPersonal = false;
   isEditingAddress = false;

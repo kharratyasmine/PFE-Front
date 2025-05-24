@@ -19,32 +19,92 @@ export class PsrComponent implements OnInit {
   users: string[] = [];
   projectId: number | null = null;
   isEditMode = false;
+  filterWeek: string = '';
+  filteredPsrs: Psr[] = [];
+  currentWeek: string = '';
 
   constructor(
     private psrService: PsrService,
     private userService: UserService,
     private route: ActivatedRoute,
     private modalService: NgbModal
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.parent?.paramMap.subscribe(params => {
-      const id = params.get('id'); 
-        if (id) {
+      const id = params.get('id');
+      if (id) {
         this.projectId = +id;
         this.loadPsrs();
-        this.loadUsers(); 
+        this.loadUsers();
+        this.setCurrentWeek();
       } else {
         alert("ID du projet non trouvé dans l'URL.");
       }
     });
   }
-  
+
+  private setCurrentWeek(): void {
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const days = Math.floor((now.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
+    const weekNumber = Math.ceil((days + startOfYear.getDay() + 1) / 7);
+    this.currentWeek = `${now.getFullYear()}-W${weekNumber.toString().padStart(2, '0')}`;
+  }
+
+  private checkCurrentWeekPsr(): void {
+    const currentWeekPsr = this.psrs.find(p => p.week === this.currentWeek);
+    if (!currentWeekPsr) {
+      this.createNewWeekPsr();
+    }
+  }
+
+  private createNewWeekPsr(): void {
+    const newPsr = this.emptyPsr();
+    newPsr.week = this.currentWeek;
+    newPsr.reportDate = new Date();
+    newPsr.reportTitle = `PSR - Semaine ${this.currentWeek}`;
+    newPsr.overallStatus = 'En cours';
+    
+    if (this.projectId) {
+      newPsr.projectId = this.projectId;
+      this.psrService.create(newPsr).subscribe(() => {
+        this.loadPsrs();
+      });
+    }
+  }
 
   loadPsrs(): void {
     if (this.projectId) {
-      this.psrService.getByProject(this.projectId).subscribe(psrs => this.psrs = psrs);
+      this.psrService.getByProject(this.projectId).subscribe(
+        psrs => {
+          this.psrs = psrs;
+          this.filterPsrs();
+          this.checkCurrentWeekPsr();
+        }
+      );
     }
+  }
+
+  filterPsrs(): void {
+    if (this.filterWeek.trim() === '') {
+      this.filteredPsrs = [...this.psrs];
+    } else {
+      this.filteredPsrs = this.psrs.filter(psr =>
+        psr.week?.toLowerCase().includes(this.filterWeek.toLowerCase())
+      );
+    }
+  }
+getHistoricalData(week: string): Psr[] {
+    return this.psrs.filter(psr => {
+        // Vérification de sécurité pour TypeScript
+        if (!psr.week) return false;
+        return psr.week <= week;
+    });
+}
+
+  getWeekData(week: string): Psr | undefined {
+    return this.psrs.find(psr => psr.week === week);
   }
 
   loadUsers(): void {
@@ -62,6 +122,10 @@ export class PsrComponent implements OnInit {
 
   savePsr(): void {
     this.psr.projectId = this.projectId!;
+    if (!this.isEditMode) {
+      this.psr.week = this.currentWeek;
+    }
+    
     const request = this.isEditMode && this.psr.id
       ? this.psrService.updatePsr(this.psr.id, this.psr)
       : this.psrService.create(this.psr);
@@ -96,7 +160,7 @@ export class PsrComponent implements OnInit {
       preparedBy: '',
       approvedBy: '',
       validatedBy: '',
-      PreparedByDate: new Date(),
+      preparedByDate: new Date(),
       approvedByDate: new Date(),
       validatedByDate: new Date(),
       status: '',
@@ -113,7 +177,8 @@ export class PsrComponent implements OnInit {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `psr-${id}.docx`; // ou .pdf si tu génères un PDF
+         a.download = `psr-${id}.xlsx`;
+
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -125,15 +190,14 @@ export class PsrComponent implements OnInit {
     });
   }
 
-  
-openPsrDetailsModal(psrId: number) {
-  const modalRef = this.modalService.open(PsrDetailsComponent, { 
-    size: 'xl',
-    centered: true,
-    backdrop: 'static',
-    keyboard: false
-  });
-  modalRef.componentInstance.psrId = psrId;
-}
-  
+  openPsrDetailsModal(psrId: number) {
+    const modalRef = this.modalService.open(PsrDetailsComponent, {
+      size: 'xl',
+      centered: true,
+      backdrop: 'static',
+      keyboard: false
+    });
+    modalRef.componentInstance.psrId = psrId;
+  }
+
 }

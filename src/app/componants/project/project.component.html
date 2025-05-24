@@ -21,7 +21,8 @@
       <button class="btn btn-outline-primary me-2" (click)="downloadExcel()">
         <i class="fas fa-download"></i>
       </button>
-      <button class="btn btn-outline-success" (click)="openModal()"> <i class="fas fa-plus"></i> {{ 'Add Project' | translate }}</button>
+      <button class="btn btn-outline-success" (click)="openModal()"> <i class="fas fa-plus"></i> {{ 'Add Project' |
+        translate }}</button>
     </div>
   </div>
 
@@ -49,7 +50,7 @@
         <td>{{ project?.startDate | date: 'yyyy-MM-dd' }}</td>
         <td>{{ project?.endDate | date: 'yyyy-MM-dd' }}</td>
         <td>{{ getStatusLabel(project.status) }}</td>
-        
+
         <td>
           <div *ngFor="let name of project.client?.salesManagers" class="d-block mb-1">
             {{ name || ('NO_CLIENT' | translate)}}
@@ -74,88 +75,83 @@
 
   <pagination-controls (pageChange)="currentPage = $event"></pagination-controls>
 
-<div class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="projectModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content">
+  <div class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="projectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
 
-      <div class="modal-header">
-        <h5 class="modal-title" id="projectModalLabel">
-          {{ selectedProject.id ? ('edit project' | translate) : ('add project' | translate) }}
-        </h5>
-        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="mb-3">
-          <label>{{ 'Project name' | translate }}</label>
-          <input class="form-control" type="text" [(ngModel)]="selectedProject.name" name="name" required />
+        <div class="modal-header">
+          <h5 class="modal-title" id="projectModalLabel">
+            {{ selectedProject.id ? ('edit project' | translate) : ('add project' | translate) }}
+          </h5>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
         </div>
 
-        <div class="mb-3">
-          <label>{{ 'Description' | translate }}</label>
-          <textarea class="form-control" [(ngModel)]="selectedProject.description" name="description" required></textarea>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label>{{ 'Project name' | translate }}</label>
+            <input class="form-control" type="text" [(ngModel)]="selectedProject.name" name="name" required />
+          </div>
+
+          <div class="mb-3">
+            <label>{{ 'Description' | translate }}</label>
+            <textarea class="form-control" [(ngModel)]="selectedProject.description" name="description"
+              required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label>{{ 'Project type' | translate }}</label>
+            <input class="form-control" type="text" [(ngModel)]="selectedProject.projectType" name="projectType"
+              required />
+          </div>
+
+          <div class="mb-3">
+            <label>{{ 'Start date' | translate }}</label>
+            <input class="form-control" type="date" [(ngModel)]="selectedProject.startDate" name="startDate" required />
+          </div>
+
+          <div class="mb-3">
+            <label>{{ 'End date' | translate }}</label>
+            <input class="form-control" type="date" [(ngModel)]="selectedProject.endDate" name="endDate" required />
+          </div>
+          <div class="mb-3">
+            <label>{{ 'Client' | translate }}</label>
+            <select class="form-select" [(ngModel)]="selectedProject.clientId" name="clientId" required>
+              <option [ngValue]="null">-- Sélectionner un client --</option>
+              <option *ngFor="let client of clients" [ngValue]="client.id">
+                {{ client.salesManagers }} - {{ client.company }}
+              </option>
+            </select>
+
+          </div>
+
+          <div class="mb-3">
+            <label>{{ 'User' | translate }}</label>
+            <select class="form-select" [(ngModel)]="selectedProject.userId" name="userId">
+              <option [ngValue]="null">-- {{ 'select user' | translate }} --</option>
+              <option *ngFor="let user of users" [value]="user.id">
+                {{ user.firstname }} {{ user.lastname }}
+              </option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label>{{ 'Activity' | translate }}</label>
+            <input class="form-control" type="text" [(ngModel)]="selectedProject.activity" name="activity" />
+          </div>
+
+          <div class="mb-3">
+            <label>{{ 'Technologies' | translate }}</label>
+            <input class="form-control" type="text" [(ngModel)]="selectedProject.technologie" name="technologie" />
+          </div>
         </div>
 
-        <div class="mb-3">
-          <label>{{ 'Project type' | translate }}</label>
-          <input class="form-control" type="text" [(ngModel)]="selectedProject.projectType" name="projectType" required />
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">❌ {{ 'cancel' | translate }}</button>
+          <button type="button" class="btn btn-primary" (click)="saveProject()">✅ {{ 'save' | translate }}</button>
         </div>
-
-        <div class="mb-3">
-          <label>{{ 'Start date' | translate }}</label>
-          <input class="form-control" type="date" [(ngModel)]="selectedProject.startDate" name="startDate" required />
-        </div>
-
-        <div class="mb-3">
-          <label>{{ 'End date' | translate }}</label>
-          <input class="form-control" type="date" [(ngModel)]="selectedProject.endDate" name="endDate" required />
-        </div>
-
-        <div class="mb-3">
-          <label>{{ 'Status' | translate }}</label>
-          <select class="form-select" [(ngModel)]="selectedProject.status" name="status">
-            <option *ngFor="let s of statusList" [ngValue]="s">{{ getStatusLabel(s) }}</option>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label>{{ 'Client' | translate }}</label>
-          <select class="form-select" [(ngModel)]="selectedProject.clientId" name="clientId">
-            <option [ngValue]="null">-- {{ 'select client' | translate }} --</option>
-            <option *ngFor="let client of clients" [value]="client.id">
-              {{ client.salesManagers }} - {{ client.company }}
-            </option>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label>{{ 'User' | translate }}</label>
-          <select class="form-select" [(ngModel)]="selectedProject.userId" name="userId">
-            <option [ngValue]="null">-- {{ 'select user' | translate }} --</option>
-            <option *ngFor="let user of users" [value]="user.id">
-              {{ user.firstname }} {{ user.lastname }}
-            </option>
-          </select>
-        </div>
-
-        <div class="mb-3">
-          <label>{{ 'Activity' | translate }}</label>
-          <input class="form-control" type="text" [(ngModel)]="selectedProject.activity" name="activity" />
-        </div>
-
-        <div class="mb-3">
-          <label>{{ 'Technologies' | translate }}</label>
-          <input class="form-control" type="text" [(ngModel)]="selectedProject.technologie" name="technologie" />
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeModal()">❌ {{ 'cancel' | translate }}</button>
-        <button type="button" class="btn btn-primary" (click)="saveProject()">✅ {{ 'save' | translate }}</button>
       </div>
     </div>
   </div>
-</div>
 
-  
+
 </div>

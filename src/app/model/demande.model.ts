@@ -14,10 +14,10 @@ export interface Demande {
     clientFirstname?: string;
     projectId: number | null;
     projectName?: string;
-    teamMemberIds: number[];         // ✅ plus flexible que Set
-    fakeMembers?: FakeMember[];      // ✅ ajouté
+    teamMemberIds: number[];         
+    fakeMembers?: FakeMember[];     
     scope: string;
-    requirements?: string;           // optionnel maintenant
+    requirements?: string;           
     generatedTeamId?: number;
     generatedDevisId?: number;
 

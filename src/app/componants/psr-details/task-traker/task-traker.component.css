@@ -1,0 +1,98 @@
+.table th, .table td {
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+.progress-bar {
+  font-size: 0.75rem;
+}
+.btn {
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-outline-primary {
+  color: #3498db;
+  border-color: #3498db;
+}
+
+.btn-outline-primary:hover {
+  background-color: #3498db;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-outline-success {
+  color: #2ecc71;
+  border-color: #2ecc71;
+}
+
+.btn-outline-success:hover {
+  background-color: #2ecc71;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-outline-danger {
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+
+.btn-outline-danger:hover {
+  background-color: #e74c3c;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.875rem;
+}
+.task-table-container {
+  position: relative;
+  overflow-x: auto;
+}
+
+.fixed-column {
+  position: sticky;
+  background-color: white;
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+.fixed-column:nth-child(1) {
+  left: 0;
+  min-width: 80px;
+}
+
+.fixed-column:nth-child(2) {
+  left: 80px;
+  min-width: 80px;
+}
+
+.fixed-column:nth-child(3) {
+  left: 160px;
+  min-width: 200px;
+}
+
+thead .fixed-column {
+  background-color: #f8f9fa;
+}
+
+tbody tr:hover .fixed-column {
+  background-color: #f8f9fa;
+}
+
+td.fixed-column:nth-child(1) {
+    min-width: 80px;
+}
+td.fixed-column:nth-child(2) {
+    min-width: 80px;
+}
+td.fixed-column:nth-child(3) {
+    min-width: 200px;
+}

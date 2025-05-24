@@ -1,52 +1,165 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, NavigationEnd, Event } from '@angular/router';
 import { filter } from 'rxjs/operators';
-
+import { NotificationService, Notification } from './services/notification.service';
 import { SearchService } from './services/search.service';
 import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from './services/auth.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'workpilot-front';
   showNavbar: boolean = true;
   searchTerm: string = '';
   userName: string = '';
   userImage: string = '';
   currentLang: string = 'en';
+  notifications: Notification[] = [];
+  notificationCount: number = 0;
+  hasNotifications: boolean = false;
+  isSidebarCollapsed: boolean = false;
+  hoverBtn: boolean = false;
 
   constructor(
     private router: Router,
     private searchService: SearchService,
     private translate: TranslateService,
-    private authService: AuthService
+    public authService: AuthService,
+    private notificationService: NotificationService,
+    private toastr: ToastrService 
   ) {
     this.translate.setDefaultLang(this.currentLang);
 
-    // Utilisation d'un type guard dans le filtre pour ne garder que NavigationEnd.
     this.router.events.pipe(
       filter((event): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       const currentRoute = event.urlAfterRedirects;
-      // Masquer la navbar sur les routes /login et /register
       this.showNavbar = !(currentRoute === '/login' || currentRoute === '/register');
     });
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     const user = this.authService.getUserInfo();
     if (user) {
       this.userName = `${user.firstname} ${user.lastname}`;
       this.userImage = user.photoUrl;
+
+      // Ne rediriger que si on est sur la page d'accueil ou de login
+      const currentUrl = this.router.url;
+      if (currentUrl === '/' || currentUrl === '/login') {
+        const role = this.authService.getCurrentUserRole();
+        switch (role) {
+          case 'ADMIN':
+            this.router.navigate(['/dashboard/admin']);
+            break;
+          case 'QUALITE':
+            this.router.navigate(['/dashboard/qualite']);
+            break;
+          case 'DIRECTION':
+            this.router.navigate(['/dashboard/direction']);
+            break;
+          case 'MANAGER':
+            this.router.navigate(['/dashboard/manager']);
+            break;
+        }
+      }
     }
-    // Optionnel : charger la langue depuis localStorage
+
     const savedLang = localStorage.getItem('lang');
     if (savedLang) {
       this.changeLanguage(savedLang);
+    }
+
+    // Initialiser la connexion WebSocket
+    this.initializeWebSocket();
+  }
+
+  private initializeWebSocket() {
+    // S'assurer que l'utilisateur est connecté avant d'initialiser WebSocket
+    if (this.authService.isAuthenticated()) {
+      console.log('🔌 Initializing WebSocket connection...');
+      this.notificationService.connect();
+
+      // S'abonner aux notifications
+      this.notificationService.notifications$.subscribe(notifications => {
+        this.notifications = notifications;
+        this.notificationCount = this.notificationService.getUnreadCount();
+        this.hasNotifications = this.notificationCount > 0;
+        
+        // Afficher une notification toast pour les nouvelles notifications
+        const unreadNotifications = notifications.filter(n => !n.read);
+        if (unreadNotifications.length > 0) {
+          this.toastr.info(unreadNotifications[0].message, '🔔 Nouvelle notification');
+        }
+      });
+    }
+  }
+
+  markAsRead(notificationId: number): void {
+    this.notificationService.markAsRead(notificationId);
+  }
+
+  markAllAsRead(): void {
+    this.notificationService.markAllAsRead();
+  }
+
+  clearAllNotifications(): void {
+    this.notificationService.clearAllNotifications();
+  }
+
+  getNotificationTime(timestamp: Date): string {
+    const now = new Date();
+    const diff = now.getTime() - new Date(timestamp).getTime();
+    const minutes = Math.floor(diff / 60000);
+    
+    if (minutes < 1) return "à l'instant";
+    if (minutes < 60) return `il y a ${minutes} minute${minutes > 1 ? 's' : ''}`;
+    
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `il y a ${hours} heure${hours > 1 ? 's' : ''}`;
+    
+    const days = Math.floor(hours / 24);
+    return `il y a ${days} jour${days > 1 ? 's' : ''}`;
+  }
+
+  ngOnDestroy() {
+    // Déconnecter proprement lors de la destruction du composant
+    this.notificationService.disconnect();
+  }
+
+  getDashboardRoute(): string {
+    const role = this.authService.getCurrentUserRole();
+    switch (role) {
+      case 'ADMIN': return '/dashboard/admin';
+      case 'MANAGER': return '/dashboard/manager';
+      case 'QUALITE': return '/dashboard/qualite';
+      case 'DIRECTION': return '/dashboard/direction';
+      default: return '/dashboard';
+    }
+  }
+
+  isAuthRoute(): boolean {
+    const authRoutes = ['/login', '/register'];
+    return authRoutes.some(route => this.router.url.startsWith(route));
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+
+  toggleSidebar() {
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
+    const pageWrapper = document.querySelector('.page-wrapper');
+    if (this.isSidebarCollapsed) {
+      pageWrapper?.classList.add('with-collapsed-sidebar');
+    } else {
+      pageWrapper?.classList.remove('with-collapsed-sidebar');
     }
   }
 
@@ -76,65 +189,4 @@ export class AppComponent implements OnInit {
       this.router.navigate(['/search'], { queryParams: { q: query } });
     }
   }
-
-  isAuthRoute(): boolean {
-    const authRoutes = ['/login', '/register'];
-    return authRoutes.some(route => this.router.url.startsWith(route));
-  }
-
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
-
-  isSidebarCollapsed = false;
-  hoverBtn: boolean = false;
-  // méthode appelée au clic sur le burger
-  toggleSidebar() {
-    this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    console.log('Sidebar toggled, new state:', this.isSidebarCollapsed);
-
-    // Appliquer ou retirer la classe pour ajuster la largeur du contenu principal
-    const pageWrapper = document.querySelector('.page-wrapper');
-    if (this.isSidebarCollapsed) {
-      pageWrapper?.classList.add('with-collapsed-sidebar');
-    } else {
-      pageWrapper?.classList.remove('with-collapsed-sidebar');
-    }
-  }
-  notificationCount = 0; // ou selon tes données
-  hasNotifications = true;
-
-  notifications = [
-    {
-      sender: "Carlson Tech",
-      action: "has approved",
-      detail: "your estimate",
-      img: "assets/img/profiles/avatar-02.jpg",
-      time: "4 mins ago"
-    },
-    {
-      sender: "International Software Inc",
-      action: "has sent you an invoice in the amount of",
-      detail: "$218",
-      img: "assets/img/profiles/avatar-11.jpg",
-      time: "6 mins ago"
-    },
-    {
-      sender: "John Hendry",
-      action: "sent a cancellation request",
-      detail: "Apple iPhone XR",
-      img: "assets/img/profiles/avatar-17.jpg",
-      time: "8 mins ago"
-    },
-    {
-      sender: "Mercury Software Inc",
-      action: "added a new product",
-      detail: "Apple MacBook Pro",
-      img: "assets/img/profiles/avatar-13.jpg",
-      time: "12 mins ago"
-    }
-  ];
-
-
 }

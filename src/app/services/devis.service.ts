@@ -40,7 +40,7 @@ export class DevisService {
     }).subscribe(blob => {
       const a = document.createElement('a');
       a.href = window.URL.createObjectURL(blob);
-      a.download = `devis_${devisId}.docx`;
+      a.download = `MON_RCT_TM_001_EN Technical and Financial Proposal.docx`;
       a.click();
     });
   }

@@ -16,6 +16,7 @@ import * as bootstrap from 'bootstrap';
 })
 export class ProjectComponent implements OnInit {
 
+  private modalInstance!: bootstrap.Modal;
 
   projects: Project[] = [];
   filteredProjects: Project[] = [];
@@ -86,11 +87,12 @@ export class ProjectComponent implements OnInit {
 
   loadUsers(): void {
     this.userService.getUsers().subscribe({
-      next: (data) => this.users = data,
-      error: (err) => console.error("Erreur chargement utilisateurs", err)
-    });
+      next: (users) => this.users = users,
+      error: (err) => {
+        console.error('Erreur chargement utilisateurs', err);
+      }
+    })
   }
-  private modalInstance!: bootstrap.Modal;
 
   openModal(project?: Project): void {
     this.selectedProject = project ? { ...project } : {
@@ -120,11 +122,6 @@ export class ProjectComponent implements OnInit {
 
 
   saveProject(): void {
-    // ✅ On extrait uniquement les IDs des équipes
-    const teamIds = (this.selectedProject.teams || [])
-      .map(team => team.id)
-      .filter((id): id is number => id !== undefined);
-
     const projectToSend: ProjectDTO = {
       id: this.selectedProject.id,
       name: this.selectedProject.name,
@@ -135,10 +132,14 @@ export class ProjectComponent implements OnInit {
       activity: this.selectedProject.activity,
       technologie: this.selectedProject.technologie,
       status: this.selectedProject.status,
-      clientId: this.selectedProject.clientId!, // 👈 vérifie bien qu’il n’est pas null
+      clientId: this.selectedProject.clientId!, // 👈 vérifie bien qu'il n'est pas null
       userId: this.selectedProject.userId!,
-      teamIds: teamIds
+
     };
+    if (!this.selectedProject.clientId) {
+      alert("Veuillez sélectionner un client.");
+      return;
+    }
 
     if (this.selectedProject.id && this.isEditMode) {
       this.projectService.updateProject(this.selectedProject.id, projectToSend).subscribe(() => {
@@ -171,9 +172,17 @@ export class ProjectComponent implements OnInit {
 
   deleteProject(id: number): void {
     if (confirm("Voulez-vous supprimer ce projet ?")) {
-      this.projectService.deleteProject(id).subscribe(() => {
-        this.projects = this.projects.filter(p => p.id !== id);
-        this.filteredProjects = [...this.projects];
+      this.projectService.deleteProject(id).subscribe({
+        next: () => {
+          this.projects = this.projects.filter(p => p.id !== id);
+          this.filteredProjects = [...this.projects];
+          console.log('✅ Projet supprimé avec succès');
+        },
+        error: (error) => {
+          console.error('❌ Erreur lors de la suppression du projet:', error?.error?.message ?? error.message);
+          alert('Une erreur est survenue lors de la suppression du projet. Veuillez réessayer.');
+        }
+
       });
     }
   }

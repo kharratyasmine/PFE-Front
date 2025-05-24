@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { TeamMember } from 'src/app/model/TeamMember.model';
+import { TeamMemberService } from 'src/app/services/team-member.service';
 
 @Component({
   selector: 'app-team-member-details',
@@ -6,41 +9,152 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./team-member-details.component.css']
 })
 export class TeamMemberDetailsComponent implements OnInit {
+  member: TeamMember | null = null;
+  memberId: number | null = null;
+  isLoading = true;
+  isDeleting = false;
+  selectedMonth: Date = new Date();
+  filteredHolidays: string[] = [];
+  months: { value: Date; label: string }[] = [];
 
-  // Liste de mois
-  months: string[] = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-  ];
-
-  // Exemple de données (vous pouvez les charger depuis un service)
-  resources: any[] = [
-    {
-      resource: 'Alice Dupont',
-      role: 'Developer',
-      monthlyData: { Jan: 5, Feb: 8, Mar: 6, Apr: 7, May: 5, Jun: 0, Jul: 2, Aug: 4, Sep: 1, Oct: 0, Nov: 3, Dec: 5 }
-    },
-    {
-      resource: 'Bob Martin',
-      role: 'Tester',
-      monthlyData: { Jan: 10, Feb: 0, Mar: 3, Apr: 1, May: 0, Jun: 2, Jul: 6, Aug: 0, Sep: 4, Oct: 5, Nov: 2, Dec: 8 }
-    },
-    {
-      resource: 'Charlie Smith',
-      role: 'Project Manager',
-      monthlyData: { Jan: 2, Feb: 2, Mar: 2, Apr: 2, May: 2, Jun: 2, Jul: 2, Aug: 2, Sep: 2, Oct: 2, Nov: 2, Dec: 2 }
-    }
-  ];
-
-  constructor() { }
-
-  ngOnInit(): void {
+  constructor(
+    private route: ActivatedRoute,
+    private teamMemberService: TeamMemberService
+  ) {
   }
 
-  /**
-   * Récupère la valeur d'un mois pour un "resource item"
-   */
-  getMonthValue(item: any, month: string): number {
-    return item.monthlyData[month] ?? 0;
+  ngOnInit(): void {
+    this.route.params.subscribe(params => {
+      const memberId = +params['id'];
+      if (!isNaN(memberId)) {
+        this.loadMemberDetails(memberId);
+      } else {
+        console.error('❌ ID de membre invalide');
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadMemberDetails(id: number): void {
+    this.isLoading = true;
+    this.teamMemberService.getMemberById(id).subscribe({
+      next: (data) => {
+        this.member = data;
+        this.generateMonthList();
+        this.filterHolidays();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Erreur chargement membre :', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  private generateMonthList(): void {
+    this.months = [];
+    if (!this.member?.holiday || this.member.holiday.length === 0) {
+      // If no holidays, just show the current month
+      const currentDate = new Date();
+       this.months.push({
+        value: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
+        label: currentDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+      });
+      this.selectedMonth = this.months[0].value;
+      return;
+    }
+
+    const uniqueMonths = new Set<string>();
+    this.member.holiday.forEach(holidayString => {
+      const holidayDate = new Date(holidayString);
+      // Use YYYY-MM to ensure uniqueness by month and year
+      uniqueMonths.add(`${holidayDate.getFullYear()}-${holidayDate.getMonth()}`);
+    });
+
+    // Add current month to the list to make it easily accessible
+     const currentDate = new Date();
+     uniqueMonths.add(`${currentDate.getFullYear()}-${currentDate.getMonth()}`);
+
+    const sortedMonths = Array.from(uniqueMonths)
+      .map(monthYear => {
+        const [year, month] = monthYear.split('-').map(Number);
+        return new Date(year, month, 1);
+      })
+      .sort((a, b) => a.getTime() - b.getTime());
+
+    this.months = sortedMonths.map(date => ({
+      value: date,
+      label: date.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+    }));
+
+    // Set the selected month to the earliest month with a holiday, or the current month
+    const earliestHolidayMonth = sortedMonths.length > 0 ? sortedMonths[0] : new Date();
+    this.selectedMonth = new Date(earliestHolidayMonth.getFullYear(), earliestHolidayMonth.getMonth(), 1);
+  }
+
+  onMonthChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.selectedMonth = new Date(select.value);
+    this.filterHolidays();
+  }
+
+  filterHolidays(): void {
+    if (!this.member?.holiday) {
+      this.filteredHolidays = [];
+      return;
+    }
+
+    const selectedMonth = this.selectedMonth.getMonth();
+    const selectedYear = this.selectedMonth.getFullYear();
+
+    this.filteredHolidays = this.member.holiday
+      .filter(day => {
+        const holidayDate = new Date(day);
+        return holidayDate.getMonth() === selectedMonth && 
+               holidayDate.getFullYear() === selectedYear;
+      })
+      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+  }
+
+  deleteHoliday(day: string): void {
+    if (!this.member || !this.member.id || !this.member.holiday) {
+      console.error('Impossible de supprimer le congé : données manquantes');
+      return;
+    }
+
+    this.isDeleting = true;
+    const updatedHolidays = this.member.holiday.filter(h => h !== day);
+    
+    const updatedMember: TeamMember = {
+      id: this.member.id,
+      name: this.member.name,
+      initial: this.member.initial,
+      jobTitle: this.member.jobTitle,
+      image: this.member.image,
+      note: this.member.note,
+      role: this.member.role,
+      holiday: updatedHolidays,
+      teams: this.member.teams || [],
+      cost: this.member.cost,
+      startDate: this.member.startDate,
+      endDate: this.member.endDate,
+      status: this.member.status,
+      experienceRange: this.member.experienceRange
+    };
+    
+    this.teamMemberService.updateTeamMember(this.member.id, updatedMember).subscribe({
+      next: (updatedData) => {
+        if (this.member) {
+          this.member.holiday = updatedHolidays;
+          this.generateMonthList(); // Regenerate month list after deletion
+          this.filterHolidays();
+        }
+        this.isDeleting = false;
+      },
+      error: (err) => {
+        console.error('Erreur lors de la suppression du congé :', err);
+        this.isDeleting = false;
+      }
+    });
   }
 }

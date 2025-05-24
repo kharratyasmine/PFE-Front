@@ -9,10 +9,10 @@
   <table class="table table-bordered table-hover text-center shadow-sm">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>Référence</th>
-        <th>Date de création</th>
-        <th>Actions</th>
+        <th>{{ 'ID' | translate }}</th>
+        <th>{{ 'reference' | translate }}</th>
+        <th>{{ 'Date de création' | translate }}</th>
+        <th>{{ 'actions' | translate }}</th>
       </tr>
     </thead>
     <tbody>
@@ -56,7 +56,7 @@
       <div class="modal-body">
         <form>
           <div class="mb-3">
-            <label>Référence</label>
+            <label>{{ 'reference' | translate }}</label>
             <input type="text" [(ngModel)]="selectedDevis!.reference" name="reference" class="form-control" />
           </div>
           <div class="mb-3">

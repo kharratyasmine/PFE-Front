@@ -4,6 +4,7 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { UploadService } from 'src/app/services/upload.service';
 import { TeamMember } from 'src/app/model/TeamMember.model';
+import { TeamMemberHistory } from 'src/app/model/TeamMemberHistory.model';
 import * as bootstrap from 'bootstrap';
 
 
@@ -27,6 +28,9 @@ export class TeamMemberComponent implements OnInit {
   currentPage: number = 1;
   itemsPerPage: number = 4; // Nombre d'éléments par page
 
+  memberHistory: TeamMemberHistory[] = [];
+  originalMember: TeamMember | null = null;
+
   constructor(
     private teamMemberService: TeamMemberService,
     private uploadService: UploadService,
@@ -44,11 +48,11 @@ export class TeamMemberComponent implements OnInit {
   }
 
   // Gestion de l'upload d'image
-  onSelect(event: any): void {
-    console.log("📂 Fichiers ajoutés :", event);
-    this.files.push(...event.addedFiles);
-    this.uploadFiles();
-  }
+ onSelect(event: any): void {
+  this.files.push(...event.addedFiles);
+}
+
+
   filterRealMembers(members: TeamMember[]): TeamMember[] {
     return members.filter(member =>
       member.name &&
@@ -212,27 +216,78 @@ export class TeamMemberComponent implements OnInit {
   // Enregistrer ou mettre à jour un membre
   saveTeamMember(): void {
     if (this.selectedMember.id && this.selectedMember.id !== 0) {
-      this.teamMemberService.updateTeamMember(this.selectedMember.id, this.selectedMember).subscribe(
-        (updatedMember) => {
+      // Créer l'historique des modifications
+      const changes = this.getChanges();
+      
+      // Mettre à jour le membre
+      this.teamMemberService.updateTeamMember(this.selectedMember.id, this.selectedMember).subscribe({
+        next: (updatedMember) => {
           console.log("✅ Membre mis à jour :", updatedMember);
-          this.loadTeamMembers();
+
+          // Sauvegarder l'historique des modifications
+          changes.forEach(change => {
+            this.teamMemberService.saveMemberHistory(change).subscribe({
+              next: (history) => {
+                console.log("✅ Modification enregistrée dans l'historique:", history);
+              },
+              error: (err) => {
+                console.error("❌ Erreur lors de l'enregistrement de l'historique:", err);
+              }
+            });
+          });
+
+          // Gérer l'upload d'image si nécessaire
+          if (this.files.length > 0) {
+            const file = this.files[0];
+            const formData = new FormData();
+            formData.append("image", file);
+
+            this.uploadService.uploadTeamMemberImage(updatedMember.id!, formData).subscribe({
+              next: (res) => {
+                console.log("✅ Image mise à jour avec succès");
+                this.loadTeamMembers();
+              },
+              error: (err) => {
+                console.error("❌ Erreur lors de l'upload de l'image:", err);
+              }
+            });
+          } else {
+            this.loadTeamMembers();
+          }
+
           this.closeModal();
         },
-        (error) => {
+        error: (error) => {
           console.error("❌ Erreur lors de la mise à jour du membre", error);
         }
-      );
+      });
     } else {
       this.teamMemberService.addTeamMember(this.selectedMember).subscribe(
         (newMember) => {
           console.log("✅ Membre ajouté :", newMember);
-          this.teamMembers.push(newMember);
-          this.filteredMembers = [...this.teamMembers];
+
+          // Si une image est en attente, upload après création
+          if (this.files.length > 0) {
+            const file = this.files[0];
+            const formData = new FormData();
+            formData.append("image", file);
+
+            this.uploadService.uploadTeamMemberImage(newMember.id!, formData).subscribe({
+              next: (res) => {
+                console.log("✅ Image uploadée avec succès");
+                this.loadTeamMembers(); // recharge la liste avec l'image
+              },
+              error: (err) => {
+                console.error("❌ Erreur l'upload de l'image :", err);
+              }
+            });
+          } else {
+            this.loadTeamMembers();
+          }
+
           this.closeModal();
         },
-        (error) => {
-          console.error("❌ Erreur lors de l'ajout du membre", error);
-        }
+
       );
     }
   }
@@ -249,13 +304,29 @@ export class TeamMemberComponent implements OnInit {
   openModal(member?: TeamMember): void {
     if (member) {
       this.selectedMember = { ...member };
+      this.originalMember = { ...member };
     } else {
       this.selectedMember = this.getEmptyTeamMember();
+      this.originalMember = null;
     }
     this.costModified = false;
     this.initialModified = false;
 
     const modalElement = document.getElementById('teamMemberModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    }
+  }
+
+  openHistoryModal(member: TeamMember): void {
+    this.selectedMember = { ...member };
+    this.memberHistory = [];
+    if (member.id) {
+      this.loadMemberHistory(member.id);
+    }
+
+    const modalElement = document.getElementById('memberHistoryModal');
     if (modalElement) {
       const modal = new bootstrap.Modal(modalElement);
       modal.show();
@@ -291,7 +362,7 @@ export class TeamMemberComponent implements OnInit {
     const match = range.match(/^(\d+)\s*-/);
     const startYear = match ? parseInt(match[1], 10) : 0;
 
-    // 🎓 Suggérer le rôle en fonction de l’expérience
+    // 🎓 Suggérer le rôle en fonction de l'expérience
     if (startYear <= 2) {
       this.selectedMember.role = 'JUNIOR';
     } else if (startYear <= 6) {
@@ -362,6 +433,47 @@ export class TeamMemberComponent implements OnInit {
     if (!this.initialModified) {
       this.generateInitial();
     }
+  }
+
+  loadMemberHistory(memberId: number): void {
+    this.teamMemberService.getMemberHistory(memberId).subscribe({
+      next: (history) => {
+        console.log('✅ Historique chargé avec succès:', history);
+        this.memberHistory = history.map(item => ({
+           ...item,
+           modifiedDate: new Date(item.modifiedDate)
+        }));
+      },
+      error: (err) => {
+        console.error('❌ Erreur lors du chargement de l\'historique:', err);
+        this.memberHistory = [];
+        alert('Impossible de charger l\'historique des modifications. Veuillez réessayer plus tard.');
+      }
+    });
+  }
+
+  private getChanges(): TeamMemberHistory[] {
+    if (!this.originalMember || !this.selectedMember.id) return [];
+
+    const changes: TeamMemberHistory[] = [];
+    const fields = ['name', 'initial', 'jobTitle', 'role', 'cost', 'startDate', 'endDate', 'note'];
+
+    fields.forEach(field => {
+      const oldValue = this.originalMember![field as keyof TeamMember];
+      const newValue = this.selectedMember[field as keyof TeamMember];
+
+      if (oldValue !== newValue) {
+        changes.push({
+          teamMemberId: this.selectedMember.id!,
+          fieldName: field,
+          oldValue: String(oldValue),
+          newValue: String(newValue),
+          modifiedDate: new Date()
+        });
+      }
+    });
+
+    return changes;
   }
 
 }

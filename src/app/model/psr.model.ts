@@ -14,7 +14,7 @@ export interface Psr {
   approvedBy?: string;
   validatedBy?: string;
   approvedByDate : Date | string;
-  PreparedByDate : Date | string;
+  preparedByDate : Date | string;
   validatedByDate : Date | string;
   status?: string;
   projectName?: string;

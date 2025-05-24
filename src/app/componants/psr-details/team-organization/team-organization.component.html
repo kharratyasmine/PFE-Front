@@ -1,44 +1,108 @@
-<div class="table-responsive">
-  <div *ngIf="loading" class="text-center my-3">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Chargement...</span>
+<div class="table-responsive p-3">
+  <!-- En-tête avec la semaine -->
+  <div class="week-header mb-4">
+    <div class="d-flex align-items-center justify-content-between">
+      <div>
+        <h4 class="text-primary mb-2">
+          <i class="fas fa-calendar-week me-2"></i>
+          {{ 'team_organization_for_week' | translate }}: {{ psr.week }}
+        </h4>
+        <p class="text-muted mb-0">
+          <i class="fas fa-info-circle me-2"></i>
+          {{ 'team_members_working_this_week' | translate }}
+        </p>
+      </div>
+      <div class="week-status">
+        <span class="badge bg-primary">
+          <i class="fas fa-users me-1"></i>
+          {{ teamMembers.length }} {{ 'active_members' | translate }}
+        </span>
+      </div>
     </div>
   </div>
 
-  <div *ngIf="error" class="alert alert-danger" role="alert">
+  <!-- Indicateur de chargement -->
+  <div *ngIf="loading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">{{ 'loading' | translate }}</span>
+    </div>
+    <p class="mt-2 text-muted">{{ 'loading_team_data' | translate }}</p>
+  </div>
+
+  <!-- Message d'erreur -->
+  <div *ngIf="error" class="alert alert-info border m-3" role="alert">
+    <i class="fas fa-info-circle me-2"></i>
     {{ error }}
   </div>
 
-  <table *ngIf="!loading && !error" class="table table-bordered table-hover text-center">
-    <thead class="table-primary">
+  <!-- Tableau des membres -->
+  <table *ngIf="!loading && !error && teamMembers.length > 0" class="table table-hover align-middle">
+    <thead>
       <tr>
-        <th>#</th>
-        <th>Initial</th>
-        <th>Member</th>
-        <th>Role</th>
-        <th>Project</th>
-        <th>Planned Start Date</th>
-        <th>Planned End Date</th>
-        <th>Allocation (%)</th>
-        <th>Coming From Team</th>
-        <th>Going To Team</th>
-        <th>Holiday</th>
+        <th class="py-3 border-bottom">#</th>
+        <th class="py-3 border-bottom">{{ 'initial' | translate }}</th>
+        <th class="py-3 border-bottom">{{ 'member' | translate }}</th>
+        <th class="py-3 border-bottom">{{ 'role' | translate }}</th>
+        <th class="py-3 border-bottom">{{ 'project' | translate }}</th>
+        <th class="py-3 border-bottom">{{ 'planned_start_date' | translate }}</th>
+        <th class="py-3 border-bottom">{{ 'planned_end_date' | translate }}</th>
+        <th class="py-3 border-bottom">{{ 'allocation' | translate }}</th>
+        <th class="py-3 border-bottom">{{ 'current_team' | translate }}</th>
+        <th class="py-3 border-bottom">{{ 'next_team' | translate }}</th>
+        <th class="py-3 border-bottom">
+          {{ 'holiday' | translate }}
+          <small class="text-muted d-block">({{ 'week' | translate }}: {{ psr.week }})</small>
+        </th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let member of teamMembers; let i = index">
-        <td>{{ i + 1 }}</td>
-        <td>{{ member.initial }}</td>
-        <td>{{ member.fullName }}</td>
-        <td>{{ member.role }}</td>
-        <td>{{ member.project }}</td>
-        <td>{{ member.plannedStartDate | date: 'dd/MM/yyyy' }}</td>
-        <td>{{ member.plannedEndDate | date: 'dd/MM/yyyy' }}</td>
-        <td>{{ member.allocation }}</td>
-        <td>{{ member.comingFromTeam }}</td>
-        <td>{{ member.goingToTeam }}</td>
-        <td [innerHTML]="member.holiday"></td>
-      </tr>
+      <ng-container *ngFor="let member of teamMembers; let i = index">
+        <tr [ngClass]="{'table-light': isMemberInMultipleTeams(member)}">
+          <td class="fw-bold">{{ i + 1 }}</td>
+          <td>{{ member.initial }}</td>
+          <td>{{ member.fullName }}</td>
+          <td>{{ member.role }}</td>
+          <td>{{ member.project }}</td>
+          <td>{{ member.plannedStartDate | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ member.plannedEndDate | date: 'dd/MM/yyyy' }}</td>
+          <td>
+            <span class="badge" [ngClass]="getAllocationBadgeClass(member.allocation)">
+              {{ member.allocation }}%
+            </span>
+          </td>
+          <td>
+            <span class="badge bg-info">
+              {{ member.comingFromTeam }}
+            </span>
+          </td>
+          <td>
+            <span *ngIf="member.goingToTeam" class="badge bg-warning">
+              {{ member.goingToTeam }}
+            </span>
+            <span *ngIf="!member.goingToTeam" class="text-muted">
+              <i class="fas fa-minus"></i>
+            </span>
+          </td>
+          <td>
+            <span *ngIf="member.holiday" class="badge bg-warning text-dark">
+              <i class="fas fa-calendar-day me-1"></i>
+              {{ member.holiday | date: 'dd/MM/yyyy' }}
+            </span>
+            <span *ngIf="!member.holiday" class="text-muted">
+              <i class="fas fa-check me-1"></i>
+              {{ 'no_holiday' | translate }}
+            </span>
+          </td>
+        </tr>
+      </ng-container>
     </tbody>
   </table>
+
+  <!-- Message si aucun membre -->
+  <div *ngIf="!loading && !error && teamMembers.length === 0" class="text-center my-5">
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle me-2"></i>
+      {{ 'no_team_members_this_week' | translate }}
+    </div>
+  </div>
 </div>

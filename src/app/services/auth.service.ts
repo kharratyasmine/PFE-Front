@@ -6,6 +6,7 @@ import { jwtDecode } from 'jwt-decode';
 export interface AuthResponse {
   access_token: string;
   refresh_token: string;
+   message?: string;
 }
 
 @Injectable({
@@ -139,4 +140,10 @@ export class AuthService {
   isAuthenticated(): boolean {
     return !!this.getAccessToken();
   }
+
+  getCurrentUserRole(): string {
+  const user = JSON.parse(localStorage.getItem('currentUser')!);
+  return user?.role || '';
+}
+
 }

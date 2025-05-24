@@ -17,4 +17,6 @@ uploadTeamMemberImage(id: number, data: FormData) {
   return this.http.post(`http://localhost:8080/teamMembers/${id}/upload-image`, data);
 }
 
+
+
 }

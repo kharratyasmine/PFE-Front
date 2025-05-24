@@ -1,125 +1,191 @@
-<div class="container mt-4">
-  <div class="mb-3 d-flex justify-content-between align-items-center">
-    <h5>{{ 'Related Project Status Reports' | translate }}</h5>
-    <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#psrModal">
-      <i class="fas fa-plus"></i> {{ 'Nouveau PSR' | translate }}
-    </button>
+<!-- Main Container -->
+<div class="psr-container">
+  <!-- Header Section -->
+  <div class="psr-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h4 class="page-title">{{ 'title' | translate }}</h4>
+        <div class="current-week">
+          <span class="week-label">{{ 'current_week' | translate }}:</span>
+          <span class="week-value">{{ currentWeek }}</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="week-filter">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="fas fa-calendar-week"></i>
+            </span>
+            <input type="text" class="form-control" [(ngModel)]="filterWeek" (ngModelChange)="filterPsrs()"
+              placeholder="{{ 'week' | translate }}">
+          </div>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#psrModal">
+          <i class="fas fa-plus"></i> {{ 'new_psr' | translate }}
+        </button>
+      </div>
+    </div>
   </div>
-  <!-- TABLEAU DES PSR -->
-  <div class="table-responsive mt-3">
-    <table class="table table-bordered table-hover text-center shadow-sm">
-      <thead>
-        <tr>
-          <th>{{ 'Titre' | translate }}</th>
-          <th>{{ 'Date' | translate }}</th>
-          <th>{{ 'Statut' | translate }}</th>
-          <th>{{ 'Projet' | translate }}</th>
-          <th>{{ 'Edition' | translate }}</th>
-          <th>{{ 'Référence' | translate }}</th>
-          <th>{{ 'Prepared' | translate }}</th>
-          <th>{{ 'Approved' | translate }}</th>
-          <th>{{ 'Validated' | translate }}</th>
-          <th>{{ 'Week' | translate }}</th>
-          <th>{{ 'actions' | translate }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let psr of psrs">
-          <td>{{ psr.reportTitle }}</td>
-          <td>{{ psr.reportDate | date }}</td>
-          <td>{{ psr.overallStatus }}</td>
-          <td>{{ psr.projectName }}</td>
-          <td>{{ psr.edition }}</td>
-          <td>{{ psr.reference }}</td>
-          <td>{{ psr.preparedBy }}</td>
-          <td>{{ psr.approvedBy }}</td>
-          <td>{{ psr.validatedBy }}</td>
-          <td>{{ psr.week }}</td>
-          <td class="d-flex justify-content-center">
-            <!-- Voir PSR -->
-            <button class="btn btn-outline-secondary btn-sm" (click)="openPsrDetailsModal(psr.id!)">
-              <i class="fas fa-eye"></i>
-            </button>
-            <!-- Modifier PSR -->
-            <button class="btn btn-outline-success btn-sm" (click)="editFromTable(psr)">
-              <i class="fas fa-pencil-alt"></i>
-            </button>
-            <!-- Supprimer PSR -->
-            <button class="btn btn-outline-danger btn-sm" (click)="deletePsr(psr.id!)">
-              <i class="fas fa-trash-alt"></i>
-            </button>
-            <!-- Télécharger PSR -->
-            <button class="btn btn-outline-success btn-sm" (click)="downloadPsr(psr.id!)">
-              <i class="fas fa-download"></i>
-            </button>
 
+  <!-- Table Section -->
+  <div class="psr-table-container">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>{{ 'title' | translate }}</th>
+            <th>{{ 'date' | translate }}</th>
+            <th>{{ 'status' | translate }}</th>
+            <th>{{ 'project' | translate }}</th>
+            <th>{{ 'edition' | translate }}</th>
+            <th>{{ 'reference' | translate }}</th>
+            <th>{{ 'prepared' | translate }}</th>
+            <th>{{ 'approved' | translate }}</th>
+            <th>{{ 'validated' | translate }}</th>
+            <th>{{ 'week' | translate }}</th>
+            <th>{{ 'actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let psr of filteredPsrs">
+            <td>{{ psr.reportTitle }}</td>
+            <td>{{ psr.reportDate | date: 'yyyy-MM-dd' }}</td>
 
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            <td>
+              <span class="status-badge" [ngClass]="'status-' + psr.overallStatus.toLowerCase()">
+                {{ psr.overallStatus }}
+              </span>
+            </td>
+            <td>{{ psr.projectName }}</td>
+            <td>{{ psr.edition }}</td>
+            <td>{{ psr.reference }}</td>
+            <td>{{ psr.preparedBy }}</td>
+            <td>{{ psr.approvedBy }}</td>
+            <td>{{ psr.validatedBy }}</td>
+            <td>{{ psr.week }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-icon" (click)="openPsrDetailsModal(psr.id!)">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-icon" (click)="editFromTable(psr)">
+                  <i class="fas fa-pencil-alt"></i>
+                </button>
+                <button class="btn btn-icon" (click)="deletePsr(psr.id!)">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+                <button class="btn btn-icon" (click)="downloadPsr(psr.id!)">
+                  <i class="fas fa-download"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
   </div>
 </div>
 
-<!-- ✅ MODAL BOOTSTRAP -->
+<!-- Modal -->
 <div class="modal fade" id="psrModal" tabindex="-1" aria-labelledby="psrModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <form (ngSubmit)="savePsr()" #psrForm="ngForm">
         <div class="modal-header">
-          <h5 class="modal-title" id="psrModalLabel">{{ isEditMode ? '✏️ Editer PSR' : '➕ Nouveau PSR' }}</h5>
+          <h5 class="modal-title" id="psrModalLabel">
+            <i class="fas" [ngClass]="isEditMode ? 'fa-edit' : 'fa-plus-circle'"></i>
+            {{ isEditMode ? ('edit_title' | translate) : ('new_title' | translate) }}
+          </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <div class="mb-2">
-            <label>Titre</label>
-            <input class="form-control" [(ngModel)]="psr.reportTitle" name="reportTitle" required>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ 'title' | translate }}</label>
+                <input class="form-control" [(ngModel)]="psr.reportTitle" name="reportTitle" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ 'date' | translate }}</label>
+                <input class="form-control" type="date" [(ngModel)]="psr.reportDate" name="reportDate" required>
+              </div>
+            </div>
           </div>
-          <div class="mb-2">
-            <label>Date</label>
-            <input class="form-control" type="date" [(ngModel)]="psr.reportDate" name="reportDate" required>
+
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ 'global_status' | translate }}</label>
+                <input class="form-control" [(ngModel)]="psr.overallStatus" name="overallStatus">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ 'week' | translate }}</label>
+                <input class="form-control" [value]="isEditMode ? psr.week : currentWeek" readonly>
+              </div>
+            </div>
           </div>
-          <div class="mb-2">
-            <label>Statut global</label>
-            <input class="form-control" [(ngModel)]="psr.overallStatus" name="overallStatus">
+
+          <div class="approval-section mt-4">
+            <h6 class="section-title">{{ 'approval_details' | translate }}</h6>
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>{{ 'prepared_by' | translate }}</label>
+                  <select class="form-select" [(ngModel)]="psr.preparedBy" name="preparedBy">
+                    <option *ngFor="let user of users" [value]="user">{{ user }}</option>
+                  </select>
+                  <input class="form-control mt-2" type="date" [(ngModel)]="psr.preparedByDate" name="prepared_by_date">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>{{ 'approved_by' | translate }}</label>
+                  <select class="form-select" [(ngModel)]="psr.approvedBy" name="approvedBy">
+                    <option *ngFor="let user of users" [value]="user">{{ user }}</option>
+                  </select>
+                  <input class="form-control mt-2" type="date" [(ngModel)]="psr.approvedByDate" name="approved_by_date">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>{{ 'validated_by' | translate }}</label>
+                  <select class="form-select" [(ngModel)]="psr.validatedBy" name="validatedBy">
+                    <option *ngFor="let user of users" [value]="user">{{ user }}</option>
+                  </select>
+                  <input class="form-control mt-2" type="date" [(ngModel)]="psr.validatedByDate"
+                    name="validated_by_date">
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="mb-2">
-            <label>Prepared By</label>
-            <select class="form-select" [(ngModel)]="psr.preparedBy" name="preparedBy">
-              <option *ngFor="let user of users" [value]="user">{{ user }}</option>
-            </select>
-            <input class="form-control mt-1" type="date" [(ngModel)]="psr.PreparedByDate" name="prepared_by_date">
-          </div>
-          <div class="mb-2">
-            <label>Approved By</label>
-            <select class="form-select" [(ngModel)]="psr.approvedBy" name="approvedBy">
-              <option *ngFor="let user of users" [value]="user">{{ user }}</option>
-            </select>
-            <input class="form-control mt-1" type="date" [(ngModel)]="psr.approvedByDate" name="approved_by_date">
-          </div>
-          <div class="mb-2">
-            <label>Validated By</label>
-            <select class="form-select" [(ngModel)]="psr.validatedBy" name="validatedBy">
-              <option *ngFor="let user of users" [value]="user">{{ user }}</option>
-            </select>
-            <input class="form-control mt-1" type="date" [(ngModel)]="psr.validatedByDate" name="validated_by_date">
-          </div>
-          <div class="mb-2">
-            <label>Week</label>
-            <input class="form-control" [(ngModel)]="psr.week" name="week">
-          </div>
-          <div class="mb-2">
-            <label>Référence</label>
-            <input class="form-control" [(ngModel)]="psr.reference" name="reference">
-          </div>
-          <div class="mb-2">
-            <label>Édition</label>
-            <input class="form-control" [(ngModel)]="psr.edition" name="edition">
+
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ 'reference' | translate }}</label>
+                <input class="form-control" [(ngModel)]="psr.reference" name="reference">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>{{ 'edition' | translate }}</label>
+                <input class="form-control" [(ngModel)]="psr.edition" name="edition">
+              </div>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-          <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times"></i> {{ 'cancel' | translate }}
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> {{ 'save' | translate }}
+          </button>
         </div>
       </form>
     </div>

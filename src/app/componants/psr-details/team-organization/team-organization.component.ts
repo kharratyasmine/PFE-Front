@@ -35,18 +35,16 @@ export class TeamOrganizationComponent implements OnInit {
       this.psrId = idParam;
       console.log('Chargement TeamOrganization pour PSR ID :', this.psrId);
       
-      // Si nous avons déjà le PSR via l'Input
       if (this.psr && this.psr.projectId) {
         this.getProjectDates(this.psr.projectId);
       } else {
-        // Sinon, on charge le PSR d'abord
         this.psrService.getById(idParam).subscribe({
           next: (psr: Psr) => {
             this.psr = psr;
             if (psr.projectId) {
               this.getProjectDates(psr.projectId);
             } else {
-              this.loadAllProjectMembers();
+              this.loadTeamMembersByWeek();
             }
           },
           error: (err: any) => {
@@ -57,7 +55,6 @@ export class TeamOrganizationComponent implements OnInit {
       }
     } else {
       this.error = "Aucun identifiant de PSR n'a été fourni.";
-      console.warn("ID PSR manquant dans l'URL ou le composant parent.");
     }
   }
 
@@ -66,53 +63,80 @@ export class TeamOrganizationComponent implements OnInit {
       next: (project: Project) => {
         this.projectStartDate = project.startDate;
         this.projectEndDate = project.endDate;
-        this.loadAllProjectMembers();
+        this.loadTeamMembersByWeek();
       },
       error: (err: any) => {
         console.error('Erreur lors du chargement du projet :', err);
-        // En cas d'erreur, on charge quand même les membres sans les dates du projet
-        this.loadAllProjectMembers();
+        this.loadTeamMembersByWeek();
       }
     });
   }
 
-  loadTeamOrganization(psrId: number): void {
+  loadTeamMembersByWeek(): void {
+    if (!this.psrId || !this.psr.week) {
+      this.error = "Informations PSR incomplètes. Impossible de charger les données.";
+      return;
+    }
+    
     this.loading = true;
     this.error = '';
     
-    this.teamOrganizationService.getTeamOrganization(psrId).subscribe({
+    this.teamOrganizationService.getTeamOrganizationByWeek(this.psrId, this.psr.week).subscribe({
       next: (data) => {
-        this.teamMembers = data;
+        if (data.length === 0) {
+          this.error = `Aucune donnée d'équipe disponible pour la semaine ${this.psr.week}`;
+        } else {
+          if (this.projectStartDate && this.projectEndDate) {
+            data.forEach(member => {
+              member.plannedStartDate = this.projectStartDate;
+              member.plannedEndDate = this.projectEndDate;
+            });
+          }
+          this.teamMembers = data;
+        }
         this.loading = false;
       },
       error: (err) => {
-        console.error('Erreur chargement TeamOrganization:', err);
+        console.error('Erreur lors du chargement des membres de l\'équipe :', err);
         this.error = 'Impossible de charger les membres de l\'équipe. Veuillez réessayer.';
         this.loading = false;
       }
     });
   }
 
-  loadAllProjectMembers(): void {
-    if (!this.psrId) return;
-    this.loading = true;
-    this.teamOrganizationService.getMembersFromProject(this.psrId).subscribe({
-      next: (data) => {
-        // Si nous avons récupéré les dates du projet, on les applique à tous les membres
-        if (this.projectStartDate && this.projectEndDate) {
-          data.forEach(member => {
-            member.plannedStartDate = this.projectStartDate;
-            member.plannedEndDate = this.projectEndDate;
-          });
-        }
-        this.teamMembers = data;
-        this.loading = false;
+  // Vérifie si un membre est dans plusieurs équipes
+  isMemberInMultipleTeams(member: TeamOrganization): boolean {
+    return this.teamMembers.filter(m => m.initial === member.initial).length > 1;
+  }
+
+  // Retourne la classe CSS pour le badge d'allocation
+  getAllocationBadgeClass(allocation: string | number): string {
+    const allocationNumber = typeof allocation === 'string' ? parseFloat(allocation) : allocation;
+    
+    if (isNaN(allocationNumber)) return 'bg-secondary';
+    if (allocationNumber >= 100) return 'bg-success';
+    if (allocationNumber >= 50) return 'bg-primary';
+    if (allocationNumber > 0) return 'bg-warning';
+    return 'bg-secondary';
+  }
+
+  // TODO: Si l'ajout d'un membre ou d'une équipe est géré dans ce composant,
+  // la méthode d'ajout devrait appeler this.loadTeamMembersByWeek() après succès
+  // Exemple (méthode hypothétique d'ajout de membre):
+  /*
+  addTeamMember(newMemberData: any): void {
+    // Appel au service backend pour ajouter le membre
+    this.teamOrganizationService.addTeamMember(this.psrId!, this.psr.week, newMemberData).subscribe({
+      next: () => {
+        console.log('Membre ajouté avec succès');
+        // Recharger les données pour mettre à jour le tableau
+        this.loadTeamMembersByWeek();
       },
       error: (err) => {
-        console.error('Erreur lors du chargement des membres du projet', err);
-        this.error = 'Impossible de charger les membres de l\'équipe. Veuillez réessayer.';
-        this.loading = false;
+        console.error('Erreur lors de l\'ajout du membre :', err);
+        // Gérer l'erreur
       }
     });
   }
+  */
 }

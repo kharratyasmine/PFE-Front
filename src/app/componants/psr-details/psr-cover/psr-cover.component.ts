@@ -80,7 +80,7 @@ export class PsrCoverComponent implements OnInit {
   onUserChange(type: 'prepared' | 'approved' | 'validated'): void {
     const now = new Date();
     if (type === 'prepared') {
-      this.psr.PreparedByDate = now;
+      this.psr.preparedByDate = now;
     } else if (type === 'approved') {
       this.psr.approvedByDate = now;
     } else if (type === 'validated') {

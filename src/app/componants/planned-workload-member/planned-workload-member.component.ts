@@ -71,57 +71,57 @@ export class PlannedWorkloadMemberComponent implements OnInit {
     if (!this.projectId || !this.selectedYear) return;
 
     this.workloadService.getByProjectAndYear(this.projectId, this.selectedYear).subscribe({
-        next: (data) => {
-            // ✅ On garde TOUTES les workloads reçues (aucun filtrage par membre)
-            this.workloads = data;
+      next: (data) => {
+        this.workloads = data;
+        console.log("✅ Workloads récupérés :", this.workloads);
 
-            this.editedWorkloads = {};
-            this.members = [];
+        this.editedWorkloads = {};
+        this.members = [];
 
-            this.projectService.getMembersByProject(this.projectId).subscribe({
-                next: (teamMembers: TeamMember[]) => {
-                    const uniqueMembers = new Map<number, TeamMember>();
+        this.projectService.getMembersByProject(this.projectId).subscribe({
+          next: (teamMembers: TeamMember[]) => {
+            const uniqueMembers = new Map<number, TeamMember>();
 
-                    // 🔄 Initialiser la structure pour CHAQUE membre
-                    for (let member of teamMembers) {
-                        if (!uniqueMembers.has(member.id!)) {
-                            uniqueMembers.set(member.id!, member);
-                            this.editedWorkloads[member.id!] = {
-                                Jan: 0,
-                                Feb: 0,
-                                Mar: 0,
-                                Apr: 0,
-                                May: 0,
-                                Jun: 0,
-                                Jul: 0,
-                                Aug: 0,
-                                Sep: 0,
-                                Oct: 0,
-                                Nov: 0,
-                                Dec: 0
-                            };
-                        }
-                    }
+            for (let member of teamMembers) {
+              if (!uniqueMembers.has(member.id!)) {
+                uniqueMembers.set(member.id!, member);
+                this.editedWorkloads[member.id!] = {};
+                this.months.forEach(m => this.editedWorkloads[member.id!][m] = 0);
 
-                    this.members = Array.from(uniqueMembers.values());
+                // 🟢 INIT allocationByTeamId (obligatoire pour la couleur)
+                member.allocationByTeamId = {};
+                const allocations: { teamId: number; allocation: number; id?: number; projectId: number }[] = (member as any).allocations || [];
 
-                    // 🔄 Injecter toutes les workloads existantes dans la structure
-                    for (let w of this.workloads) {
-                        const monthIndex = +w.month; // convertit en nombre (ex : 5)
-                        const monthLabel = this.months[monthIndex - 1]; // -1 car index commence à 0
+                allocations
+                  .filter(a => a.projectId === this.projectId)
+                  .forEach((a) => {
+                    member.allocationByTeamId![a.teamId] = {
+                      value: a.allocation,
+                      id: a.id ?? null
+                    };
+                  });
 
-                        if (monthLabel) {
-                            // On met la valeur (remplace, pas additionne) pour éviter de fausser en cas de doublons
-                            this.editedWorkloads[w.teamMemberId][monthLabel] = w.workload;
-                        }
-                    }
-                },
-                error: (err) => console.error("Erreur chargement membres équipe :", err)
-            });
-        },
-        error: (err) => console.error("❌ Erreur chargement planning :", err)
+              }
+            }
+
+            this.members = Array.from(uniqueMembers.values());
+
+
+            for (let w of this.workloads) {
+              const monthIndex = parseInt(w.month, 10);
+              const monthLabel = this.months[monthIndex - 1];
+              if (monthLabel && this.editedWorkloads[w.teamMemberId]) {
+                this.editedWorkloads[w.teamMemberId][monthLabel] = w.workload;
+              }
+            }
+          },
+          error: (err) => console.error("❌ Erreur chargement membres équipe :", err)
+        });
+      },
+      error: (err) => console.error("❌ Erreur chargement planning :", err)
     });
-}
+  }
+
 
 
 
@@ -236,7 +236,7 @@ export class PlannedWorkloadMemberComponent implements OnInit {
   saveEditedWorkload(): void {
     if (this.selectedMember && this.selectedMonth) {
       this.editedWorkloads[this.selectedMember.id!][this.selectedMonth] = this.editedValue;
-      
+
       // Créer un objet pour l'enregistrement immédiat
       const workloadToSave: PlannedWorkloadMember = {
         teamMemberId: this.selectedMember.id!,
@@ -246,14 +246,14 @@ export class PlannedWorkloadMemberComponent implements OnInit {
         workload: this.editedValue,
         note: ''
       };
-      
+
       // Chercher si cette charge existe déjà dans les workloads chargés
-      const existingWorkload = this.workloads.find(w => 
-        w.teamMemberId === this.selectedMember.id! && 
-        +w.month === this.monthsMap[this.selectedMonth] && 
+      const existingWorkload = this.workloads.find(w =>
+        w.teamMemberId === this.selectedMember.id! &&
+        +w.month === this.monthsMap[this.selectedMonth] &&
         w.year === this.selectedYear
       );
-      
+
       // Si elle existe, mettre à jour, sinon créer
       if (existingWorkload && existingWorkload.id) {
         workloadToSave.id = existingWorkload.id;
@@ -279,60 +279,92 @@ export class PlannedWorkloadMemberComponent implements OnInit {
 
   // Method to download workload data as Excel
   downloadExcel(): void {
-    try {
-      // First try to use the direct service method
-      this.workloadService.exportToExcel(this.projectId, this.selectedYear).subscribe({
-        next: (blob: Blob) => {
-          this.downloadFile(blob, `planned_workload_${this.currentProject?.name || this.projectId}_${this.selectedYear}.xlsx`);
-        },
-        error: (err) => {
-          console.error("Error downloading Excel from backend:", err);
-          // Fallback to client-side generation
-          this.generateExcelClientSide();
-        }
+    const excelData: any[] = [];
+
+    // En-tête
+    const headerRow: any = {
+      Resource: 'Resource',
+      Role: 'Role'
+    };
+    this.months.forEach(month => headerRow[month] = month);
+    headerRow['Total'] = 'Total';
+    excelData.push(headerRow);
+
+    // Contenu
+    this.members.forEach(member => {
+      const dataRow: any = {
+        Resource: member.name,
+        Role: member.role
+      };
+
+      this.months.forEach(month => {
+        const workload = this.editedWorkloads[member.id!][month];
+        dataRow[month] = {
+          value: workload,
+          color: this.getWorkloadColor(member, workload)
+        };
       });
-    } catch (error) {
-      console.error("Error in Excel download:", error);
-      // Fallback to client-side generation
-      this.generateExcelClientSide();
+
+      dataRow['Total'] = this.getTotalForMember(member.id!);
+      excelData.push(dataRow);
+    });
+
+    const fileName = `planned_workload_${this.currentProject?.name || this.projectId}_${this.selectedYear}.xlsx`;
+    this.excelService.exportDynamicExcel(excelData, fileName);
+  }
+
+
+  getWorkloadColor(member: TeamMember, workload: number): string {
+    // Get the allocation for the current project
+     const currentAllocation = member.allocationByTeamId?.[this.projectId]?.value ?? 0;
+
+    if (currentAllocation >= 1) { // 100%
+      return 'red';
+    } else if (currentAllocation >= 0.5) { // 50%
+      return 'blue';
     }
+    return '';
   }
 
   private generateExcelClientSide(): void {
     // Prepare data for Excel export
     const excelData: any[] = [];
-    
+
     // Add header row with months
     const headerRow: any = {
       Resource: 'Resource',
       Role: 'Role'
     };
-    
+
     this.months.forEach(month => {
       headerRow[month] = month;
     });
-    
+
     headerRow['Total'] = 'Total';
     excelData.push(headerRow);
-    
+
     // Add data for each member
     this.members.forEach(member => {
       const dataRow: any = {
         Resource: member.name,
         Role: member.role
       };
-      
+
       this.months.forEach(month => {
-        dataRow[month] = this.editedWorkloads[member.id!][month];
+        const workload = this.editedWorkloads[member.id!][month];
+        dataRow[month] = {
+          value: workload,
+          color: this.getWorkloadColor(member, workload)
+        };
       });
-      
+
       dataRow['Total'] = this.getTotalForMember(member.id!);
       excelData.push(dataRow);
     });
-    
+
     // Generate and download Excel file
     const fileName = `planned_workload_${this.currentProject?.name || this.projectId}_${this.selectedYear}.xlsx`;
-    this.excelService.exportToExcel(excelData, fileName);
+    this.excelService.exportDynamicExcel(excelData, fileName);
   }
 
   private downloadFile(blob: Blob, fileName: string): void {

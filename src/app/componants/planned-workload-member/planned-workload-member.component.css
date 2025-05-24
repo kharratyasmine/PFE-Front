@@ -150,4 +150,9 @@ h2 {
     background-color: #f8f9fa;
     border-top: 1px solid #eee;
   }
-  
+  .bg-100 {
+  background-color: #ffe5e5 !important; /* rouge clair */
+}
+.bg-50 {
+  background-color: #e6ffed !important; /* vert clair */
+}

@@ -31,7 +31,13 @@ import { FinancialComponent } from './componants/devis-details/financial/financi
 import { InvoicingComponent } from './componants/devis-details/invoicing/invoicing.component';
 import { WorkloadComponent } from './componants/devis-details/workload/workload.component';
 import { TeamOrganizationComponent } from './componants/psr-details/team-organization/team-organization.component';
-
+import { AuditLogComponent } from './componants/audit-log/audit-log.component';
+import { ValidateUserComponent } from './componants/validate-user/validate-user.component';
+import { TaskTrakerComponent } from './componants/psr-details/task-traker/task-traker.component';
+import { DashboardQualiteComponent } from './componants/dashboard-qualite/dashboard-qualite.component';
+import { DashboardManagerComponent } from './componants/dashboard-manager/dashboard-manager.component';
+import { DashboardAdminComponent } from './componants/dashboard-admin/dashboard-admin.component';
+import { DashboardDirectionComponent } from './componants/dashboard-direction/dashboard-direction.component';
 
 
 
@@ -47,9 +53,14 @@ const routes: Routes = [
   { path: 'profile', component: MyProfilComponent, canActivate: [AuthGuard] },
   { path: 'psr', component: PsrComponent, canActivate: [AuthGuard] },
   { path: 'excel', component: ExcelImportComponent },
-
-  {
-    path: 'project/:id', component: ProjectDetailsComponent, children: [
+  { path: 'logs', component: AuditLogComponent, canActivate: [AuthGuard], data: { roles: ['ADMIN'] } },
+  { path: 'validate-user', component: ValidateUserComponent },
+  { path: 'team-member/:id', component: TeamMemberDetailsComponent },
+  { path: 'dashboard/admin', component: DashboardAdminComponent },
+  { path: 'dashboard/manager', component: DashboardManagerComponent },
+  { path: 'dashboard/direction', component: DashboardDirectionComponent },
+  {path: 'dashboard/qualite', component: DashboardQualiteComponent},
+  {path: 'project/:id', component: ProjectDetailsComponent, children: [
       { path: 'demandes', component: DemandesComponent },
       { path: 'team', component: TeamComponent },
       { path: 'plannedWorkloadMember', component: PlannedWorkloadMemberComponent },
@@ -57,6 +68,7 @@ const routes: Routes = [
       { path: 'devis', component: DevisComponent },
       { path: 'psr', component: PsrComponent },
       { path: '', redirectTo: 'demandes', pathMatch: 'full' }
+
     ]
   },
   {
@@ -64,7 +76,8 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: 'teamOrganization', pathMatch: 'full' },
       { path: 'coverPage', component: PsrCoverComponent },
-       { path:'teamOrganization', component: TeamOrganizationComponent },
+      { path: 'teamOrganization', component: TeamOrganizationComponent },
+      { path: 'taskTraker', component: TaskTrakerComponent },
       { path: 'weekly', component: PsrWeeklyComponent },
       { path: 'risks', component: PsrRisksComponent },
       { path: 'deliveries', component: DeliveriesComponent },
@@ -84,8 +97,8 @@ const routes: Routes = [
     ]
   },
 
-  { path:'project/:projectId/psr/:psrId', component: PsrDetailsComponent },
-  { path:'project/:projectId/devis/:devisId', component: DevisDetailsComponent },
+  { path: 'project/:projectId/psr/:psrId', component: PsrDetailsComponent },
+  { path: 'project/:projectId/devis/:devisId', component: DevisDetailsComponent },
   { path: 'devisDetails/:devisId', component: DevisDetailsComponent },
   { path: 'psrDetails/:psrId', component: PsrDetailsComponent },
   { path: '', redirectTo: 'login', pathMatch: 'full' },

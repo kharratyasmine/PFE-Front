@@ -16,15 +16,10 @@ export class DeliveriesService {
   private prepareDeliveryForBackend(delivery: Deliveries): any {
     // Clone l'objet pour ne pas modifier l'original
     const backendDelivery = { ...delivery };
-    
-    // Assure que les dates sont au format ISO (YYYY-MM-DD) pour le backend
     if (backendDelivery.plannedDate) {
-      // Vérifie que c'est bien une chaîne au format date
       if (typeof backendDelivery.plannedDate === 'string' && backendDelivery.plannedDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        // Déjà au bon format, on ne fait rien
-      } else {
-        // Si c'est un objet Date, on le convertit
-        try {
+        } else {
+           try {
           const date = new Date(backendDelivery.plannedDate);
           backendDelivery.plannedDate = date.toISOString().split('T')[0];
         } catch (e) {
@@ -32,13 +27,9 @@ export class DeliveriesService {
         }
       }
     }
-    
     if (backendDelivery.effectiveDate) {
-      // Vérifie que c'est bien une chaîne au format date
       if (typeof backendDelivery.effectiveDate === 'string' && backendDelivery.effectiveDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        // Déjà au bon format, on ne fait rien
       } else {
-        // Si c'est un objet Date, on le convertit
         try {
           const date = new Date(backendDelivery.effectiveDate);
           backendDelivery.effectiveDate = date.toISOString().split('T')[0];

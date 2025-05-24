@@ -4,12 +4,14 @@ import { Observable } from 'rxjs';
 import { TeamMember } from '../model/TeamMember.model';
 import * as XLSX from 'xlsx';
 import { WorkEntry } from '../model/work-entry.model';
+import { TeamMemberHistory } from '../model/TeamMemberHistory.model';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class TeamMemberService {
-  private apiUrl = 'http://localhost:8080/teamMembers'; // URL du backend
+  private apiUrl = 'http://localhost:8080/teamMembers';
 
   constructor(private http: HttpClient) { }
 
@@ -27,9 +29,6 @@ export class TeamMemberService {
 
   addTeamMember(teamMember: TeamMember): Observable<TeamMember> {
     return this.http.post<TeamMember>(`${this.apiUrl}`, teamMember);
-  }
-  updateTeamMember(id: number, teamMember: TeamMember): Observable<TeamMember> {
-    return this.http.put<TeamMember>(`${this.apiUrl}/${id}`, teamMember);
   }
   deleteTeamMember(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
@@ -67,6 +66,24 @@ export class TeamMemberService {
 
   getWorkEntriesByMember(memberId: number) {
   return this.http.get<WorkEntry[]>(`/api/work-entries/member/${memberId}`);
+}
+getMemberById(id: number): Observable<TeamMember> {
+  return this.http.get<TeamMember>(`http://localhost:8080/teamMembers/${id}`);
+}
+
+// Méthode pour récupérer l'historique d'un membre
+getMemberHistory(memberId: number): Observable<TeamMemberHistory[]> {
+  return this.http.get<TeamMemberHistory[]>(`${this.apiUrl}/history/${memberId}`);
+}
+
+// Méthode pour sauvegarder une modification dans l'historique
+saveMemberHistory(history: TeamMemberHistory): Observable<TeamMemberHistory> {
+  return this.http.post<TeamMemberHistory>(`${this.apiUrl}/history`, history);
+}
+
+// Méthode modifiée pour mettre à jour un membre avec historique
+updateTeamMember(id: number, member: TeamMember): Observable<TeamMember> {
+  return this.http.put<TeamMember>(`${this.apiUrl}/${id}`, member);
 }
 
 }

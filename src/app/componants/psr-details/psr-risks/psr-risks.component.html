@@ -1,1 +1,251 @@
-<p>psr-risks works!</p>
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <h3 class="text-primary mb-0">
+              <i class="fas fa-exclamation-triangle me-2"></i> Project Risks
+            </h3>
+            <button class="btn btn-outline-success btn-sm" (click)="openAddModal()">
+              <i class="fas fa-plus me-1"></i> Add Risk
+            </button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+           <table class="table table-bordered table-hover text-center shadow-sm">
+              <colgroup>
+                <col style="width: 50px;">
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+                <col>
+              </colgroup>
+              <thead class="bg-light">
+                <tr>
+                  <th colspan="9" class="text-center py-3">Risk Identification</th>
+                  <th colspan="2" class="text-center py-3 bg-warning">Risk analysis</th>
+                  <th colspan="2" class="text-center py-3 bg-warning">Risk assessment</th>
+                  <th colspan="5" class="text-center py-3">Risk treatment</th>
+                  <th rowspan="2" class="text-center py-3">Actions</th>
+                </tr>
+                <tr>
+                  <th class="py-3">Id</th>
+                  <th class="py-3">Risk</th>
+                  <th class="py-3">Origin</th>
+                  <th class="py-3">Category</th>
+                  <th class="py-3">Open Date</th>
+                  <th class="py-3">Due Date</th>
+                  <th class="py-3">Causes</th>
+                  <th class="py-3">Consequences</th>
+                  <th class="py-3">Applied Measures</th>
+                  <th class="py-3 bg-warning">Probability</th>
+                  <th class="py-3 bg-warning">Gravity</th>
+                  <th class="py-3 bg-warning">Criticality</th>
+                  <th class="py-3 bg-warning">Measure</th>
+                  <th class="py-3">Risk Treatment Decision</th>
+                  <th class="py-3">Justification</th>
+                  <th class="py-3">Id Action</th>
+                  <th class="py-3">Risk Stat</th>
+                  <th class="py-3">Close Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let risk of risks; let i = index"
+                 [ngClass]="{ 
+                  'table-secondary': i % 2 === 0
+                 }"
+                >
+                  <td class="align-middle">{{ risk.id }}</td>
+                  <td class="align-middle">{{ risk.description }}</td>
+                  <td class="align-middle">{{ risk.origin }}</td>
+                  <td class="align-middle">{{ risk.category }}</td>
+                  <td class="align-middle">{{ risk.openDate | date:'shortDate' }}</td>
+                  <td class="align-middle">{{ risk.dueDate | date:'shortDate' }}</td>
+                  <td class="align-middle">{{ risk.causes }}</td>
+                  <td class="align-middle">{{ risk.consequences }}</td>
+                  <td class="align-middle">{{ risk.appliedMeasures }}</td>
+                  <td class="align-middle">{{ risk.probability }}</td>
+                  <td class="align-middle">{{ risk.gravity }}</td>
+                  <td class="align-middle">{{ risk.criticality }}</td>
+                  <td class="align-middle">{{ risk.measure }}</td>
+                  <td class="align-middle">{{ risk.riskTreatmentDecision }}</td>
+                  <td class="align-middle">{{ risk.justification }}</td>
+                  <td class="align-middle">{{ risk.idAction }}</td>
+                  <td class="align-middle">{{ risk.riskStat }}</td>
+                  <td class="align-middle">{{ risk.closeDate | date:'shortDate' }}</td>
+                  <td class="align-middle text-center">
+                    <div class="px-4 text-end">
+                      <button class="btn btn-sm btn-outline-primary" (click)="editRisk(risk)" title="Edit">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-danger" (click)="deleteRisk(risk.id!)" title="Delete">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Risk -->
+<div class="modal fade" id="riskModal" tabindex="-1" aria-labelledby="riskModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title" id="riskModalLabel">
+           <i class="fas" [ngClass]="{'fa-plus': !editingRisk.id, 'fa-pencil-alt': editingRisk.id}"></i>
+          {{ editingRisk.id ? 'Edit Risk' : 'Add Risk' }}
+          </h5>
+        <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form class="row g-3">
+
+          <!-- Risk Identification -->
+          <div class="col-md-2" *ngIf="editingRisk.id">
+            <label class="form-label">Id</label>
+            <input type="text" class="form-control" [(ngModel)]="editingRisk.id" name="id" readonly />
+          </div>
+          <div class="col-md-10">
+            <label class="form-label">Description *</label>
+            <input type="text" class="form-control" [(ngModel)]="editingRisk.description" name="description" required />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Origin</label>
+            <input type="text" class="form-control" [(ngModel)]="editingRisk.origin" name="origin" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Category</label>
+            <input type="text" class="form-control" [(ngModel)]="editingRisk.category" name="category" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Open Date</label>
+            <input type="date" class="form-control" [(ngModel)]="editingRisk.openDate" name="openDate" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Due Date</label>
+            <input type="date" class="form-control" [(ngModel)]="editingRisk.dueDate" name="dueDate" />
+          </div>
+          <div class="col-12">
+            <label class="form-label">Causes</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.causes" name="causes"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Consequences</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.consequences" name="consequences"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Applied Measures</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.appliedMeasures" name="appliedMeasures"></textarea>
+          </div>
+
+          <!-- Risk Analysis -->
+          <div class="col-md-4">
+            <label class="form-label" title="1- Improbable <10%\n2- Occasional [10% - 40%[\n3- Probable [40% - 80%[\n4- Frequent >= 80%">Probability</label>
+            <select class="form-select" [(ngModel)]="editingRisk.probability" name="probability">
+              <option value="">Select Probability</option>
+              <option value="Improbable">Improbable</option>
+              <option value="Occasional">Occasional</option>
+              <option value="Probable">Probable</option>
+              <option value="Frequent">Frequent</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" title="1- Negligible : noticeable problem inconvenience / altered performance / low additional cost can therefore be neglected\n2- Marginal : serious problem dissatisfaction / reduced performance / reduced margins / medium additional cost\n3- Critical : Worrying situation complaint / degraded performance / possible delay / significant additional cost\n4- Catastrophic : Crisis situation penalties / unachievable performance / assured delay /biggest additional cost">Gravity</label>
+            <select class="form-select" [(ngModel)]="editingRisk.gravity" name="gravity">
+              <option value="">Select Gravity</option>
+              <option value="Negligible">Negligible</option>
+              <option value="Marginal">Marginal</option>
+              <option value="Critical">Critical</option>
+              <option value="Catastrophic">Catastrophic</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Criticality</label>
+            <input type="text" class="form-control" [(ngModel)]="editingRisk.criticality" name="criticality" />
+          </div>
+
+          <!-- Risk Assessment -->
+          <div class="col-12">
+            <label class="form-label">Measure</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.measure" name="measure"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Risk Assessment</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.riskAssessment" name="riskAssessment"></textarea>
+          </div>
+
+          <!-- Risk Treatment -->
+          <div class="col-12">
+            <label class="form-label">Risk Treatment Decision</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.riskTreatmentDecision" name="riskTreatmentDecision"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Justification</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.justification" name="justification"></textarea>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Id Action</label>
+            <input type="text" class="form-control" [(ngModel)]="editingRisk.idAction" name="idAction" />
+          </div>
+          <div class="col-md-6">
+            <label class="form-label" title="Closed = mastered; attenuated">Risk Status</label>
+            <select class="form-select" [(ngModel)]="editingRisk.riskStat" name="riskStat">
+              <option value="">Select Status</option>
+              <option value="Open">Open</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Close Date</label>
+            <input type="date" class="form-control" [(ngModel)]="editingRisk.closeDate" name="closeDate" />
+          </div>
+
+           <!-- Additional Information -->
+          <div class="col-12">
+            <label class="form-label">Impact</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.impact" name="impact"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Mitigation Plan</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.mitigationPlan" name="mitigationPlan"></textarea>
+          </div>
+
+
+        </form>
+      </div>
+       <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          <i class="fas fa-times me-1"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-success" (click)="saveRisk()">
+          <i class="fas fa-save me-1"></i> Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

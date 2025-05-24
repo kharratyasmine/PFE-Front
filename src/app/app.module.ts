@@ -4,6 +4,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { CommonModule } from '@angular/common';
+import { NgxEchartsModule } from 'ngx-echarts';
+import { NgChartsModule } from 'ng2-charts';
 
 // Composants
 import { AppComponent } from './app.component';
@@ -23,6 +27,28 @@ import { DemandesComponent } from './componants/demandes/demandes.component';
 import { LoginComponent } from './componants/login/login.component';
 import { RegisterComponent } from './componants/register/register.component';
 import { TeamMemberDetailsComponent } from './componants/team-member-details/team-member-details.component';
+import { DevisDetailsComponent } from './componants/devis-details/devis-details.component';
+import { SummaryComponent } from './componants/devis-details/summary/summary.component';
+import { WorkloadComponent } from './componants/devis-details/workload/workload.component';
+import { FinancialComponent } from './componants/devis-details/financial/financial.component';
+import { InvoicingComponent } from './componants/devis-details/invoicing/invoicing.component';
+import { HistoryComponent } from './componants/devis-details/history/history.component';
+import { PlannedWorkloadMemberComponent } from './componants/planned-workload-member/planned-workload-member.component';
+import { ExcelImportComponent } from './componants/excel-import/excel-import.component';
+import { PsrComponent } from './componants/psr/psr.component';
+import { PsrDetailsComponent } from './componants/psr-details/psr-details.component';
+import { DeliveriesComponent } from './componants/psr-details/deliveries/deliveries.component';
+import { PsrCoverComponent } from './componants/psr-details/psr-cover/psr-cover.component';
+import { PsrWeeklyComponent } from './componants/psr-details/psr-weekly/psr-weekly.component';
+import { PsrRisksComponent } from './componants/psr-details/psr-risks/psr-risks.component';
+import { PsrPlanningComponent } from './componants/psr-details/psr-planning/psr-planning.component';
+import { TeamOrganizationComponent } from './componants/psr-details/team-organization/team-organization.component';
+import { AuditLogComponent } from './componants/audit-log/audit-log.component';
+import { ValidateUserComponent } from './componants/validate-user/validate-user.component';
+import { TaskTrakerComponent } from './componants/psr-details/task-traker/task-traker.component';
+import { DashboardAdminComponent } from './componants/dashboard-admin/dashboard-admin.component';
+import { DashboardManagerComponent } from './componants/dashboard-manager/dashboard-manager.component';
+import { DashboardDirectionComponent } from './componants/dashboard-direction/dashboard-direction.component';
 
 // Modules externes
 import { NgxDropzoneModule } from 'ngx-dropzone';
@@ -46,24 +72,7 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { AuthInterceptor } from './services/auth.interceptor';
-import { DevisDetailsComponent } from './componants/devis-details/devis-details.component';
-import { SummaryComponent } from './componants/devis-details/summary/summary.component';
-import { WorkloadComponent } from './componants/devis-details/workload/workload.component';
-import { FinancialComponent } from './componants/devis-details/financial/financial.component';
-import { InvoicingComponent } from './componants/devis-details/invoicing/invoicing.component';
-import { HistoryComponent } from './componants/devis-details/history/history.component';
-import { PlannedWorkloadMemberComponent } from './componants/planned-workload-member/planned-workload-member.component';
-import { ExcelImportComponent } from './componants/excel-import/excel-import.component';
-import { PsrComponent } from './componants/psr/psr.component';
-import { PsrDetailsComponent } from './componants/psr-details/psr-details.component';
-import { DeliveriesComponent } from './componants/psr-details/deliveries/deliveries.component';
-import { PsrCoverComponent } from './componants/psr-details/psr-cover/psr-cover.component';
-import { PsrWeeklyComponent } from './componants/psr-details/psr-weekly/psr-weekly.component';
-import { PsrRisksComponent } from './componants/psr-details/psr-risks/psr-risks.component';
-import { PsrPlanningComponent } from './componants/psr-details/psr-planning/psr-planning.component';
-import { NgxEchartsModule } from 'ngx-echarts';
-import { TeamOrganizationComponent } from './componants/psr-details/team-organization/team-organization.component';
-
+import { ToastrModule } from 'ngx-toastr';
 
 // Fonction de chargement i18n
 export function HttpLoaderFactory(http: HttpClient) {
@@ -105,12 +114,12 @@ export function HttpLoaderFactory(http: HttpClient) {
     PsrRisksComponent,
     PsrPlanningComponent,
     TeamOrganizationComponent,
-   
-
-   
-  
- 
-  
+    AuditLogComponent,
+    ValidateUserComponent,
+    TaskTrakerComponent,
+    DashboardAdminComponent,
+    DashboardManagerComponent,
+    DashboardDirectionComponent,
   ],
   imports: [
     BrowserModule,
@@ -119,31 +128,49 @@ export function HttpLoaderFactory(http: HttpClient) {
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    NgxDropzoneModule,
-    NgxMatSelectSearchModule,
-    NgxPaginationModule,
-     NgxEchartsModule, 
-    // Initialisation d'angular-calendar avec DateAdapter (basé sur date-fns)
-    CalendarModule.forRoot({
-      provide: DateAdapter,
-      useFactory: adapterFactory
-    }),
-    // Modules Angular Material
+    CommonModule,
+    NgbModule,
+    
+    // Material Modules
     MatCardModule,
     MatTableModule,
     MatIconModule,
     MatDatepickerModule,
-    MatNativeDateModule, 
+    MatNativeDateModule,
     MatFormFieldModule,
     MatSelectModule,
     MatButtonModule,
+    
+    // Third Party Modules
+    NgxDropzoneModule,
+    NgxMatSelectSearchModule,
+    NgxPaginationModule,
+    NgxEchartsModule.forRoot({
+      echarts: () => import('echarts')
+    }),
+    NgChartsModule,
+    
+    // Calendar
+    CalendarModule.forRoot({
+      provide: DateAdapter,
+      useFactory: adapterFactory
+    }),
+    
+    // Toastr
+    ToastrModule.forRoot({
+      timeOut: 4000,
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true,
+    }),
+    
+    // Translation
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
         deps: [HttpClient]
       }
-    }),
+    })
   ],
   providers: [
     {

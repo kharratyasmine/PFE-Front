@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 
 html, body { height: 100%; }
 body {
@@ -11,7 +12,7 @@ body {
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
-/* Forcer l’overlay Angular Material au-dessus de tout */
+/* Forcer l'overlay Angular Material au-dessus de tout */
 .cdk-overlay-container,
 .cdk-overlay-connected-position-bounding-box {
   z-index: 999999 !important;
@@ -22,3 +23,15 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 
+/* S'applique à toutes les tables */
+table {
+  width: 100% !important;
+ 
+}
+
+
+.container {
+  max-width: 100% !important;
+  padding-left: 40 !important;
+  padding-right: 40 !important;
+}

@@ -1,0 +1,112 @@
+<div class="audit-log-container p-4">
+  <!-- Header Section -->
+  <div class="header-section mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <div class="icon-wrapper me-3">
+          <i class="bi bi-clock-history"></i>
+        </div>
+        <h4 class="mb-0 fw-bold">{{ 'action history' | translate }}</h4>
+      </div>
+      <button class="btn btn-export" (click)="exportToExcel()">
+        <i class="bi bi-file-earmark-excel me-2"></i>{{ 'export to excel' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section mb-4">
+    <div class="row g-3">
+      <div class="col-md-5">
+        <div class="filter-card">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-person-fill"></i>
+            </span>
+            <input [(ngModel)]="filterUser" 
+                   [placeholder]="'filter by user' | translate" 
+                   class="form-control">
+            <button class="btn btn-filter" (click)="filterByUser()">
+              <i class="bi bi-search me-1"></i>{{ 'filter' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <div class="filter-card">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-folder-fill"></i>
+            </span>
+            <input [(ngModel)]="filterProject" 
+                   [placeholder]="'filter by entity' | translate" 
+                   class="form-control">
+            <button class="btn btn-filter-secondary" (click)="filterByProject()">
+              <i class="bi bi-search me-1"></i>{{ 'filter' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Section -->
+  <div class="table-section">
+    <div class="table-responsive">
+      <table class="table table-modern">
+        <thead>
+          <tr>
+            <th><i class="bi bi-person me-2"></i>{{ 'user' | translate }}</th>
+            <th><i class="bi bi-activity me-2"></i>{{ 'action' | translate }}</th>
+            <th><i class="bi bi-folder me-2"></i>{{ 'entity' | translate }}</th>
+            <th><i class="bi bi-calendar3 me-2"></i>{{ 'date' | translate }}</th>
+            <th><i class="bi bi-info-circle me-2"></i>{{ 'details' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of logs">
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="user-avatar me-2">
+                  <i class="bi bi-person-circle"></i>
+                </div>
+                <span>{{ log.username }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="action-badge" [ngClass]="{
+                'action-create': log.action.includes('create'),
+                'action-update': log.action.includes('update'),
+                'action-delete': log.action.includes('delete')
+              }">
+                <i class="bi" [ngClass]="{
+                  'bi-plus-circle': log.action.includes('create'),
+                  'bi-pencil': log.action.includes('update'),
+                  'bi-trash': log.action.includes('delete')
+                }"></i>
+                {{ log.action }}
+              </span>
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-folder2 me-2"></i>
+                <span>{{ log.entityAffected }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-clock me-2"></i>
+                <span>{{ log.timestamp | date:'short' }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="details-cell">
+                <pre class="mb-0">{{ log.parameters }}</pre>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

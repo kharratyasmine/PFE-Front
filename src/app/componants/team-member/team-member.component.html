@@ -25,9 +25,9 @@
       <a href="TeamMemberGrid" class="btn btn-outline-gray me-2 active">
         <i class="feather-list"></i>
       </a>
-      <a routerLink="/TeamMemberGrid" class="btn btn-outline-gray me-2">
+    <!--  <a routerLink="/TeamMemberGrid" class="btn btn-outline-gray me-2">
         <i class="feather-grid"></i>
-      </a>
+      </a>-->
       <button class="btn btn-primary me-2" (click)="downloadExcel()">
         <i class="fas fa-download"></i>
       </button>
@@ -72,7 +72,7 @@
 
         </td>
 
-        
+
         <td class="text-uppercase">{{ member.jobTitle }}</td>
         <!--   <td>
           <span *ngFor="let day of member.holiday" class="badge badge-transparent">
@@ -91,9 +91,14 @@
         <td>
 
           <div class="d-flex justify-content-end align-items-center">
-
+            <a [routerLink]="['/team-member', member.id]" class="btn btn-outline-success btn-sm me-2">
+              <i class="fas fa-eye"></i>
+            </a>
             <button class="btn btn-outline-success btn-sm me-2" (click)="openModal(member)">
               <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-outline-info btn-sm me-2" (click)="openHistoryModal(member)">
+                <i class="fas fa-history"></i>
             </button>
             <button class="btn btn-outline-danger btn-sm" (click)="deleteTeamMember(member.id!)">
               <i class="fas fa-trash"></i>
@@ -211,3 +216,40 @@
       </div>
     </div>
   </div>
+
+    <!-- Modale d'affichage de l'historique d'un membre -->
+    <div class="modal fade" id="memberHistoryModal" tabindex="-1" aria-labelledby="memberHistoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="memberHistoryModalLabel">
+                        <i class="fas fa-history me-2"></i>
+                        {{ 'Modification History for' | translate }} {{ selectedMember.name }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div *ngIf="memberHistory.length > 0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item" *ngFor="let change of memberHistory">
+                                Le champ <strong>{{ change.fieldName | titlecase }}</strong> a été modifié :
+                                De "<span class="text-danger">{{ change.oldValue }}</span>"
+                                à "<span class="text-success">{{ change.newValue }}</span>".
+                                <br>
+                                <small class="text-muted">
+                                    Le {{ change.modifiedDate | date:'short' }} par {{ change.modifiedBy || 'System' }}
+                                </small>
+                            </li>
+                        </ul>
+                    </div>
+                    <div *ngIf="memberHistory.length === 0" class="alert alert-info text-center" role="alert">
+                        Aucune modification enregistrée pour ce membre.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ {{ 'CLOSE' | translate }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

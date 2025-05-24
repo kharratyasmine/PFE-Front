@@ -42,4 +42,72 @@ export class ExcelService {
       xlsx.writeFile(workbook, fileName);
     });
   }
+
+  exportStyledExcel(data: any[], fileName: string): void {
+  import('xlsx').then(xlsx => {
+    const worksheet: any = {};
+
+    const headers = Object.keys(data[0]);
+    headers.forEach((key, colIndex) => {
+      const cellAddress = xlsx.utils.encode_cell({ r: 0, c: colIndex });
+      worksheet[cellAddress] = {
+        v: key,
+        t: 's',
+        s: { font: { bold: true }, alignment: { horizontal: 'center' } }
+      };
+    });
+
+    data.forEach((row, rowIndex) => {
+      headers.forEach((key, colIndex) => {
+        const value = row[key];
+        const cellAddress = xlsx.utils.encode_cell({ r: rowIndex + 1, c: colIndex });
+
+        worksheet[cellAddress] = {
+          v: value?.value ?? value,
+          t: typeof value?.value === 'number' ? 'n' : 's',
+          s: {
+            font: {
+              color: {
+                rgb: value?.color === 'red' ? 'FF0000' :
+                     value?.color === 'blue' ? '0000FF' : '000000'
+              }
+            }
+          }
+        };
+      });
+    });
+
+    worksheet['!ref'] = xlsx.utils.encode_range({
+      s: { r: 0, c: 0 },
+      e: { r: data.length, c: headers.length - 1 }
+    });
+
+    const workbook = {
+      SheetNames: ['Data'],
+      Sheets: { Data: worksheet }
+    };
+
+    const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+  });
+}
+
+exportDynamicExcel(data: any[], fileName: string): void {
+  const hasColor = data.some(row =>
+    Object.values(row).some((cell: any) => cell && typeof cell === 'object' && 'color' in cell)
+  );
+
+  if (hasColor) {
+    this.exportStyledExcel(data, fileName);
+  } else {
+    this.exportToExcel(data, fileName);
+  }
+}
+
+
 }

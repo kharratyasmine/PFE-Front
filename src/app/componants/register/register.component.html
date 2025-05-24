@@ -1,157 +1,410 @@
-<div class="login-background position-relative" style="min-height: 100vh; background-color: #f5f7fa; overflow: hidden;">
-  <!-- Motifs d'arrière-plan décoratifs -->
-  <div class="position-absolute" style="top: -100px; right: -100px; width: 300px; height: 300px; border-radius: 50%; background: linear-gradient(45deg, #007bff, #00a7fd); opacity: 0.1;"></div>
-  <div class="position-absolute" style="bottom: -150px; left: -150px; width: 400px; height: 400px; border-radius: 50%; background: linear-gradient(45deg, #007bff, #0056b3); opacity: 0.1;"></div>
-  <div class="position-absolute" style="top: 20%; right: 10%; width: 20px; height: 20px; border-radius: 50%; background-color: #007bff; opacity: 0.3;"></div>
-  <div class="position-absolute" style="top: 30%; left: 15%; width: 15px; height: 15px; border-radius: 50%; background-color: #007bff; opacity: 0.2;"></div>
-  <div class="position-absolute" style="bottom: 20%; right: 20%; width: 25px; height: 25px; border-radius: 50%; background-color: #007bff; opacity: 0.2;"></div>
-  <div class="position-absolute" style="top: 60%; left: 5%; width: 10px; height: 10px; border-radius: 50%; background-color: #007bff; opacity: 0.3;"></div>
-  <div class="position-absolute" style="top: 80%; right: 30%; width: 12px; height: 12px; border-radius: 50%; background-color: #007bff; opacity: 0.2;"></div>
-  
-  <!-- Lignes décoratives -->
-  <div class="position-absolute" style="top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(#007bff 1px, transparent 1px); background-size: 50px 50px; opacity: 0.03;"></div>
+<div class="login-wrapper">
+  <!-- Left Side - Branding -->
+  <div class="brand-side">
+    <div class="brand-content">
+      <div class="logo-wrapper">
+        <img src="../../../assets/img/telnet-logo.jpg" alt="Telnet Logo" class="brand-logo">
+      </div>
+      <p class="brand-subtitle">Votre portail de gestion de projets</p>
+      <div class="brand-decoration">
+        <div class="decoration-circle"></div>
+        <div class="decoration-line"></div>
+      </div>
+    </div>
+  </div>
 
-  <!-- Conteneur principal -->
-  <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh; position: relative; z-index: 1;">
-    <div class="row justify-content-center w-100">
-      <div class="col-md-10 col-xl-9">
-        <div class="card border-0 rounded-4 shadow-lg overflow-hidden">
-          <div class="row g-0">
-            <!-- Côté gauche - Image -->
-            <div class="col-lg-5 bg-primary position-relative">
-              <!-- Motif décoratif sur le côté gauche -->
-              <div class="position-absolute w-100 h-100" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 40 40\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.1\'%3E%3Cpath d=\'M0 0h20v20H0V0zm20 20h20v20H20V20z\'%3E%3C/path%3E%3C/g%3E%3C/svg%3E'); background-size: 30px 30px;"></div>
-              
-              <div class="d-flex flex-column justify-content-center align-items-center p-4 h-100 position-relative">
-                <div class="text-center text-white">
-                  <div class="bg-white rounded-circle mx-auto p-4 d-flex align-items-center justify-content-center mb-4 shadow-sm" style="width: 180px; height: 180px;">
-                    <img src="../../../assets/img/telnet-logo.jpg" alt="Telnet Logo" class="img-fluid" style="max-width: 140px;">
-                  </div>
-                  <h3 class="fw-bold mb-3">WorkPilot</h3>
-                  <p class="mb-0 opacity-75">Votre portail de gestion de projets</p>
-                </div>
+  <!-- Right Side - Register Form -->
+  <div class="form-side">
+    <div class="form-container">
+      <div class="form-header">
+        <h2>Créer un compte</h2>
+        <p>Rejoignez-nous et commencez à gérer vos projets</p>
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="register()" class="login-form" novalidate>
+        <!-- First Name & Last Name -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-field">
+              <label for="firstname">Prénom</label>
+              <div class="input-wrapper">
+                <i class="fas fa-user"></i>
+                <input id="firstname" type="text" placeholder="Prénom" formControlName="firstname">
+              </div>
+              <div class="error-message"
+                *ngIf="registerForm.get('firstname')?.touched && registerForm.get('firstname')?.invalid">
+                Prénom requis (min. 2 caractères)
               </div>
             </div>
-            
-            <!-- Côté droit - Formulaire -->
-            <div class="col-lg-7">
-              <div class="card-body p-4 p-lg-5">
-                <div class="d-lg-none text-center mb-4">
-                  <img src="../../../assets/img/telnet-logo.jpg" alt="Telnet Logo" class="img-fluid" style="max-width: 100px;">
-                </div>
-                
-                <h2 class="fw-bold text-primary mb-4">Créer un compte</h2>
-                
-                <!-- Formulaire d'inscription -->
-                <form [formGroup]="registerForm" (ngSubmit)="register()">
-                  <!-- Prénom & Nom -->
-                  <div class="row mb-3">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                      <label for="firstname" class="form-label">Prénom</label>
-                      <div class="input-group">
-                        <span class="input-group-text">
-                          <i class="fas fa-user text-primary"></i>
-                        </span>
-                        <input id="firstname" class="form-control" formControlName="firstname" placeholder="Prénom">
-                      </div>
-                      <div class="text-danger small mt-1" *ngIf="registerForm.get('firstname')?.touched && registerForm.get('firstname')?.invalid">
-                        Prénom requis (min. 2 caractères)
-                      </div>
-                    </div>
-                
-                    <div class="col-md-6">
-                      <label for="lastname" class="form-label">Nom</label>
-                      <div class="input-group">
-                        <span class="input-group-text">
-                          <i class="fas fa-user text-primary"></i>
-                        </span>
-                        <input id="lastname" class="form-control" formControlName="lastname" placeholder="Nom">
-                      </div>
-                      <div class="text-danger small mt-1" *ngIf="registerForm.get('lastname')?.touched && registerForm.get('lastname')?.invalid">
-                        Nom requis (min. 2 caractères)
-                      </div>
-                    </div>
-                  </div>
-                
-                  <!-- Email -->
-                  <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <div class="input-group">
-                      <span class="input-group-text">
-                        <i class="fas fa-envelope text-primary"></i>
-                      </span>
-                      <input id="email" type="email" class="form-control" formControlName="email" placeholder="Email">
-                    </div>
-                    <div class="text-danger small mt-1" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
-                      Email invalide ou requis
-                    </div>
-                  </div>
-                
-                  <!-- Password -->
-                  <div class="row mb-3">
-                    <div class="col-md-6 mb-3 mb-md-0">
-                      <label for="password" class="form-label">Mot de passe</label>
-                      <div class="input-group">
-                        <span class="input-group-text">
-                          <i class="fas fa-lock text-primary"></i>
-                        </span>
-                        <input id="password" type="password" class="form-control" formControlName="password" placeholder="Mot de passe">
-                      </div>
-                    </div>
-                
-                    <div class="col-md-6">
-                      <label for="confirmPassword" class="form-label">Confirmer</label>
-                      <div class="input-group">
-                        <span class="input-group-text">
-                          <i class="fas fa-lock text-primary"></i>
-                        </span>
-                        <input id="confirmPassword" type="password" class="form-control" formControlName="confirmPassword" placeholder="Confirmation">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="text-danger small mb-3" *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched">
-                    <i class="fas fa-exclamation-circle me-1"></i> Les mots de passe ne correspondent pas
-                  </div>
-                
-                  <!-- Rôle -->
-                  <div class="mb-4">
-                    <label for="role" class="form-label">Rôle</label>
-                    <div class="input-group">
-                      <span class="input-group-text">
-                        <i class="fas fa-user-tag text-primary"></i>
-                      </span>
-                      <select id="role" class="form-select" formControlName="role">
-                        <option value="" disabled selected>Choisir un rôle</option>
-                        <option value="USER">Utilisateur</option>
-                        <option value="ADMIN">Admin</option>
-                        <option value="MANAGER">Manager</option>
-                        <option value="QUALITE">QUALITE</option>
-                      </select>
-                    </div>
-                  </div>
-                
-                  <!-- Submit -->
-                  <button class="btn btn-primary w-100 py-2 mb-3" type="submit" [disabled]="loading || registerForm.invalid">
-                    <span *ngIf="!loading"><i class="fas fa-user-plus me-2"></i>S'inscrire</span>
-                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    <span *ngIf="loading">Création...</span>
-                  </button>
-                
-                  <!-- Redirection -->
-                  <div class="text-center mt-3 pt-3 border-top">
-                    <p class="mb-0">Déjà inscrit? 
-                      <a routerLink="/login" class="text-decoration-none fw-medium text-primary ms-1">
-                        Connectez-vous
-                      </a>
-                    </p>
-                  </div>
-                </form>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-field">
+              <label for="lastname">Nom</label>
+              <div class="input-wrapper">
+                <i class="fas fa-user"></i>
+                <input id="lastname" type="text" placeholder="Nom" formControlName="lastname">
+              </div>
+              <div class="error-message"
+                *ngIf="registerForm.get('lastname')?.touched && registerForm.get('lastname')?.invalid">
+                Nom requis (min. 2 caractères)
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Email -->
+        <div class="form-field">
+          <label for="email">Email</label>
+          <div class="input-wrapper">
+            <i class="fas fa-envelope"></i>
+            <input id="email" type="email" placeholder="Email" formControlName="email">
+          </div>
+          <div class="error-message" *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid">
+            Email invalide ou requis
+          </div>
+        </div>
+
+        <!-- Password & Confirm Password -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-field">
+              <label for="password">Mot de passe</label>
+              <div class="input-wrapper">
+                <i class="fas fa-lock"></i>
+                <input id="password" type="password" placeholder="Mot de passe" formControlName="password">
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="form-field">
+              <label for="confirmPassword">Confirmer</label>
+              <div class="input-wrapper">
+                <i class="fas fa-lock"></i>
+                <input id="confirmPassword" type="password" placeholder="Confirmation"
+                  formControlName="confirmPassword">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="error-message"
+          *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')?.touched">
+          <i class="fas fa-exclamation-circle"></i> Les mots de passe ne correspondent pas
+        </div>
+
+        <!-- Role -->
+        <div class="form-field">
+          <label for="role">Rôle</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user-tag"></i>
+            <select id="role" class="form-select" formControlName="role" required>
+              <option value="" disabled selected hidden>Choisir un rôle</option>
+              <option value="ADMIN">Direction </option>
+              <option value="RESPONSABLE_PROJET">Responsable Projet</option>
+              <option value="RESPONSABLE_QUALITE">Responsable Qualité</option>
+              <option value="COORDINATEUR_QUALITE">Coordinateur Qualité</option>
+              <option value="INGENIEUR">Ingénieur</option>
+            </select>
+
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn" [disabled]="loading || registerForm.invalid">
+          <span *ngIf="!loading">
+            <i class="fas fa-user-plus"></i> S'inscrire
+          </span>
+          <span *ngIf="loading" class="spinner"></span>
+          <span *ngIf="loading">Création...</span>
+        </button>
+
+        <!-- Login Link -->
+        <div class="register-section">
+          <p>Déjà inscrit? <a routerLink="/login">Connectez-vous</a></p>
+        </div>
+      </form>
+      <div *ngIf="successMessage" class="alert alert-success" style="margin-bottom: 1rem;">
+        <i class="fas fa-check-circle"></i> {{ successMessage }}
       </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger" style="margin-bottom: 1rem;">
+        <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+      </div>
+
     </div>
   </div>
 </div>
-  
+
+<style>
+  .login-wrapper {
+    display: flex;
+    min-height: 100vh;
+    background: #f8f9fa;
+  }
+
+  /* Brand Side Styles */
+  .brand-side {
+    flex: 1;
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-content {
+    text-align: center;
+    color: white;
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo-wrapper {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 30px;
+    padding: 3rem;
+    margin-bottom: 2rem;
+    display: inline-block;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .brand-logo {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+  }
+
+  .brand-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+
+  .brand-decoration {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .decoration-circle {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    top: -200px;
+    right: -200px;
+  }
+
+  .decoration-line {
+    position: absolute;
+    width: 200px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Form Side Styles */
+  .form-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .form-container {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .form-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .form-header h2 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-header p {
+    color: #6c757d;
+    font-size: 1rem;
+  }
+
+  .form-field {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-field label {
+    display: block;
+    color: #2c3e50;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  .input-wrapper {
+    position: relative;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .input-wrapper:focus-within {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .input-wrapper i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+  }
+
+  .input-wrapper input,
+  .input-wrapper select {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: transparent;
+  }
+
+  .input-wrapper input:focus,
+  .input-wrapper select:focus {
+    outline: none;
+  }
+
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%236c757d' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+  }
+
+  .error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+  }
+
+  .submit-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ffffff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .register-section {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #6c757d;
+  }
+
+  .register-section a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .register-section a:hover {
+    text-decoration: underline;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 991px) {
+    .login-wrapper {
+      flex-direction: column;
+    }
+
+    .brand-side {
+      padding: 3rem 1rem;
+    }
+
+    .brand-logo {
+      width: 150px;
+      height: 150px;
+    }
+
+    .form-side {
+      padding: 2rem 1rem;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .brand-side {
+      padding: 2rem 1rem;
+    }
+
+    .brand-logo {
+      width: 120px;
+      height: 120px;
+    }
+
+    .form-container {
+      padding: 0 1rem;
+    }
+
+    .form-header h2 {
+      font-size: 1.75rem;
+    }
+  }
+</style>

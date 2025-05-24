@@ -1,0 +1,195 @@
+<div class="container-fluid mt-4">
+  <div class="card shadow-lg border-0 rounded-3">
+    <div class="card-header bg-white py-3 border-bottom">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary fw-bold">
+          <i class="fas fa-tasks me-2"></i>Suivi des Tâches
+        </h5>
+      </div>
+    </div>
+
+    <div class="card-body p-0">
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+      </div>
+      <div *ngIf="error" class="alert alert-danger m-3" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+      </div>
+
+      <div *ngIf="!loading && groupedTasksByWeek.length" class="task-table-container">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <!-- Colonnes fixes -->
+                <th class="py-3 px-4 fixed-column">ID Tâche</th>
+                <th class="py-3 px-4 fixed-column">Projet</th>
+                <th class="py-3 px-4 fixed-column">Description</th>
+                <!-- Colonnes scrollables -->
+                <th *ngFor="let col of dynamicColumns" class="py-3 px-4">{{ col.label }}</th>
+                <th class="py-3 px-4 text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let group of groupedTasksByWeek">
+                <tr class="table-secondary">
+                  <td [attr.colspan]="dynamicColumns.length + 4" class="fw-bold">Week: {{ group.week }}</td>
+                </tr>
+                <tr *ngFor="let task of group.tasks" class="border-bottom">
+                  <!-- Colonnes fixes -->
+                  <td class="px-4 fixed-column">{{ task.id }}</td>
+                  <td class="px-4 fixed-column">{{ task.projectId }}</td>
+                  <td class="px-4 fixed-column">{{ task.description }}</td>
+                  <!-- Colonnes scrollables -->
+                  <td class="px-4">{{ task.who }}</td>
+                  <td class="px-4">{{ task.week }}</td>
+                  <td class="px-4">{{ task.startDate | date: 'dd/MM/yyyy' }}</td>
+                  <td class="px-4">{{ task.estimatedEndDate | date: 'dd/MM/yyyy' }}</td>
+                  <td class="px-4">{{ task.effectiveEndDate | date: 'dd/MM/yyyy' }}</td>
+                  <td class="px-4">{{ task.estimatedMD }}</td>
+                  <td class="px-4">{{ task.workedMD }}</td>
+                  <td class="px-4">{{ task.remainingMD }}</td>
+                  <td class="px-4" style="min-width: 150px;">
+                    <div class="progress rounded-pill" style="height: 20px;">
+                      <div class="progress-bar" [style.width.%]="task.progress" [ngClass]="{
+                        'bg-success': task.progress >= 80,
+                        'bg-warning': task.progress >= 50 && task.progress < 80,
+                        'bg-danger': task.progress < 50
+                      }">
+                        <span class="fw-bold text-black">{{ task.progress }}%</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4">
+                    <span class="badge rounded-pill" [ngClass]="{
+                      'bg-success': task.currentStatus === 'Terminé',
+                      'bg-warning': task.currentStatus === 'En cours',
+                      'bg-danger': task.currentStatus === 'En retard',
+                      'bg-info': task.currentStatus === 'Planifié'
+                    }">
+                      {{ task.currentStatus }}
+                    </span>
+                  </td>
+                  <td class="px-4" [ngClass]="{ 'text-danger': task.effortVariance! > 0, 'text-success': task.effortVariance! <= 0 }">
+                    <i class="fas" [ngClass]="{
+                      'fa-arrow-up': task.effortVariance! > 0,
+                      'fa-arrow-down': task.effortVariance! <= 0
+                    }"></i>
+                    {{ task.effortVariance | number: '1.0-2' }}%
+                  </td>
+                  <td class="px-4">{{ task.deviationReason }}</td>
+                  <td class="px-4">{{ task.note }}</td>
+                  <td class="px-4 text-end">
+                    <button class="btn btn-sm btn-outline-primary" (click)="openEditModal(task)" title="Modifier">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="deleteTask(task.id!)" title="Supprimer">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div *ngIf="!loading && !groupedTasksByWeek.length" class="text-center text-muted py-5">
+        <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+        <p class="mb-0">Aucune tâche trouvée pour ce projet.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de modification -->
+<ng-template #editTaskModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Modifier la Tâche</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="taskForm">
+      <!-- Champs fixes -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label class="form-label">ID Tâche</label>
+          <input type="text" class="form-control" [value]="selectedTask?.id" readonly>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Description</label>
+          <input type="text" class="form-control" [value]="selectedTask?.description" readonly>
+        </div>
+      </div>
+
+      <!-- Champs modifiables -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label class="form-label">Responsable</label>
+          <input type="text" class="form-control" formControlName="who">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Semaine</label>
+          <input type="text" class="form-control" formControlName="week">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Statut</label>
+          <select class="form-select" formControlName="currentStatus">
+            <option value="Planifié">Planifié</option>
+            <option value="En cours">En cours</option>
+            <option value="Terminé">Terminé</option>
+            <option value="En retard">En retard</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label class="form-label">Date de début</label>
+          <input type="date" class="form-control" formControlName="startDate">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Date de fin estimée</label>
+          <input type="date" class="form-control" formControlName="estimatedEndDate">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Date de fin effective</label>
+          <input type="date" class="form-control" formControlName="effectiveEndDate">
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <label class="form-label">MD Estimés</label>
+          <input type="number" class="form-control" formControlName="estimatedMD">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">MD Travaillés</label>
+          <input type="number" class="form-control" formControlName="workedMD">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">MD Restants</label>
+          <input type="number" class="form-control" formControlName="remainingMD">
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Raison de la déviation</label>
+          <textarea class="form-control" formControlName="deviationReason" rows="2"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Note</label>
+          <textarea class="form-control" formControlName="note" rows="2"></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Annuler</button>
+    <button type="button" class="btn btn-primary" (click)="saveTask(); modal.close()">Enregistrer</button>
+  </div>
+</ng-template>
+

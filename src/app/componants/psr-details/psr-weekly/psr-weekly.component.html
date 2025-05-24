@@ -1,137 +1,157 @@
 <div class="container-fluid">
-  <!-- En-tête du rapport -->
-  <div class="row mb-3">
-    <div class="col-12 text-center">
-      <h5 class="fw-bold">Weekly Report</h5>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
     </div>
+    <p class="mt-2 text-muted">Chargement des données...</p>
   </div>
 
-  <!-- Section: Heures travaillées par projet/module -->
-  <div class="card mb-4">
-    <div class="card-header bg-light">
-      <h6 class="mb-0">Hours Worked by Project / Module</h6>
+  <!-- Error State -->
+  <div *ngIf="error" class="alert alert-danger m-3" role="alert">
+    <i class="fas fa-exclamation-circle me-2"></i>
+    {{ error }}
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!loading && !error">
+    <!-- Weekly Reports -->
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Rapports Hebdomadaires</h5>
+        <button class="btn btn-primary" (click)="openAddReportModal()">
+          <i class="fas fa-plus me-2"></i>Nouveau Rapport
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Projet</th>
+                <th>Semaine</th>
+                <th>Jours travaillés</th>
+                <th>Jours estimés</th>
+                <th>Variance d'effort</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let report of weeklyReports">
+                <td>{{ report.projectName }}</td>
+                <td>{{ report.week }}</td>
+                <td>{{ report.workingDays }}</td>
+                <td>{{ report.estimatedDays }}</td>
+                <td [ngClass]="{'text-success': report.effortVariance! > 0, 'text-danger': report.effortVariance! < 0}">
+                  {{ report.effortVariance | percent }}
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-outline-primary me-2" (click)="openEditReportModal(report)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteWeeklyReport(report.id!)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="table-primary">
+                <td colspan="2"><strong>Total</strong></td>
+                <td><strong>{{ getTotalWorkingDays() }}</strong></td>
+                <td><strong>{{ getTotalEstimatedDays() }}</strong></td>
+                <td [ngClass]="{'text-success': getTotalVariancePercentage() > 0, 'text-danger': getTotalVariancePercentage() < 0}">
+                  <strong>{{ getTotalVariancePercentage() | percent }}</strong>
+                </td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-bordered table-sm">
-          <thead class="table-light">
-            <tr>
-              <th>Project</th>
-              <th>Worked Days</th>
-              <th>Estimated Days</th>
-              <th>Effort Variance (%)</th>
-              <th>Chart</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let report of weeklyReports">
-              <td>{{ report.projectName }}</td>
-              <td class="text-center">{{ report.workingDays }}</td>
-              <td class="text-center">{{ report.estimatedDays }}</td>
-              <td class="text-center" [ngClass]="{'text-danger bg-danger-subtle': report.effortVariance > 0}">
-                {{ (report.effortVariance * 100) | number:'1.0-0' }}%
-              </td>
-              <td>
-                <div class="progress" style="height: 20px;">
-                  <div class="progress-bar bg-success" 
-                       [style.width]="(report.workingDays / report.estimatedDays * 100) + '%'"
-                       [attr.aria-valuenow]="report.workingDays"
-                       aria-valuemin="0" 
-                       [attr.aria-valuemax]="report.estimatedDays">
-                    {{ report.workingDays }}
-                  </div>
-                  <div class="progress-bar bg-danger" 
-                       *ngIf="report.effortVariance > 0"
-                       [style.width]="(report.effortVariance * 100) + '%'">
-                    {{ (report.effortVariance * report.estimatedDays) | number:'1.0-1' }}
-                  </div>
+
+    <!-- Effort Variance Chart -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="mb-0">Variance d'Effort par Semaine</h5>
+      </div>
+      <div class="card-body">
+        <canvas baseChart
+          [data]="lineChartData"
+          [options]="lineChartOptions"
+          [type]="'line'">
+        </canvas>
+      </div>
+    </div>
+
+    <!-- Monthly Effort -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">Effort Mensuel</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Mois</th>
+                <th>Variance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="mb-0">Courbe de Variance d'Effort</h5>
                 </div>
-              </td>
-            </tr>
-            <tr class="table-secondary fw-bold">
-              <td>Totals</td>
-              <td class="text-center">{{ getTotalWorkingDays() }}</td>
-              <td class="text-center">{{ getTotalEstimatedDays() }}</td>
-              <td class="text-center" [ngClass]="{'text-danger bg-danger-subtle': getTotalVariancePercentage() > 0}">
-                {{ getTotalVariancePercentage() | number:'1.0-0' }}%
-              </td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+                <div class="card-body">
+                  
 
-      <!-- Graphique hebdomadaire -->
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="chart-container" style="position: relative; height:200px;">
-            <canvas id="weeklyWorkloadChart"></canvas>
-          </div>
+
+                </div>
+              </div>
+
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Section: Effort Variance -->
-  <div class="card mb-4">
-    <div class="card-header bg-light">
-      <h6 class="mb-0">Effort Variance</h6>
-    </div>
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-6">
-          <h6 class="text-center mb-3">Weekly Effort Variance</h6>
-          <div class="chart-container" style="position: relative; height:200px;">
-            <canvas id="weeklyEffortChart"></canvas>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <h6 class="text-center mb-3">Monthly Consolidated Effort Variance</h6>
-          <div class="chart-container" style="position: relative; height:200px;">
-            <canvas id="monthlyEffortChart"></canvas>
-          </div>
-        </div>
+<!-- Add/Edit Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reportModalLabel">{{ isEditing ? 'Modifier' : 'Ajouter' }} Rapport Hebdomadaire</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-    </div>
-  </div>
-
-  <!-- Section: Actions -->
-  <div class="card">
-    <div class="card-header bg-light">
-      <h6 class="mb-0">Actions</h6>
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-bordered table-sm">
-          <thead class="table-light">
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Risk</th>
-              <th>Who</th>
-              <th>What</th>
-              <th>When</th>
-              <th>Status</th>
-              <th>Owner</th>
-              <th>Priority</th>
-              <th>Comments</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let action of actions">
-              <td>{{ action.date | date:'dd/MM/yyyy' }}</td>
-              <td>{{ action.type }}</td>
-              <td>{{ action.risk }}</td>
-              <td>{{ action.who }}</td>
-              <td>{{ action.what }}</td>
-              <td>{{ action.when | date:'dd/MM/yyyy' }}</td>
-              <td>{{ action.status }}</td>
-              <td>{{ action.owner }}</td>
-              <td>{{ action.priority }}</td>
-              <td>{{ action.comments }}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="modal-body">
+        <form [formGroup]="reportForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label for="projectName" class="form-label">Projet</label>
+            <input type="text" class="form-control" id="projectName" formControlName="projectName" required>
+          </div>
+          <div class="mb-3">
+            <label for="week" class="form-label">Semaine</label>
+            <input type="week" class="form-control" id="week" formControlName="week" required>
+          </div>
+          <div class="mb-3">
+            <label for="workingDays" class="form-label">Jours travaillés</label>
+            <input type="number" class="form-control" id="workingDays" formControlName="workingDays" required>
+          </div>
+          <div class="mb-3">
+            <label for="estimatedDays" class="form-label">Jours estimés</label>
+            <input type="number" class="form-control" id="estimatedDays" formControlName="estimatedDays" required>
+          </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary ms-2" [disabled]="!reportForm.valid">
+              {{ isEditing ? 'Mettre à jour' : 'Ajouter' }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

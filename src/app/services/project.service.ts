@@ -51,9 +51,14 @@ export class ProjectService {
 
 
   // 🔹 Supprimer un projet par ID
-  deleteProject(id: number): Observable<any> {
-    return this.http.delete(`http://localhost:8080/projects/${id}`, { responseType: 'text' });
-    }
+  deleteProject(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Erreur lors de la suppression du projet:', error);
+        return throwError(() => new Error('Erreur lors de la suppression du projet'));
+      })
+    );
+  }
   downloadExcel(project: Project[]): Observable<Blob> {
     const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(project);
     const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };

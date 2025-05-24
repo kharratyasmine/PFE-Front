@@ -12,27 +12,28 @@
           <div class="d-flex flex-column">
             <div class="d-flex align-items-center mb-2">
               <i class="fas fa-file-invoice text-primary me-2 fs-4"></i>
-              <h4 class="mb-0 text-primary fw-bold">PSR n° {{ psr?.reference }}</h4>
+              <h4 class="mb-0 text-primary fw-bold">{{ 'psr_number' | translate }} {{ psr?.reference }}</h4>
             </div>
             <div class="text-muted small d-flex flex-wrap gap-3">
-              <div><i class="fas fa-user me-1"></i><strong>Auteur :</strong> {{ psr?.authorName || 'Non spécifié' }}</div>
-              <div><i class="fas fa-tag me-1"></i><strong>Édition :</strong> {{ psr?.edition || 'Non spécifié' }}</div>
-              <div><i class="fas fa-calendar-alt me-1"></i><strong>Date :</strong> {{ psr?.reportDate | date }}</div>
-              <div><i class="fas fa-lightbulb me-1"></i><strong>Statut :</strong> 
+              <div><i class="fas fa-user me-1"></i><strong>{{ 'author' | translate }} :</strong> {{ psr?.authorName || ('not_specified' | translate) }}</div>
+              <div><i class="fas fa-tag me-1"></i><strong>{{ 'edition' | translate }} :</strong> {{ psr?.edition || ('not_specified' | translate) }}</div>
+              <div><i class="fas fa-calendar-alt me-1"></i><strong>{{ 'date' | translate }} :</strong> {{ psr?.reportDate | date }}</div>
+              <div><i class="fas fa-lightbulb me-1"></i><strong>{{ 'status' | translate }} :</strong> 
                 <span [ngClass]="{
                   'badge bg-success': psr?.overallStatus === 'Completed',
                   'badge bg-warning text-dark': psr?.overallStatus === 'In Progress',
                   'badge bg-danger': psr?.overallStatus === 'Blocked',
                   'badge bg-info': psr?.overallStatus !== 'Completed' && psr?.overallStatus !== 'In Progress' && psr?.overallStatus !== 'Blocked'
-                }">{{ psr?.overallStatus || 'Non spécifié' }}</span>
+                }">{{ psr?.overallStatus || ('psr_details.not_specified' | translate) }}</span>
               </div>
             </div>
           </div>
         
           <!-- Right Side: Buttons -->
           <div class="d-flex gap-2 mt-2 mt-md-0">
-            <button type="button" class="btn btn-outline-primary btn-sm" (click)="downloadPsr()" *ngIf="psr?.id">
-              <i class="fas fa-download me-1"></i> Télécharger
+            <button type="button" class="btn btn-outline-primary btn-sm" (click)="downloadPsr()" *ngIf="psr?.id" [disabled]="isLoading">
+              <i class="fas" [ngClass]="isLoading ? 'fa-spinner fa-spin' : 'fa-download'"></i> 
+              {{ isLoading ? ('downloading' | translate) : ('download' | translate) }}
             </button>
             <button type="button" class="btn btn-outline-secondary btn-sm" (click)="activeModal.dismiss()">
               <i class="fas fa-times"></i>
@@ -41,42 +42,63 @@
         </div>
       </div>
 
+      <!-- Message d'erreur -->
+      <div class="alert alert-danger m-3" *ngIf="showError" role="alert">
+        <div class="d-flex justify-content-between align-items-center">
+          <span>{{ errorMessage }}</span>
+          <button type="button" class="btn-close" (click)="closeError()" aria-label="Close"></button>
+        </div>
+      </div>
+
       <!-- Body -->
       <div class="modal-body">
         <!-- Loading Indicator -->
-        <div class="text-center py-5" *ngIf="!psr">
+        <div class="text-center py-5" *ngIf="isLoading">
           <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Chargement...</span>
+            <span class="visually-hidden">{{ 'loading' | translate }}</span>
           </div>
-          <p class="mt-2 text-muted">Chargement des détails du PSR...</p>
+          <p class="mt-2 text-muted">{{ 'loading_details' | translate }}</p>
         </div>
 
         <!-- Content When Loaded -->
-        <div *ngIf="psr">
+        <div *ngIf="psr && !isLoading">
+          <!-- Filtre -->
+          <div class="mb-3">
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-search"></i>
+              </span>
+              <input type="text" class="form-control" 
+                     [placeholder]="'search' | translate"
+                     [(ngModel)]="filterCriteria"
+                     (ngModelChange)="filterData($event)">
+            </div>
+          </div>
+
           <ul class="nav nav-tabs">
             <li class="nav-item">
               <a class="nav-link" [class.active]="activeTab === 'teamOrganization'" (click)="setActiveTab('teamOrganization')">
-                <i class="fas fa-users me-1"></i> Team Organization
+                <i class="fas fa-users me-1"></i> {{ 'team_organization' | translate }}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="activeTab === 'taskTraker'" (click)="setActiveTab('taskTraker')">
+                <i class="fas fa-tasks me-1"></i> {{ 'task_tracker' | translate }}
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" [class.active]="activeTab === 'weekly'" (click)="setActiveTab('weekly')">
-                <i class="fas fa-calendar-week me-1"></i> Weekly Report
+                <i class="fas fa-calendar-week me-1"></i> {{ 'weekly_report' | translate }}
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" [class.active]="activeTab === 'risks'" (click)="setActiveTab('risks')">
-                <i class="fas fa-exclamation-triangle me-1"></i> Risks
+                <i class="fas fa-exclamation-triangle me-1"></i> {{ 'risks' | translate }}
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" [class.active]="activeTab === 'deliveries'" (click)="setActiveTab('deliveries')">
-                <i class="fas fa-truck me-1"></i> Deliveries
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" [class.active]="activeTab === 'planning'" (click)="setActiveTab('planning')">
-                <i class="fas fa-project-diagram me-1"></i> Planning
+                <i class="fas fa-truck me-1"></i> {{ 'deliveries' | translate }}
               </a>
             </li>
           </ul>
@@ -84,6 +106,9 @@
           <div class="tab-content mt-3">
             <div *ngIf="activeTab === 'teamOrganization'" class="tab-pane fade show active">
               <app-team-organization *ngIf="psr.id" [psrId]="psr.id"></app-team-organization>
+            </div>
+            <div *ngIf="activeTab === 'taskTraker'" class="tab-pane fade show active">
+              <app-task-traker *ngIf="psr.id" [psrId]="psr.id"></app-task-traker>
             </div>
             <div *ngIf="activeTab === 'weekly'" class="tab-pane fade show active">
               <app-psr-weekly *ngIf="psr.id" [psrId]="psr.id"></app-psr-weekly>
@@ -93,9 +118,6 @@
             </div>
             <div *ngIf="activeTab === 'deliveries'" class="tab-pane fade show active">
               <app-deliveries *ngIf="psr.id" [psrId]="psr.id"></app-deliveries>
-            </div>
-            <div *ngIf="activeTab === 'planning'" class="tab-pane fade show active">
-              <app-psr-planning *ngIf="psr.id" [psrId]="psr.id"></app-psr-planning>
             </div>
           </div>
         </div>

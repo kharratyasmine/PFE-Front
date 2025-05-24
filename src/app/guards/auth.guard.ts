@@ -13,13 +13,20 @@ export class AuthGuard implements CanActivate {
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean | UrlTree {
-    if (this.authService.isAuthenticated()) {
-      return true;
+    const isAuthenticated = this.authService.isAuthenticated();
+
+    if (!isAuthenticated) {
+      return this.router.createUrlTree(['/login'], {
+        queryParams: { returnUrl: state.url }
+      });
     }
 
-    // ❌ Pas connecté : on redirige avec retour vers la page demandée après connexion
-    return this.router.createUrlTree(['/login'], {
-      queryParams: { returnUrl: state.url }
-    });
+    const allowedRoles = route.data['roles'] as string[] | undefined;
+
+    if (allowedRoles && !allowedRoles.includes(this.authService.getCurrentUserRole())) {
+      return this.router.createUrlTree(['/unauthorized']);
+    }
+
+    return true;
   }
 }

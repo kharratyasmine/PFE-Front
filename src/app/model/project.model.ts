@@ -11,37 +11,36 @@ export interface Project {
   name: string;
   projectType: string;
   description: string;
-  startDate: string; // Format "yyyy-MM-dd" reçu de l'API
+  startDate: string; 
   endDate: string;
   technologie: string;
   activity: string;
-  status: Status;
-  clientId: null;
+  status: Status; // Utilisez l'enum
+  clientId: number | null;
   client?: Client;
-  userId: null;
-  userName: string;
+  userId: number | null; // Changé de 'null' à 'number | null'
+  userName?: string; // Rendez-le optionnel
   user?: User;
-  teams: Team[]; 
-  teamIds?: number[]; 
-  demandes: Demande[]; 
-  devisList: Devis[];
-  
+  teams?: Team[];
+  teamIds?: number[];
+  demandes?: Demande[]; 
+  devisList?: Devis[];
 }
 
 export interface ProjectDTO {
   id?: number;
   name: string;
-  projectType: string;
   description: string;
+  projectType: string;
   startDate: string;
   endDate: string;
-  technologie: string;
+  status: Status; // Utilisez l'enum ici aussi
   activity: string;
-  status: Status;
+  technologie: string;
   clientId: number | null;
   userId: number | null;
-  teamIds: number[];
 }
+
 
 
 export enum Status { 
