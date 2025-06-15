@@ -2,9 +2,9 @@
   <thead class="table-primary">
     <tr>
       <th style="width: 5%">N°</th>
-      <th>Description</th>
-      <th>Invoicing Date</th>
-      <th>Amount (€)</th>
+      <th>{{ 'Description' | translate }}</th>
+      <th>{{ 'Invoicing Date' | translate }}</th>
+      <th>{{ 'Amount' | translate }} (€)</th>
     </tr>
   </thead>
   <tbody>
@@ -17,7 +17,7 @@
   </tbody>
   <tfoot *ngIf="invoicingDetails.length > 0">
     <tr class="fw-bold table-secondary">
-      <td colspan="3" class="text-end">Total Cost</td>
+      <td colspan="3" class="text-end">{{ 'Total Cost' | translate }}</td>
       <td>{{ totalAmount | number:'1.0-2' }}</td>
     </tr>
   </tfoot>

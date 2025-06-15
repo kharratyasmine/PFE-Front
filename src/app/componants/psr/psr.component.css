@@ -441,20 +441,53 @@ thead th {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background-color: #e3f2fd;
     padding: 0.5rem 1rem;
-    border-radius: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
 }
 
 .week-label {
-    color: #1976d2;
     font-weight: 500;
+    color: #495057;
 }
 
 .week-value {
-    color: #1565c0;
+    color: #0d6efd;
     font-weight: 600;
-    font-size: 1.1rem;
+}
+
+.dropdown .btn-link {
+    color: #6c757d;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.dropdown .btn-link:hover {
+    background-color: #e9ecef;
+    color: #0d6efd;
+}
+
+.dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #e9ecef;
+}
+
+.dropdown-item i {
+    color: #6c757d;
 }
 
 /* Current Week Row Highlight */
@@ -469,4 +502,11 @@ tr.current-week:hover {
 .current-week-badge {
     background-color: #1976d2 !important;
     color: white !important;
+}
+
+.week-selector {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: 1rem;
 }

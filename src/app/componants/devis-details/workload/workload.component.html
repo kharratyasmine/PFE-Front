@@ -2,13 +2,13 @@
   <thead class="table-primary">
     <tr>
       <th style="width: 5%;">N</th>
-      <th>Period</th>
-      <th>Estimated workload per Resource (Man/day)</th>
-      <th>Public holidays</th>
-      <th>Number of Resources</th>
-      <th>Total Estimated Workload</th>
-      <th>Note</th>
-      <th>Action</th>
+      <th>{{ 'Period' | translate }}</th>
+      <th>{{ 'Estimated workload per Resource' | translate }}</th>
+      <th>{{ 'Public holidays' | translate }}</th>
+      <th>{{ 'Number of Resources' | translate }}</th>
+      <th>{{ 'Total Estimated Workload' | translate }}</th>
+      <th>{{ 'Note' | translate }}</th>
+      <th>{{ 'Action' | translate }}</th>
     </tr>
   </thead>
   <tbody>
@@ -36,7 +36,7 @@
 
     <!-- ✅ Ligne de total général -->
     <tr class="table-secondary fw-bold">
-      <td colspan="6">Total général</td>
+      <td colspan="6">{{ 'General Total' | translate }}</td>
       <td>{{ totalWorkload }}</td>
       <td></td>
     </tr>
@@ -47,35 +47,35 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Modifier Workload</h5>
+        <h5 class="modal-title">{{ 'Edit Workload' | translate }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" *ngIf="selectedRow">
         <div class="mb-2">
-          <label>Estimated workload per Resource</label>
+          <label>{{ 'Estimated workload per Resource' | translate }}</label>
           <input type="number" class="form-control" [(ngModel)]="selectedRow.estimatedWorkload">
         </div>
         <div class="mb-2">
-          <label>Public holidays</label>
+          <label>{{ 'Public holidays' | translate }}</label>
           <input type="number" class="form-control" [(ngModel)]="selectedRow.publicHolidays">
         </div>
         <div class="mb-2">
-          <label>Number of Resources</label>
+          <label>{{ 'Number of Resources' | translate }}</label>
           <input type="number" class="form-control" [(ngModel)]="selectedRow.numberOfResources">
         </div>
         <div class="mb-2">
-          <label>Total Estimated Workload</label>
+          <label>{{ 'Total Estimated Workload' | translate }}</label>
           <input type="number" class="form-control" [(ngModel)]="selectedRow.totalEstimatedWorkload">
         </div>
         
         <div class="mb-2">
-          <label>Note</label>
+          <label>{{ 'Note' | translate }}</label>
           <input type="text" class="form-control" [(ngModel)]="selectedRow.note">
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-        <button class="btn btn-success" (click)="updateRow()">Enregistrer</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">{{ 'Cancel' | translate }}</button>
+        <button class="btn btn-success" (click)="updateRow()">{{ 'Save' | translate }}</button>
       </div>
     </div>
   </div>

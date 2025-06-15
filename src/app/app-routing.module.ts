@@ -5,7 +5,6 @@ import { TeamComponent } from './componants/team/team.component';
 import { ProjectTaskComponent } from './componants/project-task/project-task.component';
 import { ClientComponent } from './componants/client/client.component';
 import { ProjectComponent } from './componants/project/project.component';
-import { DashboardComponent } from './componants/dashboard/dashboard.component';
 import { TeamMemberGridComponent } from './componants/team-member-grid/team-member-grid.component';
 import { MyProfilComponent } from './componants/my-profil/my-profil.component';
 import { ProjectDetailsComponent } from './componants/project-details/project-details.component';
@@ -34,17 +33,17 @@ import { TeamOrganizationComponent } from './componants/psr-details/team-organiz
 import { AuditLogComponent } from './componants/audit-log/audit-log.component';
 import { ValidateUserComponent } from './componants/validate-user/validate-user.component';
 import { TaskTrakerComponent } from './componants/psr-details/task-traker/task-traker.component';
-import { DashboardQualiteComponent } from './componants/dashboard-qualite/dashboard-qualite.component';
-import { DashboardManagerComponent } from './componants/dashboard-manager/dashboard-manager.component';
 import { DashboardAdminComponent } from './componants/dashboard-admin/dashboard-admin.component';
-import { DashboardDirectionComponent } from './componants/dashboard-direction/dashboard-direction.component';
-
-
+import { PlannedWorkloadComponent } from './componants/dashboard-admin/planned-workload/planned-workload.component';
+import { PsrHistoryComponent } from './componants/psr-history/psr-history.component';
+import { TasksTimeShestsComponent } from './componants/dashboard-admin/tasks-time-shests/tasks-time-shests.component';
+import { TeamOrgaDashboardComponent } from './componants/dashboard-admin/team-orga-dashboard/team-orga-dashboard.component';
+import { AdminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent }, // ✅ Remis ici
   { path: 'register', component: RegisterComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  //{ path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'TeamMember', component: TeamMemberComponent, canActivate: [AuthGuard] },
   { path: 'TeamMemberGrid', component: TeamMemberGridComponent, canActivate: [AuthGuard] },
   { path: 'Client', component: ClientComponent, canActivate: [AuthGuard] },
@@ -56,11 +55,13 @@ const routes: Routes = [
   { path: 'logs', component: AuditLogComponent, canActivate: [AuthGuard], data: { roles: ['ADMIN'] } },
   { path: 'validate-user', component: ValidateUserComponent },
   { path: 'team-member/:id', component: TeamMemberDetailsComponent },
-  { path: 'dashboard/admin', component: DashboardAdminComponent },
-  { path: 'dashboard/manager', component: DashboardManagerComponent },
-  { path: 'dashboard/direction', component: DashboardDirectionComponent },
-  {path: 'dashboard/qualite', component: DashboardQualiteComponent},
-  {path: 'project/:id', component: ProjectDetailsComponent, children: [
+  { path: 'dashboard', component: DashboardAdminComponent , canActivate: [AuthGuard]},
+  { path: 'dashboard/plannedworkload', component: PlannedWorkloadComponent },
+  { path: 'dashboard/tasksTimeSheets', component: TasksTimeShestsComponent },
+  { path: 'dashboard/team-orga-dashboard', component: TeamOrgaDashboardComponent },
+  //{ path: 'psrHistroy', component: PsrHistoryComponent },
+  {
+    path: 'project/:id', component: ProjectDetailsComponent, children: [
       { path: 'demandes', component: DemandesComponent },
       { path: 'team', component: TeamComponent },
       { path: 'plannedWorkloadMember', component: PlannedWorkloadMemberComponent },
@@ -85,17 +86,26 @@ const routes: Routes = [
     ]
   },
   {
-    path: 'devisDetails/:devisId', component: DevisDetailsComponent,
+    path: 'devis/:id',
+    component: DevisDetailsComponent,
     children: [
       { path: '', redirectTo: 'summary', pathMatch: 'full' },
       { path: 'summary', component: SummaryComponent },
       { path: 'history', component: HistoryComponent },
-      { path: 'financial', component: FinancialComponent },
-      { path: 'invoicing', component: InvoicingComponent },
-      { path: 'workload', component: WorkloadComponent }
-
+      { path: 'workload', component: WorkloadComponent },
+      { 
+        path: 'financial', 
+        component: FinancialComponent,
+        canActivate: [AdminGuard]
+      },
+      { 
+        path: 'invoicing', 
+        component: InvoicingComponent,
+        canActivate: [AdminGuard]
+      }
     ]
   },
+  
 
   { path: 'project/:projectId/psr/:psrId', component: PsrDetailsComponent },
   { path: 'project/:projectId/devis/:devisId', component: DevisDetailsComponent },

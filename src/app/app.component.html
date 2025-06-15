@@ -62,7 +62,7 @@
                   <div class="flex-grow-1">
                     <div class="d-flex justify-content-between align-items-start">
                       <div [class.fw-bold]="!notif.read">{{ notif.message }}</div>
-                      <small class="text-muted">{{ getNotificationTime(notif.timestamp) }}</small>
+                      <small class="text-muted">{{ getNotificationTime(notif.createdAt) }}</small>
                     </div>
                   </div>
                 </a>
@@ -87,8 +87,13 @@
 
           <!-- Profil -->
           <div class="dropdown d-flex align-items-center">
-            <img *ngIf="userImage" [src]="'http://localhost:8080' + userImage" alt="Profile" width="32"
-              height="32" class="rounded-circle me-2" />
+            <img *ngIf="userImage" 
+                 [src]="userImage.startsWith('http') ? userImage : 'http://localhost:8080/uploads/' + userImage" 
+                 alt="Profile" 
+                 width="32"
+                 height="32" 
+                 class="rounded-circle me-2"
+                 />
 
 
             <div class="text-start d-none d-md-block">
@@ -128,9 +133,37 @@
               <a class="nav-link" [routerLink]="getDashboardRoute()" routerLinkActive="active"
                 [style.borderLeft]="isActive(getDashboardRoute()) ? '3px solid #3498db' : '3px solid transparent'"
                 [style.background]="isActive(getDashboardRoute()) ? 'rgba(255,255,255,0.1)' : 'transparent'"
-                style="color: white;">
+                style="color: white;"
+                (click)="toggleDashboardMenu()">
                 <i class="fas fa-home me-2"></i> Dashboard
+                <i class="fas fa-chevron-down float-end" [class.rotate]="isDashboardMenuOpen"></i>
               </a>
+              <ul class="submenu" [class.show]="isDashboardMenuOpen">
+                <li>
+                  <a class="nav-link" routerLink="/dashboard/plannedworkload" routerLinkActive="active"
+                    [style.borderLeft]="isActive('/dashboard/plannedworkload') ? '3px solid #3498db' : '3px solid transparent'"
+                    [style.background]="isActive('/dashboard/plannedworkload') ? 'rgba(255,255,255,0.1)' : 'transparent'"
+                    style="color: white; padding-left: 2.5rem;">
+                    <i class="fas fa-calendar-alt me-2"></i> Planned Workload
+                  </a>
+                </li>
+                <li>
+                  <a class="nav-link" routerLink="/dashboard/tasksTimeSheets" routerLinkActive="active"
+                    [style.borderLeft]="isActive('/dashboard/tasksTimeSheets') ? '3px solid #3498db' : '3px solid transparent'"
+                    [style.background]="isActive('/dashboard/tasksTimeSheets') ? 'rgba(255,255,255,0.1)' : 'transparent'"
+                    style="color: white; padding-left: 2.5rem;">
+                    <i class="fas fa-clock me-2"></i> Tasks Time Sheets
+                  </a>
+                </li>
+                <li>
+                  <a class="nav-link" routerLink="/dashboard/team-orga-dashboard" routerLinkActive="active"
+                    [style.borderLeft]="isActive('/dashboard/team-orga-dashboard') ? '3px solid #3498db' : '3px solid transparent'"
+                    [style.background]="isActive('/dashboard/team-orga-dashboard') ? 'rgba(255,255,255,0.1)' : 'transparent'"
+                    style="color: white; padding-left: 2.5rem;">
+                    <i class="fas fa-users-cog me-2"></i> Team Organization
+                  </a>
+                </li>
+              </ul>
             </li>
 
             <li>

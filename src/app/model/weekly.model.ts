@@ -1,10 +1,14 @@
-
+// --- 1. weekly-report.model.ts ---
 export interface WeeklyReport {
-  id?: number;
-  psrId: number;
+  id: number;
+  month: string;
+  weekNumber: number;
+  year: number;
   projectName: string;
-  week: string;
   workingDays: number;
   estimatedDays: number;
-  effortVariance?: number;
+  effortVariance: number;
+  psrId: number;
+  week: string;
+  
 }

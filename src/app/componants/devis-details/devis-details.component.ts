@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DevisService } from '../../services/devis.service';
 import { Devis } from 'src/app/model/devis.model';
 import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-devis-details',
@@ -23,13 +24,16 @@ export class DevisDetailsComponent implements OnInit {
   customerPartial: { [name: string]: boolean } = {};
   customerComplete: { [name: string]: boolean } = {};
   
-
+  currentUser: any;
 
   constructor(
     private route: ActivatedRoute,
     private devisService: DevisService,
     public activeModal: NgbActiveModal,
-  ) { }
+    private authService: AuthService
+  ) {
+    this.currentUser = this.authService.getCurrentUser();
+  }
 
   ngOnInit(): void {
     const idFromUrl = Number(this.route.snapshot.paramMap.get('devisId'));
@@ -48,7 +52,7 @@ export class DevisDetailsComponent implements OnInit {
         this.devis = data;
         console.log("Nom du client :", this.devis.project?.client?.salesManagers);
         console.log("Nom de l'utilisateur :", this.devis.project?.userName);
-            },
+      },
       error: err => console.error('Erreur lors du chargement des détails du devis :', err)
     });
   }

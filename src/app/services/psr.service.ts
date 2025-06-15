@@ -40,4 +40,8 @@ export class PsrService {
     });
   }
   
+  getByProjectAndYear(projectId: number, year: number) {
+  return this.http.get<any[]>(`/psr/project/${projectId}/year/${year}`);
+}
+
 }

@@ -1,0 +1,172 @@
+.dashboard-container {
+  padding: 20px;
+  background: linear-gradient(to bottom, #ffffff, #e8f0fe);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header {
+  margin-bottom: 25px;
+  padding: 20px;
+  background: linear-gradient(135deg, #174ea6, #1a73e8);
+  border-radius: 10px;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header h2 {
+  color: white;
+  font-size: 24px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-header h2 i {
+  font-size: 28px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #dadce0;
+}
+
+.dashboard-table thead th {
+  background: linear-gradient(to right, #e8f0fe, #ffffff);
+  color: #174ea6;
+  font-weight: 600;
+  padding: 15px 12px;
+  border-bottom: 2px solid #dadce0;
+}
+
+.dashboard-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.dashboard-table tbody tr:hover {
+  background-color: #f6fafe;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-table tbody td {
+  color: #202124;
+}
+
+/* Styles pour les cartes (planned-workload) */
+.card {
+  border: none;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #174ea6, #1a73e8) !important;
+  color: white;
+  font-weight: 600;
+  padding: 15px;
+}
+
+.card-body {
+  padding: 0;
+}
+
+.table {
+  margin: 0;
+}
+
+.table th {
+  background-color: #e8f0fe;
+  color: #174ea6;
+  font-weight: 600;
+}
+
+.table-info {
+  background-color: #e8f0fe !important;
+  color: #174ea6 !important;
+}
+
+/* Styles communs pour les tableaux */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  font-weight: 600;
+  color: #174ea6;
+}
+
+td {
+  color: #202124;
+}
+
+/* Styles pour les listes (holidays) */
+.holiday-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.holiday-list li {
+  color: #1a73e8;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+/* Styles pour les icônes */
+i {
+  color: #1a73e8;
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .dashboard-container {
+    padding: 10px;
+  }
+  
+  .dashboard-header {
+    padding: 15px;
+  }
+  
+  .dashboard-header h2 {
+    font-size: 20px;
+  }
+  
+  .dashboard-table {
+    font-size: 13px;
+  }
+  
+  .dashboard-table th,
+  .dashboard-table td {
+    padding: 8px;
+  }
+  
+  .card-header {
+    padding: 10px;
+  }
+} 

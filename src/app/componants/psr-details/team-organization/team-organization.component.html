@@ -1,6 +1,6 @@
 <div class="table-responsive p-3">
   <!-- En-tête avec la semaine -->
-  <div class="week-header mb-4">
+  <div class="week-header mb-4" *ngIf="psr">
     <div class="d-flex align-items-center justify-content-between">
       <div>
         <h4 class="text-primary mb-2">
@@ -84,11 +84,13 @@
             </span>
           </td>
           <td>
-            <span *ngIf="member.holiday" class="badge bg-warning text-dark">
-              <i class="fas fa-calendar-day me-1"></i>
-              {{ member.holiday | date: 'dd/MM/yyyy' }}
-            </span>
-            <span *ngIf="!member.holiday" class="text-muted">
+            <ng-container *ngIf="member.holidayDetails && member.holidayDetails.length > 0">
+              <div *ngFor="let holidayDetail of member.holidayDetails" class="badge bg-warning text-dark mb-1 d-block">
+                <i class="fas fa-calendar-day me-1"></i>
+                {{ holidayDetail.date | date: 'dd/MM/yyyy' }} - {{ holidayDetail.type }}
+              </div>
+            </ng-container>
+            <span *ngIf="!member.holidayDetails || member.holidayDetails.length === 0" class="text-muted">
               <i class="fas fa-check me-1"></i>
               {{ 'no_holiday' | translate }}
             </span>

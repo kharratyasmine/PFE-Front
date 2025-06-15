@@ -23,6 +23,9 @@ export class DemandesComponent implements OnInit {
   editMode: boolean = false;
   selectedDemande: Demande | null = null;
   projectId: number | null = null;
+  currentPage: number = 1;
+  itemsPerPage: number = 5;
+  Math = Math; // Pour utiliser Math dans le template
 
   temporaryMembers: TeamMember[] = [
     { id: -1, name: 'Inconnu (Junior)', role: 'JUNIOR', initial: 'IJ', jobTitle: 'Temporaire', holiday: [], image: 'assets/img/profiles/default-avatar.jpg', cost: 200, startDate: '', note: '', experienceRange: '', teams: [] },
@@ -220,5 +223,13 @@ saveDemande(): void {
         modalInstance.hide();
       }
     }
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
+
+  onItemsPerPageChange(): void {
+    this.currentPage = 1; // Réinitialiser à la première page
   }
 }

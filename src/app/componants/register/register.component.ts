@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
-import { NotificationService } from 'src/app/services/notification.service';
+import { WebSocketService} from 'src/app/services/WebSocket.service';
 
 @Component({
   selector: 'app-register',
@@ -20,7 +20,7 @@ export class RegisterComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private notificationService: NotificationService
+    private WebSocketService: WebSocketService
   ) {
     this.registerForm = this.fb.group({
       firstname: ['', [Validators.required, Validators.minLength(2)]],
@@ -57,14 +57,8 @@ export class RegisterComponent {
       next: (response) => {
         if (response.access_token) {
           this.authService.saveToken(response.access_token, response.refresh_token!);
-          // Envoyer une notification pour le nouvel utilisateur
-          const notificationMessage = `Nouvel utilisateur inscrit: ${user.firstname} ${user.lastname} (${user.role})`;
-          if (!this.notificationService.isWebSocketConnected()) {
-            this.notificationService.connect();
-          }
-          this.notificationService.sendMessage(notificationMessage);
-
-          this.router.navigate(['/dashboard']);
+         // Suppression de la redirection automatique après inscription avec token
+         this.router.navigate(['/login']);
         } else if (response.message) {
           this.successMessage = response.message;
           this.registerForm.reset();

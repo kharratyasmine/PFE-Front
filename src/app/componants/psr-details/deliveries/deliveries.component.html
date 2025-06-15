@@ -5,10 +5,10 @@
         <div class="card-header bg-white py-3">
           <div class="d-flex justify-content-between align-items-center">
             <h3 class="text-primary mb-0">
-              <i class="fas fa-box-open me-2"></i> Project Deliveries
+              <i class="fas fa-box-open me-2"></i> {{ 'project_deliveries' | translate }}
             </h3>
             <button class="btn btn-outline-success btn-sm"(click)="openModal()">
-              <i class="fas fa-plus"></i> Add Delivery
+              <i class="fas fa-plus"></i> {{ 'add_delivery' | translate }}
             </button>
           </div>
         </div>
@@ -17,16 +17,16 @@
             <table class="table table-hover mb-0">
               <thead class="bg-light">
                 <tr>
-                  <th class="py-3">ID</th>
-                  <th class="py-3">Deliverable</th>
-                  <th class="py-3">Description</th>
-                  <th class="py-3">Version</th>
-                  <th class="py-3">Planned</th>
-                  <th class="py-3">Effective</th>
-                  <th class="py-3">Status</th>
-                  <th class="py-3">Support</th>
-                  <th class="py-3">Feedback</th>
-                  <th class="py-3 text-center">Actions</th>
+                  <th class="py-3">{{ 'id' | translate }}</th>
+                  <th class="py-3">{{ 'deliverable' | translate }}</th>
+                  <th class="py-3">{{ 'description' | translate }}</th>
+                  <th class="py-3">{{ 'version' | translate }}</th>
+                  <th class="py-3">{{ 'planned' | translate }}</th>
+                  <th class="py-3">{{ 'effective' | translate }}</th>
+                  <th class="py-3">{{ 'status' | translate }}</th>
+                  <th class="py-3">{{ 'support' | translate }}</th>
+                  <th class="py-3">{{ 'feedback' | translate }}</th>
+                  <th class="py-3 text-center">{{ 'actions' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -78,16 +78,15 @@
                   </td>
                   <td class="align-middle text-center">
                     <div class="btn-group">
-                      <button class="btn btn-sm btn-outline-primary" (click)="openModal(d)" title="Edit">
+                      <button class="btn btn-sm btn-outline-primary" (click)="openModal(d)" title="{{ 'edit' | translate }}">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-sm btn-outline-danger" (click)="deleteDelivery(d.id)" title="Delete">
+                      <button class="btn btn-sm btn-outline-danger" (click)="deleteDelivery(d.id)" title="{{ 'delete' | translate }}">
                         <i class="fas fa-trash"></i>
                       </button>
                     </div>
                   </td>
                 </tr>
-    
               </tbody>
             </table>
           </div>
@@ -104,52 +103,52 @@
       <div class="modal-header">
         <h5 class="modal-title" id="deliveryModalLabel">
           <i class="fas" [ngClass]="{'fa-plus': !isEditMode, 'fa-pencil-alt': isEditMode}"></i>
-          {{ isEditMode ? 'Edit' : 'Add New' }} Delivery
+          {{ isEditMode ? ('edit' | translate) : ('add_new' | translate) }} {{ 'deliverable' | translate }}
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" *ngIf="selectedDelivery">
         <div class="mb-3">
-          <label class="form-label">Deliverable Name</label>
-          <input class="form-control" placeholder="Enter deliverable name" [(ngModel)]="selectedDelivery.deliveriesName" />
+          <label class="form-label">{{ 'deliverable_name' | translate }}</label>
+          <input class="form-control" [placeholder]="'enter_deliverable_name' | translate" [(ngModel)]="selectedDelivery.deliveriesName" />
         </div>
         
         <div class="mb-3">
-          <label class="form-label">Description</label>
-          <input class="form-control" placeholder="Enter description" [(ngModel)]="selectedDelivery.description" />
+          <label class="form-label">{{ 'description' | translate }}</label>
+          <input class="form-control" [placeholder]="'enter_description' | translate" [(ngModel)]="selectedDelivery.description" />
         </div>
         
         <div class="row mb-3">
           <div class="col-md-6">
-            <label class="form-label">Version</label>
+            <label class="form-label">{{ 'version' | translate }}</label>
             <input class="form-control" placeholder="e.g. v1.0.0" [(ngModel)]="selectedDelivery.version" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Status</label>
+            <label class="form-label">{{ 'status' | translate }}</label>
             <select class="form-select" [(ngModel)]="selectedDelivery.status">
-              <option value="Planned">Planned</option>
-              <option value="Delivered">Delivered</option>
-              <option value="Late">Late</option>
+              <option value="Planned">{{ 'planned' | translate }}</option>
+              <option value="Delivered">{{ 'delivered' | translate }}</option>
+              <option value="Late">{{ 'late' | translate }}</option>
             </select>
           </div>
         </div>
         
         <div class="row mb-3">
           <div class="col-md-6">
-            <label class="form-label">Planned Date</label>
+            <label class="form-label">{{ 'planned' | translate }}</label>
             <input class="form-control" type="date" [(ngModel)]="selectedDelivery.plannedDate" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Effective Date</label>
+            <label class="form-label">{{ 'effective' | translate }}</label>
             <input class="form-control" type="date" [(ngModel)]="selectedDelivery.effectiveDate" />
           </div>
         </div>
         
         <div class="row mb-3">
           <div class="col-md-6">
-            <label class="form-label">Delivery Support</label>
+            <label class="form-label">{{ 'support' | translate }}</label>
             <select class="form-select" [(ngModel)]="selectedDelivery.deliverySupport">
-              <option value="">-- Select Support --</option>
+              <option value="">-- {{ 'select_support' | translate }} --</option>
               <option value="Email">Email</option>
               <option value="FTP">FTP</option>
               <option value="Cloud">Cloud</option>
@@ -157,26 +156,26 @@
             </select>
           </div>
           <div class="col-md-6">
-            <label class="form-label">Customer Feedback</label>
+            <label class="form-label">{{ 'customer_feedback' | translate }}</label>
             <select class="form-select" [(ngModel)]="selectedDelivery.customerFeedback">
-              <option value="No Feedback">No Feedback</option>
-              <option value="Accepted">Accepted</option>
-              <option value="Refused">Refused</option>
+              <option value="No Feedback">{{ 'no_feedback' | translate }}</option>
+              <option value="Accepted">{{ 'accepted' | translate }}</option>
+              <option value="Refused">{{ 'refused' | translate }}</option>
             </select>
           </div>
         </div>
         
         <div class="alert alert-info mt-3 d-flex align-items-center" *ngIf="selectedDelivery.psrId">
           <i class="fas fa-info-circle me-2"></i>
-          <small>This delivery will be associated with PSR ID: <strong>{{ selectedDelivery.psrId }}</strong></small>
+          <small>{{ 'delivery_associated_with' | translate }} <strong>{{ selectedDelivery.psrId }}</strong></small>
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          <i class="fas fa-times me-1"></i> Cancel
+          <i class="fas fa-times me-1"></i> {{ 'cancel' | translate }}
         </button>
         <button type="button" class="btn btn-success" (click)="saveDelivery()">
-          <i class="fas fa-save me-1"></i> Save
+          <i class="fas fa-save me-1"></i> {{ 'save' | translate }}
         </button>
       </div>
     </div>

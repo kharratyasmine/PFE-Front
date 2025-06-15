@@ -1,20 +1,20 @@
 <div class="history-section">
   <div class="section-header">
-    <h5 class="section-title">Historique des modifications</h5>
+    <h5 class="section-title">{{ 'Modification History' | translate }}</h5>
     <button class="btn btn-add" (click)="openAddModal()">
-      <i class="fas fa-plus-circle me-2"></i>Ajouter une ligne
+      <i class="fas fa-plus-circle me-2"></i>{{ 'Add a line' | translate }}
     </button>
   </div>
 
   <div class="table-responsive">
     <table class="history-table">
-        <thead class="table-primary">
+      <thead class="table-primary">
         <tr>
-          <th class="version-col">Version</th>
-          <th class="description-col">Description des modifications</th>
-          <th class="action-col">Action</th>
-          <th class="date-col">Date</th>
-          <th class="name-col">Nom</th>
+          <th class="version-col">{{ 'Version' | translate }}</th>
+          <th class="description-col">{{ 'Description of changes' | translate }}</th>
+          <th class="action-col">{{ 'Action' | translate }}</th>
+          <th class="date-col">{{ 'Date' | translate }}</th>
+          <th class="name-col">{{ 'Name' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -22,7 +22,6 @@
           <tr class="group-row" [class.even-row]="i % 2 === 0">
             <td class="version-cell" rowspan="3">{{ group.version }}</td>
             <td class="description-cell" rowspan="3">{{ group.description }}</td>
-
             <td class="action-cell">
               <span class="action-badge written">Written</span>
             </td>
@@ -54,7 +53,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3 class="modal-title">
-            <i class="fas fa-history me-2"></i>Nouvelle version d'historique
+            <i class="fas fa-history me-2"></i>{{ 'New history version' | translate }}
           </h3>
           <button class="modal-close" (click)="closeModal()">
             <i class="fas fa-times"></i>
@@ -64,19 +63,19 @@
         <div class="modal-body">
           <form class="history-form">
             <div class="form-group">
-              <label>Version</label>
+              <label>{{ 'Version' | translate }}</label>
               <input type="text" class="form-control" [value]="currentVersion" disabled />
             </div>
 
             <div class="form-group">
-              <label>Description des modifications</label>
+              <label>{{ 'Description of changes' | translate }}</label>
               <textarea class="form-control" [(ngModel)]="sharedDescription" name="description" rows="3"></textarea>
             </div>
 
             <div class="actions-list">
               <div class="action-item" *ngFor="let action of newActions; let i = index">
                 <div class="action-select">
-                  <label>Action</label>
+                  <label>{{ 'Action' | translate }}</label>
                   <select class="form-control" [(ngModel)]="action.action" [name]="'action' + i">
                     <option value="Written">Written</option>
                     <option value="Verified">Verified</option>
@@ -85,7 +84,7 @@
                 </div>
 
                 <div class="action-name">
-                  <label class="form-label">Name</label>
+                  <label class="form-label">{{ 'Name' | translate }}</label>
                   <select class="form-select" [(ngModel)]="action.name" name="name">
                     <option *ngFor="let user of users" [value]="user.firstname + ' ' + user.lastname">
                       {{ user.firstname }} {{ user.lastname }}
@@ -95,7 +94,7 @@
                 
 
                 <div class="action-date">
-                  <label>Date</label>
+                  <label>{{ 'Date' | translate }}</label>
                   <input type="date" class="form-control" [(ngModel)]="action.date" [name]="'date' + i" />
                 </div>
 
@@ -109,7 +108,7 @@
 
             <div class="add-action">
               <button class="btn-add-action" type="button" (click)="newActions.push(createAction(''))">
-                <i class="fas fa-plus-circle me-2"></i>Ajouter une action
+                <i class="fas fa-plus-circle me-2"></i>{{ 'Add an action' | translate }}
               </button>
             </div>
           </form>
@@ -117,10 +116,10 @@
 
         <div class="modal-footer">
           <button class="btn btn-cancel" (click)="closeModal()">
-            <i class="fas fa-times me-2"></i>Annuler
+            <i class="fas fa-times me-2"></i>{{ 'Cancel' | translate }}
           </button>
           <button class="btn btn-save" (click)="saveGroupedHistory()">
-            <i class="fas fa-save me-2"></i>Enregistrer
+            <i class="fas fa-save me-2"></i>{{ 'Save' | translate }}
           </button>
         </div>
       </div>

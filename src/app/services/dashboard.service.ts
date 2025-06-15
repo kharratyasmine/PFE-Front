@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface DashboardStats {
   totalUsers: number;
@@ -27,7 +27,7 @@ export interface ChartData {
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = 'http://localhost:8080/api/dashboard'; // Ajustez selon votre backend
+  private apiUrl = `${environment.apiUrl}/api/dashboard`;
   private statsSubject = new BehaviorSubject<DashboardStats>({
     totalUsers: 0,
     totalRevenue: 0,
@@ -42,14 +42,14 @@ export class DashboardService {
   }
 
   // Récupérer les statistiques
-  getStats(): Observable<DashboardStats> {
-    return this.http.get<DashboardStats>(`${this.apiUrl}/stats`).pipe(
-      map(stats => {
-        this.statsSubject.next(stats);
-        return stats;
-      })
-    );
-  }
+ // getStats(): Observable<DashboardStats> {
+ //   return this.http.get<DashboardStats>(`${this.apiUrl}/stats`).pipe(
+ //     map(stats => {
+ //       this.statsSubject.next(stats);
+ //       return stats;
+ //     })
+ //   );
+//  }
 
   // Récupérer les activités récentes
   getRecentActivities(): Observable<UserActivity[]> {
@@ -70,12 +70,24 @@ export class DashboardService {
   private initializeRealTimeUpdates() {
     // Simuler des mises à jour en temps réel (à remplacer par WebSocket dans un environnement réel)
     setInterval(() => {
-      this.getStats().subscribe();
+   //   this.getStats().subscribe();
     }, 30000); // Mise à jour toutes les 30 secondes
   }
 
   // Observer pour les mises à jour en temps réel
   getStatsUpdates(): Observable<DashboardStats> {
     return this.statsSubject.asObservable();
+  }
+
+  exportDashboard(projectId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/export/${projectId}`, {
+      responseType: 'blob'
+    });
+  }
+
+  exportToExcel(projectId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/export/excel/${projectId}`, {
+      responseType: 'blob'
+    });
   }
 }

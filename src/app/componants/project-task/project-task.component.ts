@@ -16,7 +16,6 @@ import { HolidayService } from 'src/app/services/holiday.service';
 })
 export class ProjectTaskComponent implements OnInit {
   projectId: number | null = null;
-  // ✅ ajouté
   projects: any[] = [];
   filteredMembers: any[] = [];
   itemsPerPage: number = 3;
@@ -28,12 +27,15 @@ export class ProjectTaskComponent implements OnInit {
   private detailsModalInstance!: any;
   private workDayModalInstance!: any;
 
+  // Exposer Math pour le template
+  Math = Math;
+
   // Données pour le calendrier de travail
   memberWorkEntries: WorkEntry[] = [];
 
   selectedAssignment: any = null;
   selectedWorkDate: string = '';
-  selectedWorkStatus: 'full' | 'half' | 'leave' | 'none' = 'full';
+  selectedWorkStatus: number = 0;
   selectedWorkComment: string = '';
 
   statusList = [
@@ -65,10 +67,10 @@ export class ProjectTaskComponent implements OnInit {
     });
   }
 
-
-
   loadCurrentProjectTasks(): void {
-    this.projectService.getProjectById(this.projectId!).subscribe(proj => {
+    if (!this.projectId) return;
+
+    this.projectService.getProjectById(this.projectId).subscribe(proj => {
       this.projects = [proj];
       this.groupedTasks = [{
         projectId: proj.id ?? null,
@@ -79,45 +81,41 @@ export class ProjectTaskComponent implements OnInit {
       }];
 
       this.taskService.getTasksByProject(this.projectId!).subscribe(tasks => {
-        console.log('taches reçues:', tasks);
+        console.log('📦 Tâches reçues:', tasks);
         this.groupedTasks[0].tasks = tasks;
         this.groupedTasks[0].filteredTasks = tasks;
 
-        // Charger les entrées de travail et calculer les valeurs dès le départ
+        // Charger les work entries pour chaque tâche
         tasks.forEach(task => {
-          if (!task.id) return;
+          if (!task.id || !task.assignments) return;
 
           this.taskService.getWorkEntriesByTask(task.id).subscribe(entries => {
             task.assignments.forEach(assignment => {
-              // Filtrer les entrées pour ce membre
               const memberEntries = entries.filter(e => e.memberId === assignment.teamMemberId);
 
-              // Calculer le nombre de jours travaillés
-              const fullDays = memberEntries.filter(e => e.status === 'full').length;
-              const halfDays = memberEntries.filter(e => e.status === 'half').length;
-              const totalMD = fullDays + halfDays * 0.5;
+              // 💡 Nouveau calcul basé sur status = number
+              const totalMD = memberEntries.reduce((sum, entry) => {
+                const s = typeof entry.status === 'number' ? entry.status : 0;
+                return sum + s;
+              }, 0);
               assignment.workedMD = parseFloat(totalMD.toFixed(2));
 
-              // Dates effectives (hors congés et "none")
-              const validEntries = memberEntries.filter(e => e.status !== 'none' && e.status !== 'leave');
+              // 🔁 Dates effectives (filtrer les entrées ayant status > 0)
+              const validEntries = memberEntries.filter(e => e.status && Number(e.status) > 0);
               validEntries.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
               if (validEntries.length > 0) {
                 assignment.effectiveStartDate = validEntries[0].date;
                 assignment.effectiveEndDate = validEntries[validEntries.length - 1].date;
               }
 
-              // MD restant
-              assignment.remainingMD = assignment.estimatedMD - assignment.workedMD;
+              // ✅ Calcul du reste même si négatif
+              assignment.remainingMD = parseFloat((assignment.estimatedMD - assignment.workedMD).toFixed(2));
             });
           });
         });
       });
-
-
     });
-
   }
-
 
   loadMembersByProject(projectId: number | null): void {
     if (!projectId) {
@@ -153,7 +151,6 @@ export class ProjectTaskComponent implements OnInit {
     }
   }
 
-
   openModal(task?: ProjectTask, projectId?: number): void {
     this.isEditMode = !!task;
     this.selectedTask = task ? { ...task } : this.createEmptyTask();
@@ -168,7 +165,6 @@ export class ProjectTaskComponent implements OnInit {
       this.modalInstance.show();
     }
   }
-
 
   closeModal(): void {
     if (this.modalInstance) {
@@ -233,8 +229,7 @@ export class ProjectTaskComponent implements OnInit {
 
     // Récupérer toutes les entrées de travail pour ce membre et cette tâche
     const memberEntries = this.memberWorkEntries.filter(
-      entry => entry.memberId === assignment.teamMemberId &&
-        entry.status !== 'none' && entry.status !== 'leave'
+      entry => entry.memberId === assignment.teamMemberId && entry.status !== 0
     );
 
     if (memberEntries.length > 0) {
@@ -266,7 +261,7 @@ export class ProjectTaskComponent implements OnInit {
   openWorkDayModal(assignment: any): void {
     this.selectedAssignment = assignment;
     this.selectedWorkDate = new Date().toISOString().split('T')[0];
-    this.selectedWorkStatus = 'full';
+    this.selectedWorkStatus = 0;
     this.selectedWorkComment = '';
 
     const modalElement = document.getElementById('workDayModal');
@@ -372,7 +367,6 @@ export class ProjectTaskComponent implements OnInit {
     });
   }
 
-
   getWorkingDays(startDateStr?: string, endDateStr?: string): Date[] {
     if (!startDateStr || !endDateStr) {
       return [];
@@ -406,27 +400,27 @@ export class ProjectTaskComponent implements OnInit {
     return day === 0 || day === 6; // 0 = Dimanche, 6 = Samedi
   }
 
-  getMemberWorkStatus(memberId: number | null, date: Date): 'full' | 'half' | 'leave' | 'none' {
-    if (!memberId) return 'none';
+  getMemberWorkStatus(memberId: number | null, date: Date): number {
+    if (!memberId) return 0;
 
     const dateStr = date.toISOString().split('T')[0];
     const entry = this.memberWorkEntries.find(
       e => e.memberId === memberId && e.date === dateStr
     );
 
-    return entry ? entry.status : 'none';
+    return entry ? Number(entry.status) : 0;
   }
 
-  setMemberWorkStatus(memberId: number | null, date: Date, status: 'full' | 'half' | 'leave' | 'none'): void {
+  setMemberWorkStatus(memberId: number | null, date: Date, status: number): void {
     if (!memberId || !this.selectedTaskDetails?.id) return;
 
     const dateStr = date.toISOString().split('T')[0];
 
     const workEntry: WorkEntry = {
-      memberId: memberId,
+      memberId,
       taskId: this.selectedTaskDetails.id,
       date: dateStr,
-      status: status
+      status
     };
 
     const entryIndex = this.memberWorkEntries.findIndex(
@@ -437,7 +431,6 @@ export class ProjectTaskComponent implements OnInit {
       workEntry.id = this.memberWorkEntries[entryIndex].id;
     }
 
-    // Sauvegarder dans la base de données
     this.taskService.saveWorkEntry(workEntry).subscribe({
       next: (savedEntry) => {
         if (entryIndex >= 0) {
@@ -446,74 +439,48 @@ export class ProjectTaskComponent implements OnInit {
           this.memberWorkEntries.push(savedEntry);
         }
 
-        // Automatiquement gérer le congé dans team_member_holidays
-        this.manageHolidayEntry(memberId, dateStr, status);
-
-        // Mettre à jour les MD travaillés si c'est dans une tâche sélectionnée
-        if (this.selectedTaskDetails) {
-          const assignment = this.selectedTaskDetails.assignments.find(a => a.teamMemberId === memberId);
-          if (assignment) {
-            console.log(`Mise à jour après changement de statut pour ${memberId} à la date ${dateStr}`);
-
-            // Mettre à jour les MD travaillés
-            this.updateWorkedMD(assignment);
-
-            // Mettre à jour les dates effectives
-            this.updateEffectiveDates(assignment);
-
-            // Mettre à jour la tâche pour enregistrer les MD travaillés et les dates
-            this.updateTaskAssignment(assignment);
-
-            // Rafraîchir les données principales pour afficher les mises à jour
-            if (this.projectId) {
-              this.loadCurrentProjectTasks();
-            }
-          }
+        this.manageHolidayEntry(memberId, dateStr, savedEntry.status);
+        const assignment = this.selectedTaskDetails?.assignments.find(a => a.teamMemberId === memberId);
+        if (assignment) {
+          this.updateWorkedMD(assignment);
+          this.updateEffectiveDates(assignment);
+          this.updateTaskAssignment(assignment);
+          this.loadCurrentProjectTasks();
         }
       },
-      error: (error) => {
-        console.error('Erreur lors de la mise à jour du statut de travail:', error);
-      }
+      error: (error) => console.error('Erreur maj statut de travail:', error)
     });
   }
 
-  // Nouvelle méthode pour gérer les entrées de congés
-  manageHolidayEntry(memberId: number, dateStr: string, status: 'full' | 'half' | 'leave' | 'none'): void {
-    // Si le statut est "leave" (congé), ajouter à la table team_member_holidays
-    if (status === 'leave') {
+  manageHolidayEntry(memberId: number, dateStr: string, status: number): void {
+    if (status === 0) {
+      // Congé total
       this.holidayService.addSimpleHoliday(memberId, dateStr).subscribe({
-        next: () => {
-          console.log(`Congé ajouté pour le membre ${memberId} à la date ${dateStr}`);
-        },
-        error: (error) => {
-          console.error('Erreur lors de l\'ajout du congé:', error);
-        }
+        next: () => console.log(`✅ Congé TOTAL ajouté pour le membre ${memberId} à ${dateStr}`),
+        error: (error) => console.error('Erreur ajout congé total:', error)
       });
-    }
-    // Si le statut est autre que "leave", vérifier et supprimer de la table team_member_holidays si nécessaire
-    else {
-      // D'abord vérifier si le congé existe
+    } else if (status === 0.5 || status === 0.25 || status === 0.75) {
+      // Congé partiel
+      const label = status === 0.5 ? 'Demi-journée' : status === 0.25 ? 'Quart' : 'Trois-quarts';
+      this.holidayService.addPartialHoliday(memberId, dateStr, label).subscribe({
+        next: () => console.log(`✅ Congé ${label} ajouté pour ${memberId} à ${dateStr}`),
+        error: (error) => console.error(`Erreur ajout congé ${label}:`, error)
+      });
+    } else {
+      // Si jour normal travaillé, supprimer congé s'il existe
       this.holidayService.checkHolidayForMember(memberId, dateStr).subscribe({
         next: (exists) => {
-          console.log(`Vérification de congé pour membre ${memberId} à la date ${dateStr}: ${exists ? 'Existe' : 'N\'existe pas'}`);
-
           if (exists) {
-            // Utiliser la méthode robuste qui essaie plusieurs approches
             this.holidayService.deleteHolidayRobust(memberId, dateStr).subscribe({
-              next: () => {
-                console.log(`Congé supprimé pour le membre ${memberId} à la date ${dateStr}`);
-              },
-              error: (error) => {
-                console.error('Toutes les tentatives de suppression ont échoué:', error);
-                // Informer l'utilisateur
-                alert('Impossible de supprimer le jour de congé. L\'enregistrement des données de travail a été effectué, mais le congé reste présent dans le système.');
+              next: () => console.log(`❌ Congé supprimé pour ${memberId} à ${dateStr}`),
+              error: (err) => {
+                console.error('Erreur suppression congé:', err);
+                alert('Impossible de supprimer le congé existant');
               }
             });
           }
         },
-        error: (error) => {
-          console.error('Erreur lors de la vérification du congé:', error);
-        }
+        error: (error) => console.error('Erreur vérification congé:', error)
       });
     }
   }
@@ -588,24 +555,22 @@ export class ProjectTaskComponent implements OnInit {
     });
   }
 
-  countMemberWorkDays(memberId: number | null, status: 'full' | 'half' | 'leave' | 'none'): number {
+  countMemberWorkDays(memberId: number | null, statusValue: number): number {
     if (!memberId) return 0;
 
     return this.memberWorkEntries.filter(
-      e => e.memberId === memberId && e.status === status
+      e => e.memberId === memberId && Number(e.status) === statusValue
     ).length;
   }
 
   calculateTotalMD(memberId: number | null): number {
     if (!memberId) return 0;
 
-    const fullDays = this.countMemberWorkDays(memberId, 'full');
-    const halfDays = this.countMemberWorkDays(memberId, 'half') * 0.5;
+    const total = this.memberWorkEntries
+      .filter(e => e.memberId === memberId)
+      .reduce((sum, e) => sum + (typeof e.status === 'number' ? e.status : 0), 0);
 
-    const totalMD = fullDays + halfDays;
-    console.log(`Calcul des MD pour le membre ${memberId}: ${fullDays} jours complets + ${halfDays} demi-jours = ${totalMD} MD`);
-
-    return parseFloat(totalMD.toFixed(2)); // Retourner avec 2 décimales max et s'assurer que c'est un nombre
+    return parseFloat(total.toFixed(2));
   }
 
   updateWorkedMD(assignment: any): void {
@@ -641,7 +606,6 @@ export class ProjectTaskComponent implements OnInit {
     }
   }
 
-
   // Avant de sauvegarder la tâche, mettre à jour toutes les valeurs calculées
   updateAllCalculatedValues(): void {
     if (!this.selectedTask || !this.selectedTask.assignments) return;
@@ -663,7 +627,6 @@ export class ProjectTaskComponent implements OnInit {
       }
     });
   }
-
 
   // Modifier la méthode saveTask pour mettre à jour les valeurs calculées avant sauvegarde
   saveTask(): void {
@@ -702,57 +665,80 @@ export class ProjectTaskComponent implements OnInit {
       return;
     }
 
-    this.updateAllCalculatedValues();
+    // ✅ Validation : la date de fin de la tâche ne doit pas dépasser la date de fin du projet
+    this.projectService.getProjectById(this.selectedTask.projectId).subscribe({
+      next: (project) => {
+        if (project && project.endDate) {
+          const projectEndDate = new Date(project.endDate);
+          const taskEndDate = new Date(this.selectedTask.dateFin);
 
-    const request = this.isEditMode
-      ? this.taskService.updateTask(this.selectedTask.id!, this.selectedTask)
-      : this.taskService.createTaskForProject(this.projectId!, this.selectedTask);
-
-    request.subscribe({
-      next: () => {
-        // ✅ Recharge les données
-        this.loadCurrentProjectTasks();
-
-        // ✅ Si on édite une tâche déjà ouverte dans la modale, il faut aussi mettre à jour selectedTaskDetails
-        if (this.selectedTaskDetails?.id === this.selectedTask.id) {
-          this.taskService.getTaskById(this.selectedTask.id!).subscribe(task => {
-            this.selectedTaskDetails = {
-              id: task.id!,
-              name: task.name || '',
-              description: task.description || '',
-              dateDebut: task.dateDebut || '',
-              dateFin: task.dateFin || '',
-              status: task.status || TaskStatus.TODO,
-              progress: task.progress || 0,
-              projectId: task.projectId!,
-              projectName: task.projectName || '',
-              assignments: task.assignments || []
-            };
-          });
+          if (taskEndDate > projectEndDate) {
+            alert("❌ La date de fin de la tâche ne peut pas dépasser la date de fin du projet.");
+            return; // Arrête le processus de sauvegarde
+          }
         }
 
-        this.closeModal();
+        // Si la validation passe ou si la date de fin du projet n'est pas définie, continuer la sauvegarde
+        this.updateAllCalculatedValues();
+
+        const request = this.isEditMode
+          ? this.taskService.updateTask(this.selectedTask.id!, this.selectedTask)
+          : this.taskService.createTaskForProject(this.projectId!, this.selectedTask);
+
+        request.subscribe({
+          next: () => {
+            // ✅ Recharge les données
+            this.loadCurrentProjectTasks();
+
+            // ✅ Si on édite une tâche déjà ouverte dans la modale, il faut aussi mettre à jour selectedTaskDetails
+            if (this.selectedTaskDetails?.id === this.selectedTask.id) {
+              this.taskService.getTaskById(this.selectedTask.id!).subscribe(task => {
+                this.selectedTaskDetails = {
+                  id: task.id!,
+                  name: task.name || '',
+                  description: task.description || '',
+                  dateDebut: task.dateDebut || '',
+                  dateFin: task.dateFin || '',
+                  status: task.status || TaskStatus.TODO,
+                  progress: task.progress || 0,
+                  projectId: task.projectId!,
+                  projectName: task.projectName || '',
+                  assignments: task.assignments || []
+                };
+              });
+            }
+
+            this.closeModal();
+          },
+          error: error => {
+            alert("❌ Erreur lors de l'enregistrement.");
+            console.error(error);
+          }
+        });
+
       },
-      error: error => {
-        alert("❌ Erreur lors de l'enregistrement.");
-        console.error(error);
+      error: (error) => {
+        console.error('Erreur lors du chargement du projet pour validation:', error);
+        alert("❌ Erreur lors de la vérification de la date de fin du projet.");
+        // On pourrait choisir de ne pas bloquer la sauvegarde ici ou de la bloquer
+        // Pour l'instant, on affiche une alerte mais on ne bloque pas la sauvegarde si le projet ne peut pas être chargé.
+        // Si vous voulez bloquer la sauvegarde en cas d'erreur de chargement, ajoutez un `return;` ici.
       }
     });
   }
 
-
   deleteTask(id: number): void {
     if (confirm('Voulez-vous vraiment supprimer cette tâche ?')) {
       this.taskService.deleteTask(id).subscribe({
-        next: () => this.loadCurrentProjectTasks(),
+        next: () => this.loadCurrentProjectTasks(),   // ✅ fonctionnera sans erreur
         error: (error) => {
           console.error('Erreur suppression', error);
           alert("Erreur lors de la suppression !");
         }
       });
+
     }
   }
-
 
   downloadExcel(): void {
     this.taskService.downloadExcel(this.projects).subscribe(
@@ -829,44 +815,51 @@ export class ProjectTaskComponent implements OnInit {
   }
 
   addWorkDayOutsideRange(assignment: any): void {
-  this.selectedAssignment = assignment;
-  this.selectedWorkDate = new Date().toISOString().split('T')[0]; // par défaut : aujourd’hui
-  this.selectedWorkStatus = 'full'; // valeur initiale
-  this.selectedWorkComment = '';
+    this.selectedAssignment = assignment;
+    this.selectedWorkDate = new Date().toISOString().split('T')[0]; // par défaut : aujourd'hui
+    this.selectedWorkStatus = 1; // valeur initiale
+    this.selectedWorkComment = '';
 
-  const modal = document.getElementById('workDayModal');
-  if (modal) {
-    this.workDayModalInstance = new bootstrap.Modal(modal);
-    this.workDayModalInstance.show();
+    const modal = document.getElementById('workDayModal');
+    if (modal) {
+      this.workDayModalInstance = new bootstrap.Modal(modal);
+      this.workDayModalInstance.show();
+    }
   }
-}
-getAllWorkedDays(assignment: any): Date[] {
-  const estimatedDays = this.getWorkingDays(assignment.estimatedStartDate, assignment.estimatedEndDate);
 
-  const extraDates = this.memberWorkEntries
-    .filter(e => e.memberId === assignment.teamMemberId)
-    .map(e => new Date(e.date))
-    .filter(date =>
-      !estimatedDays.some(d => d.toDateString() === date.toDateString())
+  getAllWorkedDays(assignment: any): Date[] {
+    const estimatedDays = this.getWorkingDays(assignment.estimatedStartDate, assignment.estimatedEndDate);
+
+    const extraDates = this.memberWorkEntries
+      .filter(e => e.memberId === assignment.teamMemberId)
+      .map(e => new Date(e.date))
+      .filter(date =>
+        !estimatedDays.some(d => d.toDateString() === date.toDateString())
+      );
+
+    const allDates = [...estimatedDays, ...extraDates];
+
+    // 🔹 Assurez-vous que tous les jours sont uniques (même si entrées dupliquées existent)
+    const uniqueDates = allDates.filter((date, index, self) =>
+      index === self.findIndex(d => d.toDateString() === date.toDateString())
     );
 
-  const allDates = [...estimatedDays, ...extraDates];
+    // 🔹 Filtrez les weekends
+    const nonWeekendDates = uniqueDates.filter(date => !this.isWeekend(date));
 
-  // 🔹 Assurez-vous que tous les jours sont uniques (même si entrées dupliquées existent)
-  const uniqueDates = allDates.filter((date, index, self) =>
-    index === self.findIndex(d => d.toDateString() === date.toDateString())
-  );
+    // 🔹 Triez les dates pour affichage propre
+    return nonWeekendDates.sort((a, b) => a.getTime() - b.getTime());
+  }
 
-  // 🔹 Triez les dates pour affichage propre
-  return uniqueDates.sort((a, b) => a.getTime() - b.getTime());
-}
+  isOutOfEstimatedRange(day: Date, estimatedStartDate: string | null | undefined, estimatedEndDate: string | null | undefined): boolean {
+    if (!estimatedStartDate || !estimatedEndDate) return false;
+    const start = new Date(estimatedStartDate);
+    const end = new Date(estimatedEndDate);
+    return day < start || day > end;
+  }
 
-isOutOfEstimatedRange(day: Date, estimatedStartDate: string | null | undefined, estimatedEndDate: string | null | undefined): boolean {
-  if (!estimatedStartDate || !estimatedEndDate) return false;
-  const start = new Date(estimatedStartDate);
-  const end = new Date(estimatedEndDate);
-  return day < start || day > end;
-}
-
-
+  onItemsPerPageChange(groupIndex: number): void {
+    const group = this.groupedTasks[groupIndex];
+    group.currentPage = 1; // Réinitialiser à la première page
+  }
 }

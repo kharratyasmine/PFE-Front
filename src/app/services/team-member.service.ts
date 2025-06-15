@@ -73,7 +73,7 @@ getMemberById(id: number): Observable<TeamMember> {
 
 // Méthode pour récupérer l'historique d'un membre
 getMemberHistory(memberId: number): Observable<TeamMemberHistory[]> {
-  return this.http.get<TeamMemberHistory[]>(`${this.apiUrl}/history/${memberId}`);
+  return this.http.get<TeamMemberHistory[]>(`${this.apiUrl}/${memberId}/history`);
 }
 
 // Méthode pour sauvegarder une modification dans l'historique

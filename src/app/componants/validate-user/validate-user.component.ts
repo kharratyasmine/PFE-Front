@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-validate-user',
@@ -16,33 +17,38 @@ export class ValidateUserComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private http: HttpClient
+    private http: HttpClient,
+    private authService: AuthService
   ) {}
 
-ngOnInit(): void {
-  const userId = this.route.snapshot.queryParamMap.get('userId');
-  const reject = this.route.snapshot.queryParamMap.get('reject') === 'true';
+  ngOnInit(): void {
+    const userId = this.route.snapshot.queryParamMap.get('userId');
+    const reject = this.route.snapshot.queryParamMap.get('reject') === 'true';
 
-  if (!userId) {
-    this.message = '❌ Aucun ID utilisateur reçu.';
-    return;
-  }
-
-  const body = reject
-    ? { approved: false, reason: 'Refusé depuis lien email' }
-    : { approved: true };
-
-  this.http.patch(`http://localhost:8080/users/${userId}/approval`, body).subscribe({
-    next: () => {
-      this.message = reject
-        ? '❌ Utilisateur a été refusé avec succès.'
-        : '✅ Uutilisateur a été approuvé avec succès.';
-    },
-    error: (err) => {
-      console.error('❌ Erreur API :', err);
-      this.message = '❌ Une erreur est survenue.';
+    if (!userId) {
+      this.message = '❌ Aucun ID utilisateur reçu.';
+      return;
     }
-  });
-}
 
+    const body = reject
+      ? { approved: false, reason: 'Refusé depuis lien email' }
+      : { approved: true };
+
+    const token = this.authService.getAccessToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    this.http.patch(`http://localhost:8080/users/${userId}/approval`, body, { headers }).subscribe({
+      next: () => {
+        this.message = reject
+          ? '❌ Utilisateur a été refusé avec succès.'
+          : '✅ Utilisateur a été approuvé avec succès.';
+      },
+      error: (err) => {
+        console.error('❌ Erreur API :', err);
+        this.message = '❌ Une erreur est survenue.';
+      }
+    });
+  }
 }

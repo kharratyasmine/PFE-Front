@@ -20,7 +20,11 @@ export class DevisComponent implements OnInit {
   selectedDevis: Devis | null = null; // Pour le modal
   isModalEditOpen = false;
   projectId: number | null = null;
- @Input() devisId!: number;
+  @Input() devisId!: number;
+  currentPage: number = 1;
+  itemsPerPage: number = 5;
+  Math = Math; // Pour utiliser Math dans le template
+
   constructor(
     private fb: FormBuilder,
     private devisService: DevisService,
@@ -136,4 +140,25 @@ export class DevisComponent implements OnInit {
     }
   }
   
+  onPageChange(page: number): void {
+    this.currentPage = page;
+  }
+
+  onItemsPerPageChange(): void {
+    this.currentPage = 1; // Réinitialiser à la première page
+  }
+
+  isOverdue(date: Date): boolean {
+    const creationDate = new Date(date);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return creationDate < thirtyDaysAgo;
+  }
+
+  isNearDeadline(date: Date): boolean {
+    const creationDate = new Date(date);
+    const twentyDaysAgo = new Date();
+    twentyDaysAgo.setDate(twentyDaysAgo.getDate() - 20);
+    return creationDate >= twentyDaysAgo && creationDate < new Date();
+  }
 }

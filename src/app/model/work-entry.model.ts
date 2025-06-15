@@ -3,6 +3,6 @@ export interface WorkEntry {
   memberId: number;
   taskId: number;
   date: string; // Format YYYY-MM-DD
-  status: 'full' | 'half' | 'leave' | 'none';
+  status: number;
   comment?: string;
 } 

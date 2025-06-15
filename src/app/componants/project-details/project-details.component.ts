@@ -4,6 +4,7 @@ import { Client } from 'src/app/model/client.model';
 import { Demande } from 'src/app/model/demande.model';
 import { Project, Status } from 'src/app/model/project.model';
 import { User } from 'src/app/model/user.model';
+import { AuthService } from 'src/app/services/auth.service';
 import { ClientService } from 'src/app/services/client.service';
 import { DemandeService } from 'src/app/services/demande.service';
 import { ProjectService } from 'src/app/services/project.service';
@@ -35,6 +36,7 @@ export class ProjectDetailsComponent implements OnInit {
     userId: null,
     status: Status.EN_COURS,
   };
+  currentUser: any;
   
 
 
@@ -42,19 +44,25 @@ export class ProjectDetailsComponent implements OnInit {
     private route: ActivatedRoute,
     private projectService: ProjectService,
     private clientService: ClientService,
-    private userService: UserService
+    private userService: UserService,
+    private authService: AuthService
   ) {}
 
-  ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.loadProjectDetails(+id);
-        this.loadClients();
-        this.loadUsers();
-      }
-    });
-  }
+ ngOnInit(): void {
+  // Charger l'utilisateur courant
+  this.currentUser = this.authService.getCurrentUser();
+
+  // Charger les données du projet si un ID est présent
+  this.route.paramMap.subscribe(params => {
+    const id = params.get('id');
+    if (id) {
+      this.loadProjectDetails(+id);
+      this.loadClients();
+      this.loadUsers();
+    }
+  });
+}
+
 
   loadProjectDetails(id: number): void {
     this.projectService.getProjectById(id).subscribe(

@@ -5,10 +5,10 @@
         <div class="card-header bg-white py-3">
           <div class="d-flex justify-content-between align-items-center">
             <h3 class="text-primary mb-0">
-              <i class="fas fa-exclamation-triangle me-2"></i> Project Risks
+              <i class="fas fa-exclamation-triangle me-2"></i> {{ 'project_risks' | translate }}
             </h3>
             <button class="btn btn-outline-success btn-sm" (click)="openAddModal()">
-              <i class="fas fa-plus me-1"></i> Add Risk
+              <i class="fas fa-plus me-1"></i> {{ 'add_risk' | translate }}
             </button>
           </div>
         </div>
@@ -39,31 +39,31 @@
               </colgroup>
               <thead class="bg-light">
                 <tr>
-                  <th colspan="9" class="text-center py-3">Risk Identification</th>
-                  <th colspan="2" class="text-center py-3 bg-warning">Risk analysis</th>
-                  <th colspan="2" class="text-center py-3 bg-warning">Risk assessment</th>
-                  <th colspan="5" class="text-center py-3">Risk treatment</th>
-                  <th rowspan="2" class="text-center py-3">Actions</th>
+                  <th colspan="9" class="text-center py-3">{{ 'risk_identification' | translate }}</th>
+                  <th colspan="2" class="text-center py-3 bg-warning">{{ 'risk_analysis' | translate }}</th>
+                  <th colspan="2" class="text-center py-3 bg-warning">{{ 'risk_assessment' | translate }}</th>
+                  <th colspan="5" class="text-center py-3">{{ 'risk_treatment' | translate }}</th>
+                  <th rowspan="2" class="text-center py-3">{{ 'actions' | translate }}</th>
                 </tr>
                 <tr>
-                  <th class="py-3">Id</th>
-                  <th class="py-3">Risk</th>
-                  <th class="py-3">Origin</th>
-                  <th class="py-3">Category</th>
-                  <th class="py-3">Open Date</th>
-                  <th class="py-3">Due Date</th>
-                  <th class="py-3">Causes</th>
-                  <th class="py-3">Consequences</th>
-                  <th class="py-3">Applied Measures</th>
-                  <th class="py-3 bg-warning">Probability</th>
-                  <th class="py-3 bg-warning">Gravity</th>
-                  <th class="py-3 bg-warning">Criticality</th>
-                  <th class="py-3 bg-warning">Measure</th>
-                  <th class="py-3">Risk Treatment Decision</th>
-                  <th class="py-3">Justification</th>
-                  <th class="py-3">Id Action</th>
-                  <th class="py-3">Risk Stat</th>
-                  <th class="py-3">Close Date</th>
+                  <th class="py-3">{{ 'id' | translate }}</th>
+                  <th class="py-3">{{ 'risk' | translate }}</th>
+                  <th class="py-3">{{ 'origin' | translate }}</th>
+                  <th class="py-3">{{ 'category' | translate }}</th>
+                  <th class="py-3">{{ 'open_date' | translate }}</th>
+                  <th class="py-3">{{ 'due_date' | translate }}</th>
+                  <th class="py-3">{{ 'causes' | translate }}</th>
+                  <th class="py-3">{{ 'consequences' | translate }}</th>
+                  <th class="py-3">{{ 'applied_measures' | translate }}</th>
+                  <th class="py-3 bg-warning">{{ 'probability' | translate }}</th>
+                  <th class="py-3 bg-warning">{{ 'gravity' | translate }}</th>
+                  <th class="py-3 bg-warning">{{ 'criticality' | translate }}</th>
+                  <th class="py-3 bg-warning">{{ 'measure' | translate }}</th>
+                  <th class="py-3">{{ 'risk_treatment_decision' | translate }}</th>
+                  <th class="py-3">{{ 'justification' | translate }}</th>
+                  <th class="py-3">{{ 'id_action' | translate }}</th>
+                  <th class="py-3">{{ 'risk_status' | translate }}</th>
+                  <th class="py-3">{{ 'close_date' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -92,10 +92,10 @@
                   <td class="align-middle">{{ risk.closeDate | date:'shortDate' }}</td>
                   <td class="align-middle text-center">
                     <div class="px-4 text-end">
-                      <button class="btn btn-sm btn-outline-primary" (click)="editRisk(risk)" title="Edit">
+                      <button class="btn btn-sm btn-outline-primary" (click)="editRisk(risk)" title="{{ 'edit' | translate }}">
                         <i class="fas fa-edit"></i>
                       </button>
-                      <button class="btn btn-sm btn-outline-danger" (click)="deleteRisk(risk.id!)" title="Delete">
+                      <button class="btn btn-sm btn-outline-danger" (click)="deleteRisk(risk.id!)" title="{{ 'delete' | translate }}">
                         <i class="fas fa-trash"></i>
                       </button>
                     </div>
@@ -117,7 +117,7 @@
       <div class="modal-header bg-light">
         <h5 class="modal-title" id="riskModalLabel">
            <i class="fas" [ngClass]="{'fa-plus': !editingRisk.id, 'fa-pencil-alt': editingRisk.id}"></i>
-          {{ editingRisk.id ? 'Edit Risk' : 'Add Risk' }}
+          {{ editingRisk.id ? ('edit' | translate) : ('add_risk' | translate) }}
           </h5>
         <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
       </div>
@@ -126,47 +126,47 @@
 
           <!-- Risk Identification -->
           <div class="col-md-2" *ngIf="editingRisk.id">
-            <label class="form-label">Id</label>
+            <label class="form-label">{{ 'id' | translate }}</label>
             <input type="text" class="form-control" [(ngModel)]="editingRisk.id" name="id" readonly />
           </div>
           <div class="col-md-10">
-            <label class="form-label">Description *</label>
+            <label class="form-label">{{ 'risk' | translate }} *</label>
             <input type="text" class="form-control" [(ngModel)]="editingRisk.description" name="description" required />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Origin</label>
+            <label class="form-label">{{ 'origin' | translate }}</label>
             <input type="text" class="form-control" [(ngModel)]="editingRisk.origin" name="origin" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Category</label>
+            <label class="form-label">{{ 'category' | translate }}</label>
             <input type="text" class="form-control" [(ngModel)]="editingRisk.category" name="category" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Open Date</label>
+            <label class="form-label">{{ 'open_date' | translate }}</label>
             <input type="date" class="form-control" [(ngModel)]="editingRisk.openDate" name="openDate" />
           </div>
           <div class="col-md-6">
-            <label class="form-label">Due Date</label>
+            <label class="form-label">{{ 'due_date' | translate }}</label>
             <input type="date" class="form-control" [(ngModel)]="editingRisk.dueDate" name="dueDate" />
           </div>
           <div class="col-12">
-            <label class="form-label">Causes</label>
+            <label class="form-label">{{ 'causes' | translate }}</label>
             <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.causes" name="causes"></textarea>
           </div>
           <div class="col-12">
-            <label class="form-label">Consequences</label>
+            <label class="form-label">{{ 'consequences' | translate }}</label>
             <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.consequences" name="consequences"></textarea>
           </div>
           <div class="col-12">
-            <label class="form-label">Applied Measures</label>
+            <label class="form-label">{{ 'applied_measures' | translate }}</label>
             <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.appliedMeasures" name="appliedMeasures"></textarea>
           </div>
 
           <!-- Risk Analysis -->
           <div class="col-md-4">
-            <label class="form-label" title="1- Improbable <10%\n2- Occasional [10% - 40%[\n3- Probable [40% - 80%[\n4- Frequent >= 80%">Probability</label>
+            <label class="form-label" title="1- Improbable <10%\n2- Occasional [10% - 40%[\n3- Probable [40% - 80%[\n4- Frequent >= 80%">{{ 'probability' | translate }}</label>
             <select class="form-select" [(ngModel)]="editingRisk.probability" name="probability">
-              <option value="">Select Probability</option>
+              <option value="">{{ 'select_probability' | translate }}</option>
               <option value="Improbable">Improbable</option>
               <option value="Occasional">Occasional</option>
               <option value="Probable">Probable</option>
@@ -174,9 +174,9 @@
             </select>
           </div>
           <div class="col-md-4">
-            <label class="form-label" title="1- Negligible : noticeable problem inconvenience / altered performance / low additional cost can therefore be neglected\n2- Marginal : serious problem dissatisfaction / reduced performance / reduced margins / medium additional cost\n3- Critical : Worrying situation complaint / degraded performance / possible delay / significant additional cost\n4- Catastrophic : Crisis situation penalties / unachievable performance / assured delay /biggest additional cost">Gravity</label>
+            <label class="form-label" title="1- Negligible : noticeable problem inconvenience / altered performance / low additional cost can therefore be neglected\n2- Marginal : serious problem dissatisfaction / reduced performance / reduced margins / medium additional cost\n3- Critical : Worrying situation complaint / degraded performance / possible delay / significant additional cost\n4- Catastrophic : Crisis situation penalties / unachievable performance / assured delay /biggest additional cost">{{ 'gravity' | translate }}</label>
             <select class="form-select" [(ngModel)]="editingRisk.gravity" name="gravity">
-              <option value="">Select Gravity</option>
+              <option value="">{{ 'select_gravity' | translate }}</option>
               <option value="Negligible">Negligible</option>
               <option value="Marginal">Marginal</option>
               <option value="Critical">Critical</option>
@@ -184,65 +184,64 @@
             </select>
           </div>
           <div class="col-md-4">
-            <label class="form-label">Criticality</label>
+            <label class="form-label">{{ 'criticality' | translate }}</label>
             <input type="text" class="form-control" [(ngModel)]="editingRisk.criticality" name="criticality" />
           </div>
 
           <!-- Risk Assessment -->
           <div class="col-12">
-            <label class="form-label">Measure</label>
+            <label class="form-label">{{ 'measure' | translate }}</label>
             <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.measure" name="measure"></textarea>
           </div>
           <div class="col-12">
-            <label class="form-label">Risk Assessment</label>
+            <label class="form-label">{{ 'risk_assessment' | translate }}</label>
             <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.riskAssessment" name="riskAssessment"></textarea>
           </div>
 
           <!-- Risk Treatment -->
           <div class="col-12">
-            <label class="form-label">Risk Treatment Decision</label>
+            <label class="form-label">{{ 'risk_treatment_decision' | translate }}</label>
             <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.riskTreatmentDecision" name="riskTreatmentDecision"></textarea>
           </div>
           <div class="col-12">
-            <label class="form-label">Justification</label>
+            <label class="form-label">{{ 'justification' | translate }}</label>
             <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.justification" name="justification"></textarea>
           </div>
           <div class="col-md-6">
-            <label class="form-label">Id Action</label>
+            <label class="form-label">{{ 'id_action' | translate }}</label>
             <input type="text" class="form-control" [(ngModel)]="editingRisk.idAction" name="idAction" />
           </div>
           <div class="col-md-6">
-            <label class="form-label" title="Closed = mastered; attenuated">Risk Status</label>
+            <label class="form-label" title="Closed = mastered; attenuated">{{ 'risk_status' | translate }}</label>
             <select class="form-select" [(ngModel)]="editingRisk.riskStat" name="riskStat">
-              <option value="">Select Status</option>
-              <option value="Open">Open</option>
-              <option value="Closed">Closed</option>
+              <option value="">{{ 'select_status' | translate }}</option>
+              <option value="Open">{{ 'open' | translate }}</option>
+              <option value="Closed">{{ 'closed' | translate }}</option>
             </select>
           </div>
           <div class="col-md-6">
-            <label class="form-label">Close Date</label>
+            <label class="form-label">{{ 'close_date' | translate }}</label>
             <input type="date" class="form-control" [(ngModel)]="editingRisk.closeDate" name="closeDate" />
           </div>
 
            <!-- Additional Information -->
           <div class="col-12">
-            <label class="form-label">Impact</label>
+            <label class="form-label">{{ 'impact' | translate }}</label>
             <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.impact" name="impact"></textarea>
           </div>
           <div class="col-12">
-            <label class="form-label">Mitigation Plan</label>
+            <label class="form-label">{{ 'mitigation_plan' | translate }}</label>
             <textarea class="form-control" rows="3" [(ngModel)]="editingRisk.mitigationPlan" name="mitigationPlan"></textarea>
           </div>
-
 
         </form>
       </div>
        <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeModal()">
-          <i class="fas fa-times me-1"></i> Cancel
+          <i class="fas fa-times me-1"></i> {{ 'cancel' | translate }}
         </button>
         <button type="button" class="btn btn-success" (click)="saveRisk()">
-          <i class="fas fa-save me-1"></i> Save
+          <i class="fas fa-save me-1"></i> {{ 'save' | translate }}
         </button>
       </div>
     </div>

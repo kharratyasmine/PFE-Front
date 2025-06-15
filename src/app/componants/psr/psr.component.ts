@@ -30,34 +30,49 @@ export class PsrComponent implements OnInit {
     private modalService: NgbModal
   ) { }
 
-  ngOnInit(): void {
+ ngOnInit(): void {
     this.route.parent?.paramMap.subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.projectId = +id;
-        this.loadPsrs();
-        this.loadUsers();
-        this.setCurrentWeek();
-      } else {
-        alert("ID du projet non trouvé dans l'URL.");
-      }
+        const id = params.get('id');
+        if (id) {
+            this.projectId = +id;
+            this.setCurrentWeek(); 
+            this.loadPsrs();
+            this.loadUsers();
+        } else {
+            alert("ID du projet non trouvé dans l'URL.");
+        }
     });
-  }
+}
 
-  private setCurrentWeek(): void {
+private getWeekLabel(date: Date): string {
+    const weekNumber = this.getIsoWeekNumber(date);
+    return `${date.getFullYear()}-W${weekNumber.toString().padStart(2, '0')}`;
+}
+
+private setCurrentWeek(): void {
     const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    const days = Math.floor((now.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
-    const weekNumber = Math.ceil((days + startOfYear.getDay() + 1) / 7);
-    this.currentWeek = `${now.getFullYear()}-W${weekNumber.toString().padStart(2, '0')}`;
+    const previousWeekDate = new Date(now);
+    previousWeekDate.setDate(now.getDate() - 7); // On recule de 7 jours → semaine précédente
+
+    this.currentWeek = this.getWeekLabel(previousWeekDate);
+}
+
+  private getIsoWeekNumber(date: Date): number {
+    // Copy date so don't modify original
+    const tmpDate = new Date(date.getTime());
+    // Set to Thursday in current week
+    tmpDate.setDate(tmpDate.getDate() + 3 - ((tmpDate.getDay() + 6) % 7));
+    // January 4 is always in week 1
+    const week1 = new Date(tmpDate.getFullYear(), 0, 4);
+    // Adjust to Thursday in week 1
+    return (
+      1 +
+      Math.round(
+        ((tmpDate.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7
+      )
+    );
   }
 
-  private checkCurrentWeekPsr(): void {
-    const currentWeekPsr = this.psrs.find(p => p.week === this.currentWeek);
-    if (!currentWeekPsr) {
-      this.createNewWeekPsr();
-    }
-  }
 
   private createNewWeekPsr(): void {
     const newPsr = this.emptyPsr();
@@ -65,7 +80,7 @@ export class PsrComponent implements OnInit {
     newPsr.reportDate = new Date();
     newPsr.reportTitle = `PSR - Semaine ${this.currentWeek}`;
     newPsr.overallStatus = 'En cours';
-    
+
     if (this.projectId) {
       newPsr.projectId = this.projectId;
       this.psrService.create(newPsr).subscribe(() => {
@@ -75,33 +90,39 @@ export class PsrComponent implements OnInit {
   }
 
   loadPsrs(): void {
-    if (this.projectId) {
-      this.psrService.getByProject(this.projectId).subscribe(
-        psrs => {
-          this.psrs = psrs;
-          this.filterPsrs();
-          this.checkCurrentWeekPsr();
-        }
-      );
-    }
+    if (!this.projectId) return;
+
+    this.psrService.getByProject(this.projectId).subscribe(psrs => {
+      this.psrs = psrs;
+      const currentWeekPsr = this.psrs.find(p => p.week === this.currentWeek);
+        this.filterPsrs(); // filtre automatiquement sur currentWeek
+    
+    });
   }
+
 
   filterPsrs(): void {
     if (this.filterWeek.trim() === '') {
-      this.filteredPsrs = [...this.psrs];
+      this.filteredPsrs = this.psrs.filter(psr => psr.week === this.currentWeek);
     } else {
       this.filteredPsrs = this.psrs.filter(psr =>
         psr.week?.toLowerCase().includes(this.filterWeek.toLowerCase())
       );
     }
   }
-getHistoricalData(week: string): Psr[] {
+
+  selectWeek(week: string): void {
+    this.filterWeek = week;
+    this.filterPsrs();
+  }
+
+  getHistoricalData(week: string): Psr[] {
     return this.psrs.filter(psr => {
-        // Vérification de sécurité pour TypeScript
-        if (!psr.week) return false;
-        return psr.week <= week;
+      // Vérification de sécurité pour TypeScript
+      if (!psr.week) return false;
+      return psr.week <= week;
     });
-}
+  }
 
   getWeekData(week: string): Psr | undefined {
     return this.psrs.find(psr => psr.week === week);
@@ -125,16 +146,17 @@ getHistoricalData(week: string): Psr[] {
     if (!this.isEditMode) {
       this.psr.week = this.currentWeek;
     }
-    
+
     const request = this.isEditMode && this.psr.id
       ? this.psrService.updatePsr(this.psr.id, this.psr)
       : this.psrService.create(this.psr);
 
     request.subscribe(() => {
-      this.loadPsrs();
+      this.loadPsrs(); // ça recharge ET applique le filtre
       const modal = bootstrap.Modal.getInstance(document.getElementById('psrModal')!)!;
       modal.hide();
     });
+
   }
 
   deletePsr(id: number): void {
@@ -177,7 +199,7 @@ getHistoricalData(week: string): Psr[] {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-         a.download = `psr-${id}.xlsx`;
+        a.download = `psr-${id}.xlsx`;
 
         document.body.appendChild(a);
         a.click();
@@ -199,5 +221,7 @@ getHistoricalData(week: string): Psr[] {
     });
     modalRef.componentInstance.psrId = psrId;
   }
+
+
 
 }

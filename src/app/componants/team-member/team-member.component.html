@@ -22,10 +22,10 @@
       (input)="searchMemberByName($event)" style="width: 250px;" />
 
     <div>
-      <a href="TeamMemberGrid" class="btn btn-outline-gray me-2 active">
+     <!--   <a href="TeamMemberGrid" class="btn btn-outline-gray me-2 active">
         <i class="feather-list"></i>
       </a>
-    <!--  <a routerLink="/TeamMemberGrid" class="btn btn-outline-gray me-2">
+    <a routerLink="/TeamMemberGrid" class="btn btn-outline-gray me-2">
         <i class="feather-grid"></i>
       </a>-->
       <button class="btn btn-primary me-2" (click)="downloadExcel()">
@@ -49,7 +49,7 @@
         <th>{{ 'End_Date' | translate }}</th> <!-- ✅ Colonne correcte -->
         <th>{{ 'EXPERIENCE' | translate }}</th>
         <th>{{ 'ROLE' | translate }}</th>
-        <th>{{ 'COST' | translate }}</th>
+        <th *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ 'COST' | translate }}</th>
         <th>{{ 'NOTE' | translate }}</th>
         <th>{{ 'ACTIONS' | translate }}</th>
       </tr>
@@ -86,7 +86,7 @@
         <td>{{ member.experienceRange }}</td>
 
         <td>{{ member.role }}</td>
-        <td class="fw-bold text-success">{{ member.cost }}</td>
+        <td class="fw-bold text-success" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ member.cost }}</td>
         <td>{{ member.note }}</td>
         <td>
 

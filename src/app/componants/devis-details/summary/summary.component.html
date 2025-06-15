@@ -6,7 +6,7 @@
     <div class="mb-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="fw-bold text-primary mb-0">
-          <i class="fas fa-list-check me-2"></i>Distribution List
+          <i class="fas fa-list-check me-2"></i>{{ 'Distribution List' | translate }}
         </h5>
       </div>
       
@@ -14,17 +14,17 @@
         <table class="table table-bordered table-hover align-middle rounded overflow-hidden">
           <thead class="bg-primary text-white">
             <tr>
-              <th>Name</th>
-              <th>Function</th>
+              <th>{{ 'Name' | translate }}</th>
+              <th>{{ 'Function' | translate }}</th>
               <th width="60" class="text-center">P</th>
               <th width="60" class="text-center">C</th>
-              <th width="80" class="text-center">Action</th>
+              <th width="80" class="text-center">{{ 'Action' | translate }}</th>
             </tr>
           </thead>
           <tbody>
             <!-- Customer Section -->
             <tr class="bg-light fw-bold">
-              <td colspan="5"><i class="fas fa-users me-2"></i> Customer Name</td>
+              <td colspan="5"><i class="fas fa-users me-2"></i> {{ 'Customer Name' | translate }}</td>
             </tr>
             <tr *ngFor="let dist of customerDistributions">
               <td>{{ dist.name }}</td>
@@ -72,10 +72,10 @@
     <div class="mb-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="fw-bold text-primary mb-0">
-          <i class="fas fa-file-signature me-2"></i>Visas
+          <i class="fas fa-file-signature me-2"></i>{{ 'Visas' | translate }}
         </h5>
         <button class="btn btn-primary btn-sm rounded-pill px-3" (click)="openAddVisaModal()">
-          <i class="fas fa-plus me-1"></i> Add Visa
+          <i class="fas fa-plus me-1"></i> {{ 'Add Visa' | translate }}
         </button>
       </div>
       
@@ -83,11 +83,11 @@
         <table class="table table-bordered table-hover align-middle rounded overflow-hidden">
           <thead class="bg-primary text-white">
             <tr>
-              <th>Action</th>
-              <th>Name</th>
-              <th>Date</th>
-              <th>Visa</th>
-              <th width="80" class="text-center">Actions</th>
+              <th>{{ 'Action' | translate }}</th>
+              <th>{{ 'Name' | translate }}</th>
+              <th>{{ 'Date' | translate }}</th>
+              <th>{{ 'Visa' | translate }}</th>
+              <th width="80" class="text-center">{{ 'Actions' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -103,7 +103,7 @@
               </td>
             </tr>
             <tr *ngIf="!visas || visas.length === 0">
-              <td colspan="5" class="text-center py-3 text-muted">No visas found</td>
+              <td colspan="5" class="text-center py-3 text-muted">{{ 'No visas found' | translate }}</td>
             </tr>
           </tbody>
         </table>
@@ -115,24 +115,24 @@
     <!-- Proposal Summary Section -->
     <div>
       <h5 class="fw-bold text-primary mb-3">
-        <i class="fas fa-clipboard-list me-2"></i>Proposal Summary
+        <i class="fas fa-clipboard-list me-2"></i>{{ 'Proposal Summary' | translate }}
       </h5>
       
       <div class="row g-4">
         <div class="col-md-6">
           <div class="card border-0 bg-light h-100">
             <div class="card-body">
-              <h6 class="card-subtitle mb-3 text-muted">Customer & Project</h6>
+              <h6 class="card-subtitle mb-3 text-muted">{{ 'Customer & Project' | translate }}</h6>
               <div class="mb-3">
-                <div class="fw-bold text-primary small mb-1">Customer</div>
+                <div class="fw-bold text-primary small mb-1">{{ 'Customer' | translate }}</div>
                 <div>{{ proposalSummary.customer }}</div>
               </div>
               <div class="mb-3">
-                <div class="fw-bold text-primary small mb-1">Project</div>
+                <div class="fw-bold text-primary small mb-1">{{ 'Project' | translate }}</div>
                 <div>{{ proposalSummary.project }}</div>
               </div>
               <div>
-                <div class="fw-bold text-primary small mb-1">Type</div>
+                <div class="fw-bold text-primary small mb-1">{{ 'Type' | translate }}</div>
                 <div>{{ proposalSummary.projectType }}</div>
               </div>
             </div>
@@ -142,17 +142,17 @@
         <div class="col-md-6">
           <div class="card border-0 bg-light h-100">
             <div class="card-body">
-              <h6 class="card-subtitle mb-3 text-muted">Timeline & Validity</h6>
+              <h6 class="card-subtitle mb-3 text-muted">{{ 'Timeline & Validity' | translate }}</h6>
               <div class="mb-3">
-                <div class="fw-bold text-primary small mb-1">Proposal Validity</div>
+                <div class="fw-bold text-primary small mb-1">{{ 'Proposal Validity' | translate }}</div>
                 <div>{{ proposalSummary.proposalValidity }}</div>
               </div>
               <div class="mb-3">
-                <div class="fw-bold text-primary small mb-1">Start Date</div>
+                <div class="fw-bold text-primary small mb-1">{{ 'Start Date' | translate }}</div>
                 <div>{{ proposalSummary.possibleStartDate | date: 'dd/MM/yyyy' }}</div>
               </div>
               <div>
-                <div class="fw-bold text-primary small mb-1">End Date</div>
+                <div class="fw-bold text-primary small mb-1">{{ 'End Date' | translate }}</div>
                 <div>{{ proposalSummary.estimatedEndDate | date: 'dd/MM/yyyy' }}</div>
               </div>
             </div>
@@ -168,37 +168,37 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg rounded-3">
         <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Distribution</h5>
+          <h5 class="modal-title"><i class="fas fa-edit me-2"></i>{{ 'Edit Distribution' | translate }}</h5>
           <button type="button" class="btn-close btn-close-white" (click)="closeEditModal()"></button>
         </div>
         <div class="modal-body">
           <form *ngIf="distributionToEdit">
             <div class="mb-3">
-              <label class="form-label text-muted">Name</label>
+              <label class="form-label text-muted">{{ 'Name' | translate }}</label>
               <input class="form-control form-control-lg" [(ngModel)]="distributionToEdit.name" name="name" readonly>
             </div>
             <div class="mb-3">
-              <label class="form-label text-muted">Function</label>
+              <label class="form-label text-muted">{{ 'Function' | translate }}</label>
               <input class="form-control" [(ngModel)]="distributionToEdit.function" name="function">
             </div>
             <div class="mb-3">
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="partialSwitch" [(ngModel)]="distributionToEdit.partial" name="partial">
-                <label class="form-check-label" for="partialSwitch">Partial</label>
+                <label class="form-check-label" for="partialSwitch">{{ 'Partial' | translate }}</label>
               </div>
             </div>
             <div class="mb-3">
               <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" id="completeSwitch" [(ngModel)]="distributionToEdit.complete" name="complete">
-                <label class="form-check-label" for="completeSwitch">Complete</label>
+                <label class="form-check-label" for="completeSwitch">{{ 'Complete' | translate }}</label>
               </div>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline-secondary" (click)="closeEditModal()">Cancel</button>
+          <button class="btn btn-outline-secondary" (click)="closeEditModal()">{{ 'Cancel' | translate }}</button>
           <button class="btn btn-primary" (click)="saveEditedDistribution()">
-            <i class="fas fa-save me-1"></i> Save
+            <i class="fas fa-save me-1"></i> {{ 'Save' | translate }}
           </button>
         </div>
       </div>
@@ -215,14 +215,14 @@
         <div class="modal-header bg-primary text-white">
           <h5 class="modal-title">
             <i class="fas" [class.fa-plus]="!currentVisa.id" [class.fa-edit]="currentVisa.id"></i>
-            {{ currentVisa.id ? 'Edit Visa' : 'Add Visa' }}
+            {{ currentVisa.id ? ('Edit Visa' | translate) : ('Add Visa' | translate) }}
           </h5>
           <button type="button" class="btn-close btn-close-white" (click)="closeVisaModal()"></button>
         </div>
         <div class="modal-body">
           <form>
             <div class="mb-3">
-              <label class="form-label text-muted">Action</label>
+              <label class="form-label text-muted">{{ 'Action' | translate }}</label>
               <select class="form-select" [(ngModel)]="currentVisa.action" name="action">
                 <option *ngFor="let act of availableActions" [value]="act" [disabled]="isActionUsed(act)">
                   {{ act }}
@@ -230,7 +230,7 @@
               </select>
             </div>
             <div class="mb-3">
-              <label class="form-label text-muted">Name</label>
+              <label class="form-label text-muted">{{ 'Name' | translate }}</label>
               <select class="form-select" [(ngModel)]="currentVisa.name" name="name">
                 <option *ngFor="let user of users" [value]="user.firstname + ' ' + user.lastname">
                   {{ user.firstname }} {{ user.lastname }}
@@ -238,19 +238,19 @@
               </select>
             </div>
             <div class="mb-3">
-              <label class="form-label text-muted">Date</label>
+              <label class="form-label text-muted">{{ 'Date' | translate }}</label>
               <input type="date" class="form-control" [(ngModel)]="currentVisa.date" name="date" />
             </div>
             <div class="mb-3">
-              <label class="form-label text-muted">Visa</label>
+              <label class="form-label text-muted">{{ 'Visa' | translate }}</label>
               <input class="form-control" [(ngModel)]="currentVisa.visa" name="visa" />
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-outline-secondary" (click)="closeVisaModal()">Cancel</button>
+          <button class="btn btn-outline-secondary" (click)="closeVisaModal()">{{ 'Cancel' | translate }}</button>
           <button class="btn btn-primary" (click)="saveEditedVisa()">
-            <i class="fas fa-save me-1"></i> Save
+            <i class="fas fa-save me-1"></i> {{ 'Save' | translate }}
           </button>
         </div>
       </div>

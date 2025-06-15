@@ -20,6 +20,8 @@ export interface Devis {
   distributions?: Distribution[];
   visas?: Visa[];
   history?: DevisHistory[];
+  projectId: number;
+  demandeId?: number;
 }
 
 

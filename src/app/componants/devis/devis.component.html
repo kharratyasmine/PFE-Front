@@ -1,11 +1,18 @@
-
-
 <div class="container mt-4">
+  <div class="mb-3 d-flex justify-content-between align-items-center">
+    <h5>{{ 'Technical and Financial Proposal Project' | translate }}</h5>
+    <div class="d-flex align-items-center">
+      <label class="me-2">{{ 'Items per page' | translate }}:</label>
+      <select class="form-select form-select-sm" style="width: auto" [(ngModel)]="itemsPerPage" (change)="onItemsPerPageChange()">
+        <option [value]="3">3</option>
+        <option [value]="5">5</option>
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+        <option [value]="50">50</option>
+      </select>
+    </div>
+  </div>
 
-<div class="mb-3 d-flex justify-content-between align-items-center">
-  <h5>{{ 'Technical and Financial Proposal Project' | translate }}</h5>
-
-</div>
   <table class="table table-bordered table-hover text-center shadow-sm">
     <thead>
       <tr>
@@ -16,12 +23,30 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let devis of devisList">
+      <tr *ngFor="let devis of devisList | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
         <td>{{ devis.id }}</td>
-        <td>{{ devis.reference }}</td>
-        <td>{{ devis.creationDate | date }}</td>
         <td>
-
+          <div class="d-flex align-items-center">
+            <span class="status-indicator me-2" [ngClass]="{
+              'bg-success': devis.status === 'ACCEPTED',
+              'bg-warning': devis.status === 'PENDING',
+              'bg-danger': devis.status === 'REJECTED',
+              'bg-info': devis.status === 'DRAFT'
+            }"></span>
+            {{ devis.reference }}
+          </div>
+        </td>
+        <td>
+          <div class="d-flex align-items-center">
+            <span class="date-indicator me-2" [ngClass]="{
+              'bg-danger': isOverdue(devis.creationDate),
+              'bg-warning': isNearDeadline(devis.creationDate),
+              'bg-success': !isOverdue(devis.creationDate) && !isNearDeadline(devis.creationDate)
+            }"></span>
+            {{ devis.creationDate | date }}
+          </div>
+        </td>
+        <td>
           <!-- Button to view Devis --> 
           <button class="btn btn-outline-secondary btn-sm me-2" (click)="openDevisDetailsModal(devis.id!)">
             <i class="fas fa-eye"></i>
@@ -36,14 +61,26 @@
           <button class="btn btn-outline-danger btn-sm me-2" (click)="deleteDevis(devis.id!)">
             <i class="fas fa-trash-alt"></i>
           </button>
-
-
         </td>
       </tr>
     </tbody>
   </table>
-</div>
 
+  <!-- Pagination -->
+  <div class="d-flex justify-content-between align-items-center mt-3 mb-4">
+    <div class="text-muted">
+      {{ 'Showing' | translate }} {{ (currentPage - 1) * itemsPerPage + 1 }} - {{ Math.min(currentPage * itemsPerPage, devisList.length) }} {{ 'of' | translate }} {{ devisList.length }} {{ 'items' | translate }}
+    </div>
+    <pagination-controls 
+      (pageChange)="onPageChange($event)" 
+      [autoHide]="false"
+      [maxSize]="5"
+      [directionLinks]="true"
+      previousLabel="« {{ 'Previous' | translate }}"
+      nextLabel="{{ 'Next' | translate }} »">
+    </pagination-controls>
+  </div>
+</div>
 
 <div class="modal fade show d-block" tabindex="-1" role="dialog" *ngIf="isModalEditOpen"
   style="background-color: rgba(0,0,0,0.5);">
@@ -89,3 +126,28 @@
     </div>
   </div>
 </div>
+
+<style>
+.status-indicator, .date-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.bg-success {
+  background-color: #28a745;
+}
+
+.bg-warning {
+  background-color: #ffc107;
+}
+
+.bg-danger {
+  background-color: #dc3545;
+}
+
+.bg-info {
+  background-color: #17a2b8;
+}
+</style>

@@ -56,7 +56,7 @@ export class TeamMemberDetailsComponent implements OnInit {
     if (!this.member?.holiday || this.member.holiday.length === 0) {
       // If no holidays, just show the current month
       const currentDate = new Date();
-       this.months.push({
+      this.months.push({
         value: new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
         label: currentDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
       });
@@ -66,14 +66,16 @@ export class TeamMemberDetailsComponent implements OnInit {
 
     const uniqueMonths = new Set<string>();
     this.member.holiday.forEach(holidayString => {
-      const holidayDate = new Date(holidayString);
+      const [datePart] = holidayString.split('|');
+      const holidayDate = new Date(datePart);
+
       // Use YYYY-MM to ensure uniqueness by month and year
       uniqueMonths.add(`${holidayDate.getFullYear()}-${holidayDate.getMonth()}`);
     });
 
     // Add current month to the list to make it easily accessible
-     const currentDate = new Date();
-     uniqueMonths.add(`${currentDate.getFullYear()}-${currentDate.getMonth()}`);
+    const currentDate = new Date();
+    uniqueMonths.add(`${currentDate.getFullYear()}-${currentDate.getMonth()}`);
 
     const sortedMonths = Array.from(uniqueMonths)
       .map(monthYear => {
@@ -109,9 +111,11 @@ export class TeamMemberDetailsComponent implements OnInit {
 
     this.filteredHolidays = this.member.holiday
       .filter(day => {
-        const holidayDate = new Date(day);
-        return holidayDate.getMonth() === selectedMonth && 
-               holidayDate.getFullYear() === selectedYear;
+        const [datePart] = day.split('|');
+        const holidayDate = new Date(datePart);
+
+        return holidayDate.getMonth() === selectedMonth &&
+          holidayDate.getFullYear() === selectedYear;
       })
       .sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
   }
@@ -124,7 +128,7 @@ export class TeamMemberDetailsComponent implements OnInit {
 
     this.isDeleting = true;
     const updatedHolidays = this.member.holiday.filter(h => h !== day);
-    
+
     const updatedMember: TeamMember = {
       id: this.member.id,
       name: this.member.name,
@@ -141,7 +145,7 @@ export class TeamMemberDetailsComponent implements OnInit {
       status: this.member.status,
       experienceRange: this.member.experienceRange
     };
-    
+
     this.teamMemberService.updateTeamMember(this.member.id, updatedMember).subscribe({
       next: (updatedData) => {
         if (this.member) {

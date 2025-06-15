@@ -1,0 +1,167 @@
+// Variables de couleurs
+$primary-blue: #1a73e8;
+$primary-dark: #174ea6;
+$primary-light: #e8f0fe;
+$secondary-blue: #4285f4;
+$text-dark: #202124;
+$text-light: #5f6368;
+$border-color: #dadce0;
+$hover-color: #f6fafe;
+
+.dashboard-container {
+  padding: 20px;
+  background: linear-gradient(to bottom, #ffffff, $primary-light);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header {
+  margin-bottom: 25px;
+  padding: 20px;
+  background: linear-gradient(135deg, $primary-dark, $primary-blue);
+  border-radius: 10px;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  .project-title {
+    color: white;
+    font-size: 28px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  
+  .year-header {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 18px;
+    font-weight: 500;
+  }
+}
+
+.table-responsive {
+  overflow-x: auto;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  
+  th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid $border-color;
+  }
+  
+  .table-header {
+    background: linear-gradient(to right, $primary-light, #ffffff);
+    th {
+      font-weight: 600;
+      color: $primary-dark;
+      padding: 15px 12px;
+      border-bottom: 2px solid $border-color;
+    }
+  }
+  
+  .sub-header {
+    background-color: $primary-light;
+    th {
+      font-weight: 500;
+      color: $text-light;
+      font-size: 13px;
+      padding: 10px 12px;
+    }
+  }
+  
+  .month-row {
+    background: linear-gradient(to right, $primary-light, #ffffff);
+    font-weight: 600;
+    
+    td {
+      color: $primary-dark;
+      padding: 12px;
+    }
+  }
+  
+  .task-row {
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: $hover-color;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    td {
+      color: $text-dark;
+    }
+  }
+}
+
+// Colonnes spécifiques
+.year-col { width: 80px; }
+.owner-col { width: 120px; }
+.summary-col { width: 200px; }
+.cost-col { width: 100px; text-align: right; }
+.workload-col { width: 100px; text-align: right; }
+.date-col { width: 100px; }
+.holiday-col { width: 120px; }
+.note-col { width: 200px; }
+
+// Cellules spécifiques
+.cost-cell, .workload-cell {
+  text-align: right;
+  font-family: 'Roboto Mono', monospace;
+  color: $primary-dark;
+  font-weight: 500;
+}
+
+.date-cell {
+  color: $text-light;
+  font-style: italic;
+}
+
+.holiday-cell {
+  font-size: 13px;
+  color: $primary-blue;
+  font-weight: 500;
+}
+
+.note-cell {
+  font-size: 13px;
+  color: $text-light;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// Responsive design
+@media (max-width: 1200px) {
+  .dashboard-container {
+    padding: 10px;
+  }
+  
+  .dashboard-header {
+    padding: 15px;
+    
+    .project-title {
+      font-size: 24px;
+    }
+    
+    .year-header {
+      font-size: 16px;
+    }
+  }
+  
+  .dashboard-table {
+    font-size: 13px;
+    
+    th, td {
+      padding: 8px;
+    }
+  }
+} 

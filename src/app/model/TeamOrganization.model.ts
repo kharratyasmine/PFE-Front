@@ -1,3 +1,8 @@
+export interface HolidayDetail {
+  date: string;
+  type: string;
+}
+
 export interface TeamOrganization {
   initial: string;
   fullName: string;
@@ -9,6 +14,7 @@ export interface TeamOrganization {
   comingFromTeam: string;
   goingToTeam: string;
   holiday: string;
+  holidayDetails?: HolidayDetail[];
   email?: string;
   phone?: string;
   department?: string;

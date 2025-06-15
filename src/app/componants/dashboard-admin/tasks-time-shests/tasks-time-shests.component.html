@@ -1,0 +1,81 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h2 class="project-title">{{ 'dashboard' | translate }} '{{ selectedProject?.name || "Project Name" }}'</h2>
+    <div *ngIf="selectedYear" class="year-header">{{ 'Year' | translate }} : {{ selectedYear }}</div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="dashboard-table">
+      <thead>
+        <tr class="table-header">
+          <th class="year-col">{{ 'Year' | translate }}</th>
+          <th class="owner-col">{{ 'Owner' | translate }}</th>
+          <th class="summary-col">{{ 'Summary' | translate }}</th>
+          <th class="cost-col" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ 'Daily Cost' | translate }}</th>
+          <th [attr.colspan]="colspanValueForAdmin" class="effective-col">{{ 'Effective' | translate }}</th>
+          <th [attr.colspan]="colspanValueForAdmin" class="planned-col">{{ 'Planned' | translate }}</th>
+          <th [attr.colspan]="colspanValueForAdmin" class="remaining-col">{{ 'Remaining' | translate }}</th>
+          <th class="date-col">{{ 'Start Date' | translate }}</th>
+          <th class="date-col">{{ 'End Date' | translate }}</th>
+          <th class="status-col">{{ 'Holidays' | translate }}</th>
+          <th class="note-col">{{ 'Note' | translate }}</th>
+        </tr>
+        <tr class="sub-header">
+          <th></th>
+          <th></th>
+          <th></th>
+          <th *ngIf="authService.getCurrentUserRole() === 'ADMIN'"></th>
+          <th class="workload-col">{{ 'Effective Workload' | translate }} (M/D)</th>
+          <th class="cost-col" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ 'Effective Cost' | translate }} (Euro)</th>
+          <th class="workload-col">{{ 'Planned Workload' | translate }} (M/D)</th>
+          <th class="cost-col" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ 'Planned Cost' | translate }} (Euro)</th>
+          <th class="workload-col">{{ 'Remaining Workload' | translate }} (M/D)</th>
+          <th class="cost-col" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ 'Remaining Cost' | translate }} (Euro)</th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <ng-container *ngFor="let monthName of months">
+          <!-- Row for Month Summary -->
+          <tr class="month-row">
+            <td class="month-cell">{{ monthName | titlecase }}</td>
+            <td></td>
+            <td></td>
+            <td *ngIf="authService.getCurrentUserRole() === 'ADMIN'"></td>
+            <td class="workload-cell">{{ getMonthTotal(groupedTasksByMonth[monthName] || [], 'workedMD') }}</td>
+            <td class="cost-cell" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ getMonthEffectiveCost(groupedTasksByMonth[monthName] || []) | number: '1.2-2' }}</td>
+            <td class="workload-cell">{{ getMonthPlannedWorkload(monthName) }}</td>
+            <td class="cost-cell" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ getMonthPlannedCost(monthName) | number: '1.2-2' }}</td>
+            <td class="workload-cell">{{ getOverallRemainingWorkload(monthName) }}</td>
+            <td class="cost-cell" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ getOverallRemainingCost(monthName) | number: '1.2-2' }}</td>
+            <td colspan="4"></td>
+          </tr>
+
+          <!-- Rows for Tasks -->
+          <ng-container *ngFor="let task of groupedTasksByMonth[monthName]">
+            <tr class="task-row">
+              <td></td>
+              <td class="owner-cell">{{ task.who }}</td>
+              <td class="summary-cell">{{ task.description }}</td>
+              <td class="cost-cell" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ getDailyCostForTask(task) | number: '1.2-2' }} </td>
+              <td class="workload-cell">{{ task.workedMD || 0 }}</td>
+              <td class="cost-cell" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ getEffectiveCost(task) | number: '1.2-2' }}</td>
+              <td class="workload-cell">{{ getEstimatedWorkloadPerResourceForTask(task) }}</td>
+              <td class="cost-cell" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ getPlannedCost(task) | number: '1.2-2' }}</td>
+              <td class="workload-cell">{{ task.remainingMD || 0 }}</td>
+              <td class="cost-cell" *ngIf="authService.getCurrentUserRole() === 'ADMIN'">{{ getRemainingCost(task) | number: '1.2-2' }}</td>
+              <td class="date-cell">{{ task.startDate | date: 'dd/MM/yyyy' }}</td>
+              <td class="date-cell">{{ task.estimatedEndDate | date: 'dd/MM/yyyy' }}</td>
+              <td class="status-cell"><span [innerHTML]="getHolidaysForTask(task).join('<br/>')"></span></td>
+              <td class="note-cell">{{ task.note }}</td>
+            </tr>
+          </ng-container>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+</div>

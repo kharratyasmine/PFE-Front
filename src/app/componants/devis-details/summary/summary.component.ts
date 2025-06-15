@@ -92,7 +92,7 @@ export class SummaryComponent implements OnInit {
 
     const payload = {
       ...this.distributionToEdit,
-      type: this.distributionToEdit.type || 'customer'
+      type: this.distributionToEdit.type || 'Customer'
     };
 
     // 🔁 Update si ID existe
@@ -125,11 +125,11 @@ export class SummaryComponent implements OnInit {
 
 
   get customerDistributions(): Distribution[] {
-    return this.distributions.filter(d => d.type === 'customer');
+    return this.distributions.filter(d => d.type === 'Customer');
   }
 
   get telnetDistributions(): Distribution[] {
-    return this.distributions.filter(d => d.type === 'telnet');
+    return this.distributions.filter(d => d.type === 'Telnet');
   }
 
 

@@ -1,0 +1,68 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h2><i class="fas fa-users"></i> {{ 'team_organization' | translate }} - {{selectedProject?.name || "Project Name"}}
+    </h2>
+    <div class="current-month">
+      {{ selectedMonth | date:'MMMM yyyy' }}
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="dashboard-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th><i class="fas fa-user"></i> {{ 'initial' | translate }}</th>
+          <th><i class="fas fa-users"></i> {{ 'member' | translate }}</th>
+          <th><i class="fas fa-id-badge"></i> {{ 'role' | translate }}</th>
+          <th><i class="fas fa-project-diagram"></i> {{ 'project' | translate }}</th>
+          <th><i class="fas fa-calendar-alt"></i> {{ 'planned_start_date' | translate }}</th>
+          <th><i class="fas fa-calendar-check"></i> {{ 'planned_end_date' | translate }}</th>
+          <th><i class="fas fa-percentage"></i> {{ 'allocation' | translate }}</th>
+          <th><i class="fas fa-arrow-left"></i> {{ 'coming_from_team' | translate }}</th>
+          <th><i class="fas fa-arrow-right"></i> {{ 'going_to_team' | translate }}</th>
+          <th><i class="fas fa-umbrella-beach"></i> {{ 'holiday' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let member of filteredTeamMembers; index as i">
+          <td>{{ i + 1 }}</td>
+          <td>{{ member.initial }}</td>
+          <td>{{ member.name }}</td>
+          <td>{{ member.role }}</td>
+          <td>{{ selectedProject?.name }}</td>
+          <td>
+            {{ member.demandeStartDate ? (member.demandeStartDate | date: 'dd/MM/yyyy') : '-' }}
+          </td>
+          <td>
+            {{ member.demandeEndDate ? (member.demandeEndDate | date: 'dd/MM/yyyy') : '-' }}
+          </td>
+
+
+          <td>{{ (member.allocation ?? 0) * 100 | number: '1.0-0' }}%</td>
+          <td></td>
+          <td></td>
+          <td>
+            <div class="holiday-container">
+              <ng-container *ngIf="getHolidaysForMember(member).length > 0">
+                <div *ngFor="let holiday of getHolidaysForMember(member)" class="holiday-item">
+                  <i class="fas fa-calendar-day me-1"></i>
+                  {{ holiday.split('|')[0] | date: 'dd/MM/yyyy' }}
+                  <span *ngIf="holiday.includes('|')" class="holiday-type">
+                    ({{ holiday.split('|')[1] }})
+                  </span>
+                </div>
+              </ng-container>
+              <span *ngIf="getHolidaysForMember(member).length === 0" class="text-muted">
+                <i class="fas fa-check me-1"></i>
+                {{ 'no_holiday' | translate }}
+              </span>
+            </div>
+          </td>
+
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

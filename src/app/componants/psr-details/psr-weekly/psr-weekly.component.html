@@ -1,158 +1,176 @@
-<div class="container-fluid">
-  <!-- Loading State -->
-  <div *ngIf="loading" class="text-center py-5">
+<div class="container my-4">
+  <h3 class="text-center mb-4">Rapport Hebdomadaire - {{ selectedMonth }} {{ selectedYear }}</h3>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="text-center my-5">
     <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Chargement...</span>
+      <span class="visually-hidden">Loading...</span>
     </div>
-    <p class="mt-2 text-muted">Chargement des données...</p>
+    <p class="mt-2">Chargement des données...</p>
   </div>
 
-  <!-- Error State -->
-  <div *ngIf="error" class="alert alert-danger m-3" role="alert">
-    <i class="fas fa-exclamation-circle me-2"></i>
+  <!-- Error state -->
+  <div *ngIf="error" class="alert alert-danger my-5" role="alert">
     {{ error }}
   </div>
 
   <!-- Content -->
   <div *ngIf="!loading && !error">
-    <!-- Weekly Reports -->
+
+    <!-- Monthly Workload By Project / Module Table (Full Width) -->
     <div class="card mb-4">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Rapports Hebdomadaires</h5>
-        <button class="btn btn-primary" (click)="openAddReportModal()">
-          <i class="fas fa-plus me-2"></i>Nouveau Rapport
-        </button>
-      </div>
+      <div class="card-header"><h4>Monthly Workload By Project / Module</h4></div>
       <div class="card-body">
         <div class="table-responsive">
-          <table class="table table-hover">
+          <table class="table table-bordered table-striped table-sm">
             <thead>
               <tr>
-                <th>Projet</th>
-                <th>Semaine</th>
-                <th>Jours travaillés</th>
-                <th>Jours estimés</th>
-                <th>Variance d'effort</th>
-                <th>Actions</th>
+                <th>Month</th>
+                <th>Project Name</th>
+                <th>Working Days (MD)</th>
+                <th>Estimated Days (MD)</th>
+                <th>Effort Variance</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let report of weeklyReports">
-                <td>{{ report.projectName }}</td>
-                <td>{{ report.week }}</td>
-                <td>{{ report.workingDays }}</td>
-                <td>{{ report.estimatedDays }}</td>
-                <td [ngClass]="{'text-success': report.effortVariance! > 0, 'text-danger': report.effortVariance! < 0}">
-                  {{ report.effortVariance | percent }}
-                </td>
-                <td>
-                  <button class="btn btn-sm btn-outline-primary me-2" (click)="openEditReportModal(report)">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn btn-sm btn-outline-danger" (click)="deleteWeeklyReport(report.id!)">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-            <tfoot>
+              <ng-container *ngIf="monthlyWorkloadData.length > 0">
+                <tr *ngFor="let item of monthlyWorkloadData; let i = index">
+                  <td *ngIf="i === 0" [attr.rowspan]="monthlyWorkloadData.length">{{ item.month }}</td>
+                  <td>{{ item.projectName }}</td>
+                  <td>{{ item.workingDays | number:'1.0-2' }}</td>
+                  <td>{{ item.estimatedDays | number:'1.0-2' }}</td>
+                  <td [ngClass]="{'text-danger': item.effortVariance < 0, 'text-success': item.effortVariance >= 0}">{{ item.effortVariance | number:'1.0-2' }}%</td>
+                </tr>
+              </ng-container>
+               <ng-container *ngIf="monthlyWorkloadData.length === 0">
+                 <tr>
+                   <td colspan="5" class="text-center text-muted">No monthly workload data available for the selected period</td>
+                 </tr>
+               </ng-container>
               <tr class="table-primary">
-                <td colspan="2"><strong>Total</strong></td>
-                <td><strong>{{ getTotalWorkingDays() }}</strong></td>
-                <td><strong>{{ getTotalEstimatedDays() }}</strong></td>
-                <td [ngClass]="{'text-success': getTotalVariancePercentage() > 0, 'text-danger': getTotalVariancePercentage() < 0}">
-                  <strong>{{ getTotalVariancePercentage() | percent }}</strong>
-                </td>
-                <td></td>
+                <td colspan="2"><strong>Totals</strong></td>
+                <td><strong>{{ monthlyWorkloadTotals.workingDays | number:'1.0-2' }}</strong></td>
+                <td><strong>{{ monthlyWorkloadTotals.estimatedDays | number:'1.0-2' }}</strong></td>
+                <td [ngClass]="{'text-danger': monthlyWorkloadTotals.effortVariance < 0, 'text-success': monthlyWorkloadTotals.effortVariance >= 0}"><strong>{{ monthlyWorkloadTotals.effortVariance | number:'1.0-2' }}%</strong></td>
               </tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Effort Variance Chart -->
-    <div class="card mb-4">
-      <div class="card-header">
-        <h5 class="mb-0">Variance d'Effort par Semaine</h5>
-      </div>
-      <div class="card-body">
-        <canvas baseChart
-          [data]="lineChartData"
-          [options]="lineChartOptions"
-          [type]="'line'">
-        </canvas>
-      </div>
-    </div>
-
-    <!-- Monthly Effort -->
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">Effort Mensuel</h5>
-      </div>
-      <div class="card-body">
-        <div class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>Mois</th>
-                <th>Variance</th>
-              </tr>
-            </thead>
-            <tbody>
-              <div class="card">
-                <div class="card-header">
-                  <h5 class="mb-0">Courbe de Variance d'Effort</h5>
-                </div>
-                <div class="card-body">
-                  
-
-
-                </div>
-              </div>
-
             </tbody>
           </table>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Add/Edit Report Modal -->
-<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="reportModalLabel">{{ isEditing ? 'Modifier' : 'Ajouter' }} Rapport Hebdomadaire</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Weekly Workload By Project / Module Bar Chart (Full Width) -->
+    <div class="card mb-4">
+       <div class="card-header"><h4>Weekly Workload By Project / Module</h4></div>
+        <div class="card-body">
+          <ng-container *ngIf="weeklyWorkloadChartData.labels!.length > 0">
+            <canvas baseChart
+                    [data]="weeklyWorkloadChartData"
+                    [options]="chartOptions"
+                    [type]="'bar'">
+            </canvas>
+          </ng-container>
+           <div *ngIf="weeklyWorkloadChartData.labels!.length === 0" class="text-center text-muted my-4">
+            No weekly workload data available for the selected period
+          </div>
+        </div>
+    </div>
+
+    <div class="row">
+      <!-- Weekly Effort Variance Table -->
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header"><h4>Effort Variance (Weekly)</h4></div>
+          <div class="card-body">
+              <div class="table-responsive">
+                  <table class="table table-bordered table-striped table-sm">
+                      <thead>
+                        <tr>
+                          <th>Week</th>
+                          <th *ngFor="let item of weeklyEffortVarianceData">{{ item.week }}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Weekly Effort Variance</td>
+                          <td *ngFor="let item of weeklyEffortVarianceData" [ngClass]="{'text-danger': item.effortVariance < 0, 'text-success': item.effortVariance >= 0}">{{ item.effortVariance | number:'1.0-2' }}%</td>
+                        </tr>
+                       <tr *ngIf="weeklyEffortVarianceData.length === 0">
+                          <td [attr.colspan]="weeks.length + 1" class="text-center text-muted">No weekly effort variance data available for the selected period</td>
+                        </tr>
+                      </tbody>
+                    </table>
+              </div>
+          </div>
+        </div>
       </div>
-      <div class="modal-body">
-        <form [formGroup]="reportForm" (ngSubmit)="onSubmit()">
-          <div class="mb-3">
-            <label for="projectName" class="form-label">Projet</label>
-            <input type="text" class="form-control" id="projectName" formControlName="projectName" required>
-          </div>
-          <div class="mb-3">
-            <label for="week" class="form-label">Semaine</label>
-            <input type="week" class="form-control" id="week" formControlName="week" required>
-          </div>
-          <div class="mb-3">
-            <label for="workingDays" class="form-label">Jours travaillés</label>
-            <input type="number" class="form-control" id="workingDays" formControlName="workingDays" required>
-          </div>
-          <div class="mb-3">
-            <label for="estimatedDays" class="form-label">Jours estimés</label>
-            <input type="number" class="form-control" id="estimatedDays" formControlName="estimatedDays" required>
-          </div>
-          <div class="text-end">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="submit" class="btn btn-primary ms-2" [disabled]="!reportForm.valid">
-              {{ isEditing ? 'Mettre à jour' : 'Ajouter' }}
-            </button>
-          </div>
-        </form>
+       <!-- Weekly Effort Variance Line Chart -->
+      <div class="col-md-6">
+        <div class="card mb-4">
+             <div class="card-header"><h4>Weekly Effort Variance Chart</h4></div>
+             <div class="card-body">
+                <ng-container *ngIf="weeklyEffortVarianceChartData.labels!.length > 0">
+                    <canvas baseChart
+                            [data]="weeklyEffortVarianceChartData"
+                            [options]="chartOptions"
+                            [type]="'line'">
+                    </canvas>
+                </ng-container>
+                <div *ngIf="weeklyEffortVarianceChartData.labels!.length === 0" class="text-center text-muted my-4">
+                    No weekly effort variance data available for the selected period
+                </div>
+             </div>
+        </div>
       </div>
     </div>
+
+    <div class="row">
+         <!-- Monthly Consolidated Effort Variance Table -->
+        <div class="col-md-6">
+             <div class="card mb-4">
+                <div class="card-header"> <h4>Monthly Consolidated Effort Variance</h4></div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-sm">
+                          <thead>
+                            <tr>
+                              <th>Month</th>
+                              <th *ngFor="let item of monthlyConsolidatedEffortVarianceData">{{ item.month }}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>Consolidated Effort Variance</td>
+                              <td *ngFor="let item of monthlyConsolidatedEffortVarianceData" [ngClass]="{'text-danger': item.effortVariance < 0, 'text-success': item.effortVariance >= 0}">{{ item.effortVariance | number:'1.0-2' }}%</td>
+                            </tr>
+                            <tr *ngIf="monthlyConsolidatedEffortVarianceData.length === 0">
+                                <td colspan="2" class="text-center text-muted">No monthly consolidated effort variance data available</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                </div>
+             </div>
+        </div>
+        <!-- Monthly Consolidated Effort Variance Line Chart -->
+        <div class="col-md-6">
+             <div class="card mb-4">
+                <div class="card-header"><h4>Monthly Consolidated Effort Variance Chart</h4></div>
+                <div class="card-body">
+                     <ng-container *ngIf="monthlyConsolidatedEffortVarianceChartData.labels!.length > 0">
+                        <canvas baseChart
+                                [data]="monthlyConsolidatedEffortVarianceChartData"
+                                [options]="chartOptions"
+                                [type]="'line'">
+                        </canvas>
+                    </ng-container>
+                    <div *ngIf="monthlyConsolidatedEffortVarianceChartData.labels!.length === 0" class="text-center text-muted my-4">
+                        No monthly consolidated effort variance data available for the selected period
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
   </div>
 </div>

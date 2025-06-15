@@ -2,9 +2,8 @@
   <div class="card shadow-lg border-0 rounded-3">
     <div class="card-header bg-gradient bg-primary text-white d-flex align-items-center p-4">
       <div class="position-relative">
-        <img [src]="'http://localhost:8080' + member?.image" alt="Photo" 
-             class="rounded-circle border border-3 border-white shadow" 
-             width="100" height="100">
+        <img [src]="'http://localhost:8080' + member?.image" alt="Photo"
+          class="rounded-circle border border-3 border-white shadow" width="100" height="100">
         <span class="position-absolute bottom-0 end-0 bg-success rounded-circle p-2 border border-white"></span>
       </div>
       <div class="ms-4">
@@ -34,7 +33,7 @@
                   <span><i class="fas fa-user-tag me-2 text-muted"></i>Rôle</span>
                   <span class="badge bg-info text-dark rounded-pill">{{ member?.role }}</span>
                 </li>
-          
+
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                   <span><i class="fas fa-chart-line me-2 text-muted"></i>Expérience</span>
                   <span>{{ member?.experienceRange || 'Non spécifiée' }}</span>
@@ -69,7 +68,7 @@
                   <span><i class="fas fa-money-bill-wave me-2 text-muted"></i>Coût journalier</span>
                   <span class="fw-bold">{{ member?.cost ? member?.cost + ' TND' : 'Non défini' }}</span>
                 </li>
-       
+
               </ul>
             </div>
           </div>
@@ -84,11 +83,9 @@
                 <h5 class="mb-0 text-primary">
                   <i class="fas fa-umbrella-beach me-2"></i>Jours de congé
                 </h5>
-                <select class="form-select w-auto" 
-                        [value]="selectedMonth.toISOString()"
-                        (change)="onMonthChange($event)">
-                  <option *ngFor="let month of months" 
-                          [value]="month.value.toISOString()">
+                <select class="form-select w-auto" [value]="selectedMonth.toISOString()"
+                  (change)="onMonthChange($event)">
+                  <option *ngFor="let month of months" [value]="month.value.toISOString()">
                     {{ month.label }}
                   </option>
                 </select>
@@ -98,15 +95,18 @@
               <div *ngIf="filteredHolidays.length; else noHolidays" class="holidays-container">
                 <div class="row g-3">
                   <div *ngFor="let day of filteredHolidays" class="col-md-4 col-sm-6">
-                    <div class="holiday-card p-3 bg-light rounded-3 shadow-sm d-flex justify-content-between align-items-center">
+                    <div
+                      class="holiday-card p-3 bg-light rounded-3 shadow-sm d-flex justify-content-between align-items-center">
                       <div>
-                        <div class="fw-bold">{{ day | date:'EEEE' }}</div>
-                        <div class="text-muted">{{ day | date:'dd MMMM yyyy' }}</div>
+                        <div class="fw-bold">{{ day.split('|')[0] | date:'EEEE' }}</div>
+                        <div class="text-muted">{{ day.split('|')[0] | date:'dd MMMM yyyy' }}</div>
+                        <div class="badge bg-secondary mt-2">
+                          {{ day.split('|')[1] }}
+                        </div>
+
                       </div>
-                      <button class="btn btn-sm btn-outline-danger" 
-                              (click)="deleteHoliday(day)"
-                              [disabled]="isDeleting"
-                              title="Supprimer ce congé">
+                      <button class="btn btn-sm btn-outline-danger" (click)="deleteHoliday(day)" [disabled]="isDeleting"
+                        title="Supprimer ce congé">
                         <i class="fas" [ngClass]="isDeleting ? 'fa-spinner fa-spin' : 'fa-trash-alt'"></i>
                       </button>
                     </div>
@@ -125,10 +125,10 @@
       </div>
 
 
-    <div class="card-footer bg-light p-3 text-end">
-      <a routerLink="/equipe" class="btn btn-outline-primary">
-        <i class="fas fa-arrow-left me-2"></i>Retour à l'équipe
-      </a>
+      <div class="card-footer bg-light p-3 text-end">
+        <a routerLink="/TeamMember" class="btn btn-outline-primary">
+          <i class="fas fa-arrow-left me-2"></i>Retour à l'équipe
+        </a>
+      </div>
     </div>
   </div>
-</div>

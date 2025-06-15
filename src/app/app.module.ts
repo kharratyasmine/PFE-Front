@@ -2,23 +2,25 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS, HttpClient, HttpClientModule } from '@angular/common/http';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CommonModule } from '@angular/common';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { NgChartsModule } from 'ng2-charts';
+import { CalendarModule, DateAdapter } from 'angular-calendar';
+import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 // Composants
 import { AppComponent } from './app.component';
-import { DashboardQualiteComponent } from './componants/dashboard-qualite/dashboard-qualite.component';
 import { TeamMemberComponent } from './componants/team-member/team-member.component';
 import { NavbarComponent } from './componants/navbar/navbar.component';
 import { TeamComponent } from './componants/team/team.component';
 import { ProjectTaskComponent } from './componants/project-task/project-task.component';
 import { ClientComponent } from './componants/client/client.component';
 import { ProjectComponent } from './componants/project/project.component';
-import { DashboardComponent } from './componants/dashboard/dashboard.component';
 import { TeamMemberGridComponent } from './componants/team-member-grid/team-member-grid.component';
 import { MyProfilComponent } from './componants/my-profil/my-profil.component';
 import { ProjectDetailsComponent } from './componants/project-details/project-details.component';
@@ -47,25 +49,24 @@ import { AuditLogComponent } from './componants/audit-log/audit-log.component';
 import { ValidateUserComponent } from './componants/validate-user/validate-user.component';
 import { TaskTrakerComponent } from './componants/psr-details/task-traker/task-traker.component';
 import { DashboardAdminComponent } from './componants/dashboard-admin/dashboard-admin.component';
-import { DashboardManagerComponent } from './componants/dashboard-manager/dashboard-manager.component';
-import { DashboardDirectionComponent } from './componants/dashboard-direction/dashboard-direction.component';
+import { TasksTimeShestsComponent } from './componants/dashboard-admin/tasks-time-shests/tasks-time-shests.component';
+import { PlannedWorkloadComponent } from './componants/dashboard-admin/planned-workload/planned-workload.component';
+import { PsrHistoryComponent } from './componants/psr-history/psr-history.component';
+import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 // Modules externes
 import { NgxDropzoneModule } from 'ngx-dropzone';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { CalendarModule, DateAdapter } from 'angular-calendar';
-import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
-
-// Angular Material
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatButtonModule } from '@angular/material/button';
-import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatListModule } from '@angular/material/list';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 // Traduction
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -73,7 +74,12 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { AuthInterceptor } from './services/auth.interceptor';
 import { ToastrModule } from 'ngx-toastr';
+import { ProjectSelectionService } from './services/DashboardSelection.service';
+import { TeamOrgaDashboardComponent } from './componants/dashboard-admin/team-orga-dashboard/team-orga-dashboard.component';
 
+export function loadEcharts() {
+  return import('echarts');
+}
 // Fonction de chargement i18n
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -82,14 +88,12 @@ export function HttpLoaderFactory(http: HttpClient) {
 @NgModule({
   declarations: [
     AppComponent,
-    DashboardQualiteComponent,
-    TeamMemberComponent,
+   TeamMemberComponent,
     NavbarComponent,
     TeamComponent,
     ProjectTaskComponent,
     ClientComponent,
     ProjectComponent,
-    DashboardComponent,
     TeamMemberGridComponent,
     MyProfilComponent,
     ProjectDetailsComponent,
@@ -118,8 +122,10 @@ export function HttpLoaderFactory(http: HttpClient) {
     ValidateUserComponent,
     TaskTrakerComponent,
     DashboardAdminComponent,
-    DashboardManagerComponent,
-    DashboardDirectionComponent,
+    TasksTimeShestsComponent,
+    PlannedWorkloadComponent,
+    TeamOrgaDashboardComponent,
+    PsrHistoryComponent
   ],
   imports: [
     BrowserModule,
@@ -130,23 +136,24 @@ export function HttpLoaderFactory(http: HttpClient) {
     ReactiveFormsModule,
     CommonModule,
     NgbModule,
-    
     // Material Modules
     MatCardModule,
     MatTableModule,
     MatIconModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatFormFieldModule,
     MatSelectModule,
     MatButtonModule,
+    MatTabsModule,
+    MatListModule,
+    MatExpansionModule,
     
     // Third Party Modules
     NgxDropzoneModule,
     NgxMatSelectSearchModule,
     NgxPaginationModule,
     NgxEchartsModule.forRoot({
-      echarts: () => import('echarts')
+      echarts: loadEcharts
     }),
     NgChartsModule,
     
@@ -170,14 +177,16 @@ export function HttpLoaderFactory(http: HttpClient) {
         useFactory: HttpLoaderFactory,
         deps: [HttpClient]
       }
-    })
+    }),
+    RouterModule
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
-    }
+    },
+    ProjectSelectionService
   ],
   bootstrap: [AppComponent]
 })

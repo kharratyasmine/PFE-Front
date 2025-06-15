@@ -1,35 +1,32 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { WeeklyReport } from '../model/weekly.model';
 
 
-@Injectable({
-  providedIn: 'root'
-})
-export class WeeklyService {
-  private baseUrl = 'http://localhost:8080/weekly-reports';
+@Injectable({ providedIn: 'root' })
+export class WeeklyReportService {
 
+  private apiUrl = 'http://localhost:8080/api/weekly-reports';
 
   constructor(private http: HttpClient) {}
 
-  getWeeklyReports(psrId: number): Observable<WeeklyReport[]> {
-    return this.http.get<WeeklyReport[]>(`${this.baseUrl}/psr/${psrId}/reports`);
-  }
-  addWeeklyReport(psrId: number, report: WeeklyReport): Observable<WeeklyReport> {
-    return this.http.post<WeeklyReport>(`${this.baseUrl}/psr/${psrId}/reports`, report);
+  getByMonth(month: string, year: number): Observable<WeeklyReport[]> {
+    const params = new HttpParams().set('month', month).set('year', year);
+    return this.http.get<WeeklyReport[]>(this.apiUrl, { params });
   }
 
-  updateWeeklyReport(psrId: number, reportId: number, report: WeeklyReport): Observable<WeeklyReport> {
-    return this.http.put<WeeklyReport>(`${this.baseUrl}/psr/${psrId}/reports/${reportId}`, report);
+  generate(psrId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/generate/${psrId}`, {});
   }
 
-  deleteWeeklyReport(psrId: number, reportId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/psr/${psrId}/reports/${reportId}`);
-  }
-
-  getGeneratedWeeklyReports(psrId: number): Observable<WeeklyReport[]> {
-  return this.http.get<WeeklyReport[]>(`${this.baseUrl}/psr/${psrId}/generated`);
+getReportsByMonthAndPsr(month: string, year: number, psrId: number): Observable<WeeklyReport[]> {
+    const params = new HttpParams()
+        .set('month', month)
+        .set('year', year.toString())
+        .set('psrId', psrId.toString());
+    return this.http.get<WeeklyReport[]>(this.apiUrl, { params });
 }
+
 
 }

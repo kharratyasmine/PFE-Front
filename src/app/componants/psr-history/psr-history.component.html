@@ -1,0 +1,41 @@
+<div class="container mt-4">
+  <h3>Historique des PSR</h3>
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <label>Projet</label>
+      <select [(ngModel)]="selectedProjectId" (change)="loadPsrs()">
+        <option *ngFor="let project of projects" [value]="project.id">{{ project.name }}</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label>Année</label>
+      <select [(ngModel)]="selectedYear" (change)="loadPsrs()">
+        <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+      </select>
+    </div>
+  </div>
+
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Week</th>
+        <th>Report Title</th>
+        <th>Author</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let psr of psrs">
+        <td>{{ psr.week }}</td>
+        <td>{{ psr.reportTitle }}</td>
+        <td>{{ psr.authorName }}</td>
+        <td>{{ psr.overallStatus }}</td>
+        <td>
+          <button (click)="viewPsr(psr.id)" class="btn btn-primary btn-sm">🔍 View</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

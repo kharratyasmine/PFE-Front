@@ -1,0 +1,142 @@
+/* Conteneur général */
+.dashboard-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 32px;
+  margin: 32px auto;
+  max-width: 100%;
+}
+
+/* Titre */
+.dashboard-header h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #2d3a4b;
+}
+
+/* Tableau */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fafbfc;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+th, td {
+  padding: 12px 16px;
+  text-align: left;
+}
+
+th {
+  background: #3498db;
+  color: white;
+  font-weight: 600;
+  border-bottom: 2px solid #e3e8ee;
+}
+
+tbody tr {
+  border-bottom: 1px solid #e3e8ee;
+  transition: background 0.2s;
+}
+
+tbody tr:hover {
+  background: #f5f7fa;
+}
+
+/* Lignes alternées */
+tbody tr:nth-child(even) {
+  background-color: #f6f8fa;
+}
+
+/* Hover sur lignes */
+tbody tr:hover {
+  background-color: #eaf6fb;
+}
+
+/* Coin rouge sur colonnes spécifiques */
+th.team-arrow {
+  position: relative;
+}
+
+th.team-arrow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, red 50%, transparent 50%);
+}
+
+/* Fond hachuré pour colonnes spécifiques */
+td:nth-child(9), td:nth-child(10) {
+  background: repeating-linear-gradient(135deg, #f0f0f0, #f0f0f0 4px, #ffffff 4px, #ffffff 8px);
+}
+
+/* Style colonnes "Holiday" et "Note" */
+td:nth-child(11), td:nth-child(12) {
+  font-style: italic;
+  color: #555;
+}
+/* Colonnes spécifiques avec largeur plus petite */
+th:nth-child(1), td:nth-child(1), /* # */
+th:nth-child(2), td:nth-child(2), /* Initial */
+th:nth-child(4), td:nth-child(4), /* Role */
+th:nth-child(6), td:nth-child(6), /* Start Date */
+th:nth-child(7), td:nth-child(7), /* End Date */
+th:nth-child(8), td:nth-child(8), /* Allocation */
+th:nth-child(12), td:nth-child(12) /* Note */ {
+  width: 60px;
+  font-size: 12px;
+}
+
+.holiday-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #e67e22;
+  font-size: 0.95em;
+}
+
+td {
+  vertical-align: middle;
+}
+
+.team-arrow {
+  text-align: center;
+}
+
+/* Styles pour les congés */
+.holiday-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.holiday-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.9em;
+  color: #e67e22;
+  background-color: #fff3e0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #ffe0b2;
+}
+
+.holiday-type {
+  margin-left: 4px;
+  color: #f57c00;
+  font-size: 0.9em;
+}
+
+/* Style pour le message "pas de congés" */
+.text-muted {
+  color: #6c757d;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+}

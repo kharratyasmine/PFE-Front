@@ -25,4 +25,7 @@ export interface TeamMember {
   };
    workEntries?: WorkEntry[]; // ✅ ajoute cette ligne
    
+   // Ajoute ceci :
+  demandeStartDate?: string;
+  demandeEndDate?: string;
 }

@@ -41,23 +41,8 @@ login(): void {
       console.log('✅ Authentification réussie:', response);
       this.authService.saveToken(response.access_token, response.refresh_token);
 
-      const role = this.authService.getCurrentUserRole();
-
-      // 🔁 Redirection selon le rôle
-      switch (role) {
-        case 'ADMIN':
-          this.router.navigate(['/dashboard/admin']);
-          break;
-        case 'QUALITE':
-          this.router.navigate(['/dashboard/qualite']);
-          break;
-        case 'DIRECTION':
-          this.router.navigate(['/dashboard/direction']);
-          break;
-        case 'MANAGER':
-          this.router.navigate(['/dashboard/manager']);
-          break;
-      }
+      // Redirection vers le dashboard pour tous les utilisateurs
+      this.router.navigate(['/dashboard']);
     },
     error: (error) => {
       console.error('❌ Erreur de login:', error);

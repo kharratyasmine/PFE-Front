@@ -5,24 +5,28 @@
     <div class="header-content">
       <div class="header-left">
         <h4 class="page-title">{{ 'title' | translate }}</h4>
-        <div class="current-week">
-          <span class="week-label">{{ 'current_week' | translate }}:</span>
-          <span class="week-value">{{ currentWeek }}</span>
+        <div class="week-selector">
+          <div class="current-week">
+            <span class="week-label">{{ 'current_week' | translate }}:</span>
+            <span class="week-value">{{ currentWeek }}</span>
+          </div>
+          <div class="dropdown">
+            <button class="btn btn-link dropdown-toggle" type="button" id="weekDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-history"></i> {{ 'previous_weeks' | translate }}
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="weekDropdown">
+              <li *ngFor="let psr of psrs" (click)="selectWeek(psr.week || '')">
+                <a class="dropdown-item" href="#" (click)="$event.preventDefault(); selectWeek(psr.week || '')">
+                  <i class="fas fa-calendar-week"></i> {{ psr.week || ('undefined_week' | translate) }}
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
       <div class="header-actions">
-        <div class="week-filter">
-          <div class="input-group">
-            <span class="input-group-text">
-              <i class="fas fa-calendar-week"></i>
-            </span>
-            <input type="text" class="form-control" [(ngModel)]="filterWeek" (ngModelChange)="filterPsrs()"
-              placeholder="{{ 'week' | translate }}">
-          </div>
-        </div>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#psrModal">
-          <i class="fas fa-plus"></i> {{ 'new_psr' | translate }}
-        </button>
+        <!-- Retirer le filtre de texte ici -->
+        <!-- Retirer le bouton Voir l'historique ici -->
       </div>
     </div>
   </div>
@@ -65,16 +69,16 @@
             <td>{{ psr.week }}</td>
             <td>
               <div class="action-buttons">
-                <button class="btn btn-icon" (click)="openPsrDetailsModal(psr.id!)">
+                <button class="btn btn-icon" (click)="openPsrDetailsModal(psr.id!)" title="{{ 'view' | translate }}">
                   <i class="fas fa-eye"></i>
                 </button>
-                <button class="btn btn-icon" (click)="editFromTable(psr)">
+                <button class="btn btn-icon" (click)="editFromTable(psr)" title="{{ 'edit' | translate }}">
                   <i class="fas fa-pencil-alt"></i>
                 </button>
-                <button class="btn btn-icon" (click)="deletePsr(psr.id!)">
+                <button class="btn btn-icon" (click)="deletePsr(psr.id!)" title="{{ 'delete' | translate }}">
                   <i class="fas fa-trash-alt"></i>
                 </button>
-                <button class="btn btn-icon" (click)="downloadPsr(psr.id!)">
+                <button class="btn btn-icon" (click)="downloadPsr(psr.id!)" title="{{ 'download' | translate }}">
                   <i class="fas fa-download"></i>
                 </button>
               </div>

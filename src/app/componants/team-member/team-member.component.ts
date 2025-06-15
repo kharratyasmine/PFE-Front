@@ -6,6 +6,7 @@ import { UploadService } from 'src/app/services/upload.service';
 import { TeamMember } from 'src/app/model/TeamMember.model';
 import { TeamMemberHistory } from 'src/app/model/TeamMemberHistory.model';
 import * as bootstrap from 'bootstrap';
+import { AuthService } from 'src/app/services/auth.service';
 
 
 @Component({
@@ -34,7 +35,7 @@ export class TeamMemberComponent implements OnInit {
   constructor(
     private teamMemberService: TeamMemberService,
     private uploadService: UploadService,
-
+    public authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -61,7 +62,11 @@ export class TeamMemberComponent implements OnInit {
       member.initial.trim() !== '' &&
       member.startDate !== null &&
       member.jobTitle !== null &&
-      member.cost !== null
+      member.cost !== null &&
+      // Vérifier si le membre est toujours actif
+      (!member.endDate || new Date(String(member.endDate)) > new Date()) &&
+      // Vérifier si le statut n'est pas "sortie de travail"
+      member.status !== 'SORTIE_DE_TRAVAIL'
     );
   }
 

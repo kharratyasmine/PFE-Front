@@ -8,6 +8,7 @@ import { TeamMember } from '../model/TeamMember.model';
 import { TeamAllocation, TeamMemberAllocation } from '../model/MemberAllocation.model';
 import { Team } from '../model/Team.model';
 import { ProjectDTO } from '../model/project.model'; // ✅ si tu as mis DTO dans le même fichier
+import { Demande } from '../model/demande.model';
 @Injectable({
   providedIn: 'root'
 })
@@ -95,6 +96,9 @@ export class ProjectService {
     return this.http.post<{ id: number }>(`${this.apiUrl}/allocations`, allocation);
   }
 
+getDemandesByProject(projectId: number): Observable<Demande[]> {
+  return this.http.get<Demande[]>(`${this.apiUrl}/${projectId}/demandes`);
+}
 
 
   deleteAllocation(id: number) {
